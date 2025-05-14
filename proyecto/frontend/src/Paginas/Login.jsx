@@ -1,26 +1,50 @@
 import { useState } from "react";
 
+
+const BACKEND_URL = "http://0.0.0.0:8000/login";
+
 export function Login() {
+
     const [correo, setCorreo] = useState("");
     const [contrasena, setContrasena] = useState("");
     const [error, setError] = useState(false);
     const [correoInvalido, setCorreoInvalido] = useState(false);
 
-    const handlesubmit = (e) => {
+    const handlesubmit = async (e) => {
         e.preventDefault();
+    
         if (correo === "" || contrasena === "") {
             setError(true); 
             setCorreoInvalido(false);
             return;
         }
+    
         if (!correo.endsWith("@mail.udp.cl")) {
             setCorreoInvalido(true);
             setError(false);
             return;
         }
-        setError(false);
-        setCorreoInvalido(false);
-        console.log("Datos enviados:", { correo, contrasena });
+    
+        try {
+            const response = await fetch(BACKEND_URL, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ correo, contrasena }),
+            });
+    
+            if (!response.ok) {
+                throw new Error("Error en la solicitud");
+            }
+    
+            const data = await response.json();
+            console.log("Respuesta del backend:", data);
+            alert("Inicio de sesión exitoso");
+        } catch (error) {
+            console.error("Error al conectar con el backend:", error);
+            alert("Error al iniciar sesión");
+        }
     };
 
     // Estilos en línea

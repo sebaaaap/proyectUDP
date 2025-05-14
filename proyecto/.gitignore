@@ -9,7 +9,3 @@ node_modules/
 *.log
 dist/
 .vscode/
-
-# Docker (opcional)
-Dockerfile
-docker-compose*.yml
