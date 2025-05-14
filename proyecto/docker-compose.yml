@@ -24,13 +24,19 @@ services:
       - DATABASE_URL=postgresql://user:password@db:5432/alumnosdb
 
   frontend:
-    build: ./frontend
+    build: 
+      context: ./frontend  # Apunta al directorio frontend
+      dockerfile: Dockerfile
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app  # Monta el directorio frontend
+      - /app/node_modules  # Volumen separado para node_modules
     ports:
-      - "3000:3000"
-    depends_on:
-      - backend
+      - "5173:5173"
+    environment:
+      - NODE_ENV=development
+    stdin_open: true  # Necesario para Vite
+    tty: true  # Necesario para Vite
+
 
 volumes:
   postgres_data:

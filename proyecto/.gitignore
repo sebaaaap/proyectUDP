@@ -1,0 +1,15 @@
+# Ignorar .DS_Store en TODOS los directorios (incluyendo padres)
+.DS_Store
+*/.DS_Store
+**/.DS_Store
+../.DS_Store  # Ignorar en directorio padre
+
+# Ignorar node_modules y otros archivos generados
+node_modules/
+*.log
+dist/
+.vscode/
+
+# Docker (opcional)
+Dockerfile
+docker-compose*.yml

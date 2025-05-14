@@ -1,8 +1,0 @@
-/* index.css */
-body {
-    background-color: #222222f0; /* #222222f0 */
-    margin: 0; /* Elimina márgenes predeterminados */
-    padding: 0; /* Elimina paddings predeterminados */
-    font-family: Arial, sans-serif; /* Fuente predeterminada */
-    min-height: 100vh; /* Asegura que el fondo cubra toda la pantalla */
-}
