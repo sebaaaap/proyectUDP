@@ -21,7 +21,8 @@ services:
     depends_on:
       - db
     environment:
-      - DATABASE_URL=postgresql://user:password@db:5432/alumnosdb
+       - DATABASE_URL=postgresql://postgres:postgres@db:5432/proyectUDP
+
 
   frontend:
     build: 
