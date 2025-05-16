@@ -1,3 +1,4 @@
+//registrar.jsx
 import { useState } from "react";
 
 export function Registrar() {

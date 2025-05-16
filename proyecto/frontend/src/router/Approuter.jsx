@@ -1,6 +1,6 @@
 import { Route, Routes } from "react-router-dom"; // Asegúrate de usar react-router-dom
 import PruebaNavbar from "../PruebaNavbar";
-import { Login, Registrar, Home } from "../Paginas"; // Asegúrate de que "Home" esté correctamente exportado
+import { Login, Registrar, Home, ProyectoForm } from "../Paginas"; // Asegúrate de que "Home" esté correctamente exportado
 
 export const Approuter = () => {
     return (
@@ -11,6 +11,7 @@ export const Approuter = () => {
                 <Route index element={<Home />} />
                 <Route path="login" element={<Login />} />
                 <Route path="registrar" element={<Registrar />} />
+                <Route path="proyecto-form" element={<ProyectoForm />} />
             </Route>
         </Routes>
     );
