@@ -14,6 +14,6 @@ class ArchivoProyecto(Base):
     url = Column(String, nullable=False)
     fecha_subida = Column(DateTime, default=datetime.utcnow)
     descripcion = Column(String)
-    version = Column(String)
+    
 
     proyecto = relationship("Proyecto", back_populates="archivos")
