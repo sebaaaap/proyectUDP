@@ -16,8 +16,10 @@
    ```
 5. **levantar servicio especifico**
    ```bash
-   docker compose up --build backend
    docker compose up --build fronted
+   ```
+      ```bash
+   docker compose up --build backend
    ```
 
 
