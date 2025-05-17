@@ -1,6 +1,7 @@
 # main.py
 from fastapi import FastAPI, Depends
 from database.db import Base, engine,  SessionLocal
+from controllers import register, login
 import models  # Esto activa los modelos vía models/__init__.py
 
 from sqlalchemy.orm import Session
@@ -28,7 +29,8 @@ def ping(db: Session = Depends(get_db)):
     return {"status": "Conectado a Postgres 🎉"}
 
 
-
+app.include_router(register.router, prefix="/auth", tags=["Register"])
+app.include_router(login.router, prefix="/auth", tags=["Login"])
 
 # from fastapi import FastAPI
 # from fastapi.middleware.cors import CORSMiddleware  # Importa el middleware CORS
