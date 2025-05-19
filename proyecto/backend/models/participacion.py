@@ -5,6 +5,7 @@ import enum
 class RolParticipanteEnum(enum.Enum):
     colaborador = "colaborador"
     co_lider = "co_lider"
+    lider = "lider"
 
 class EstadoParticipacionEnum(enum.Enum):
     pendiente = "pendiente"
