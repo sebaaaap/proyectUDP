@@ -1,8 +1,7 @@
-//registrar.jsx
 import { useState } from "react";
 
 export function Registrar() {
-    const [tipo, setTipo] = useState("estudiante"); // "estudiante" o "profesor"
+    const [tipo, setTipo] = useState("estudiante");
     const [nombre1, setNombre1] = useState("");
     const [nombre2, setNombre2] = useState("");
     const [apellido1, setApellido1] = useState("");
@@ -16,20 +15,17 @@ export function Registrar() {
     const [facultad, setFacultad] = useState("");
     const [correo, setCorreo] = useState("");
     const [rut, setRut] = useState("");
-    // Campos solo para profesor
     const [especialidad, setEspecialidad] = useState("");
     const [departamento, setDepartamento] = useState("");
     const [error, setError] = useState(false);
     const [mensajeError, setMensajeError] = useState("");
     const [isHover, setIsHover] = useState(false);
 
-    // Validación de rut: 7 u 8 dígitos, último puede ser número o k/K
     const validarRut = (valor) => {
         const rutRegex = /^\d{7,8}[0-9kK]$/;
         return rutRegex.test(valor);
     };
 
-    // Validación de teléfono: solo números
     const validarTelefono = (valor) => {
         const telRegex = /^\d+$/;
         return telRegex.test(valor);
@@ -38,7 +34,6 @@ export function Registrar() {
     const handleSubmit = (e) => {
         e.preventDefault();
 
-        // Validaciones comunes
         if (
             !nombre1 || !apellido1 || !apellido2 || !telefono ||
             !facultad || !rut
@@ -60,7 +55,6 @@ export function Registrar() {
             return;
         }
 
-        // Validaciones específicas
         if (tipo === "estudiante") {
             if (
                 !fechaNacimiento || !nacionalidad || !genero ||
@@ -90,7 +84,6 @@ export function Registrar() {
 
         setError(false);
         setMensajeError("");
-        // Aquí puedes enviar los datos al backend según el tipo
         if (tipo === "estudiante") {
             console.log("Datos estudiante:", {
                 nombre1, nombre2, apellido1, apellido2, fechaNacimiento,
@@ -185,16 +178,13 @@ export function Registrar() {
             color: "red",
             textAlign: "center",
         }
-        // Se elimina decorativeImage
     };
 
-    // Solo permitir números y k/K en el input de rut
     const handleRutChange = (e) => {
         const valor = e.target.value.replace(/[^0-9kK]/g, "");
         setRut(valor);
     };
 
-    // Solo permitir números en el input de teléfono
     const handleTelefonoChange = (e) => {
         const valor = e.target.value.replace(/\D/g, "");
         setTelefono(valor);
@@ -261,7 +251,6 @@ export function Registrar() {
                                 placeholder="Ej: Soto"
                             />
                         </div>
-                        {/* Campos solo para estudiante */}
                         {tipo === "estudiante" && (
                             <>
                                 <div style={styles.formGroup}>
@@ -343,7 +332,6 @@ export function Registrar() {
                                 </div>
                             </>
                         )}
-                        {/* Campos solo para profesor */}
                         {tipo === "profesor" && (
                             <>
                                 <div style={styles.formGroup}>
@@ -370,7 +358,6 @@ export function Registrar() {
                                 </div>
                             </>
                         )}
-                        {/* Campos comunes */}
                         <div style={styles.formGroup}>
                             <label htmlFor="telefono" style={styles.label}>Teléfono:</label>
                             <input

@@ -7,25 +7,21 @@ export function ProyectoForm() {
   const navigate = useNavigate();
   const alertRef = useRef(null);
   
-  // Validación de RUT (exactamente 9 dígitos)
   const validateRUT = (rut) => {
     const cleanRut = rut.replace(/[^0-9kK]/g, '');
     return /^\d{9}$/.test(cleanRut);
   };
 
-  // Validación de teléfono (+56 seguido de 9 dígitos)
   const validatePhone = (phone) => {
     const cleanPhone = phone.replace(/[\s-()]/g, '');
     return /^\+56\d{9}$/.test(cleanPhone);
   };
 
-  // Validación de correo UDP
   const validateEmail = (email) => {
     const regex = /^[a-zA-Z0-9._%+-]+@mail\.udp\.cl$/;
     return regex.test(email);
   };
 
-  // Lista de campos obligatorios
   const camposObligatorios = [
     'nombreCompleto',
     'rut',
@@ -47,54 +43,44 @@ export function ProyectoForm() {
   ];
 
   const [formData, setFormData] = useState({
-    // Información del estudiante
     nombreCompleto: '',
     rut: '',
     correoUDP: '',
     telefono: '+56',
     
-    // Información académica
     facultad: '',
     carrera: '',
     añoIngreso: '',
     semestreActual: '',
     promedioGeneral: '',
     
-    // Habilidades y experiencia
     habilidades: [],
     experiencia: '',
     
-    // Descripción del proyecto
     tituloProyecto: '',
     resumenProyecto: '',
     problema: '',
     justificacion: '',
     
-    // Objetivos
     objetivoGeneral: '',
     objetivosEspecificos: ['', '', '', '', ''],
     
-    // Equipo de trabajo
     equipo: [{ carreraEspecialidad: '', cantidad: '', justificacion: '' }],
     trabajoIndividual: false,
     
-    // Metodología y desarrollo
     metodologia: '',
     
-    // Impacto y proyección
     impactoAcademico: '',
     impactoSocial: '',
     otrosImpactos: '',
     beneficiarios: '',
     proyeccionFutura: '',
     
-    // Necesidades de supervisión
     perfilProfesor: '',
     areasExperiencia: '',
     facultadesSugeridas: '',
     comentariosSupervision: '',
     
-    // Información adicional
     comentariosAdicionales: '',
     referencias: ''
   });
@@ -102,7 +88,6 @@ export function ProyectoForm() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
-  // Listado de facultades según lo solicitado
   const facultadesUDP = [
     "Facultad de Administración y Economía",
     "Facultad de Arquitectura, Arte y Diseño",
@@ -118,7 +103,6 @@ export function ProyectoForm() {
     "Instituto de Filosofía"
   ];
 
-  // Listado de carreras (ejemplo, puedes completarlo con las carreras reales de la UDP)
   const carrerasUDP = [
     "Administración Pública",
     "Antropología",
@@ -225,7 +209,6 @@ export function ProyectoForm() {
     setError('');
     setSuccess(false);
 
-    // Validar campos obligatorios
     const camposFaltantes = camposObligatorios.filter(campo => !formData[campo]);
     if (camposFaltantes.length > 0) {
       setError('Por favor completa todos los campos obligatorios');
@@ -233,21 +216,18 @@ export function ProyectoForm() {
       return;
     }
 
-    // Validación de RUT
     if (!validateRUT(formData.rut)) {
       setError('El RUT debe tener exactamente 9 dígitos (sin puntos ni guión)');
       alertRef.current.scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
-    // Validación de correo
     if (!validateEmail(formData.correoUDP)) {
       setError('Por favor ingresa un correo electrónico válido de la UDP (@mail.udp.cl)');
       alertRef.current.scrollIntoView({ behavior: 'smooth' });
       return;
     }
 
-    // Validación de teléfono (si se ingresó)
     if (formData.telefono && !validatePhone(formData.telefono)) {
       setError('El teléfono debe tener el formato +56 seguido de 9 dígitos');
       alertRef.current.scrollIntoView({ behavior: 'smooth' });
