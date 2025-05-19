@@ -276,7 +276,7 @@ export function ProyectoForm() {
       <Row className="justify-content-center">
         <Col md={12} lg={10}>
           <Card className="shadow">
-            <Card.Header className="bg-primary text-white">
+            <Card.Header className="text-white" style={{ backgroundColor: '#4f0000' }}>
               <h3 className="text-center">Formulario de Postulación de Proyecto Estudiantil</h3>
               <h5 className="text-center">Universidad Diego Portales</h5>
             </Card.Header>

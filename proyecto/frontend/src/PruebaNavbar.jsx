@@ -8,7 +8,7 @@ import Col from 'react-bootstrap/Col';
 import { Outlet } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Usuario from '../public/Usuario.png';
+import Usuario from '../public/Astronauta.png';
 import { Link } from 'react-router-dom';
 
 function PruebaNavbar() {
@@ -32,7 +32,7 @@ function PruebaNavbar() {
                                         <img
                                             src={Usuario}
                                             alt="Usuario"
-                                            style={{ width: '40px', height: '40px', borderRadius: '50%' }}
+                                            style={{ width: '80px', height: '50px', borderRadius: '10%' }}
                                         />
                                     </Button>
                                 }

@@ -1,8 +1,8 @@
 /* index.css */
 body {
-    background-color: #272627; /* #222222f0 */
+    background: linear-gradient(to bottom, #272627, #000000);
     margin: 0; /* Elimina márgenes predeterminados */
     padding: 0; /* Elimina paddings predeterminados */
     font-family: Arial, sans-serif; /* Fuente predeterminada */
     min-height: 100vh; /* Asegura que el fondo cubra toda la pantalla */
-}
+}   

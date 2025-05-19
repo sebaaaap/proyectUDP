@@ -168,7 +168,7 @@ export function Registrar() {
         submitButton: {
             width: "100%",
             padding: "10px",
-            backgroundColor: "#007bff",
+            backgroundColor: "#4f0000",
             color: "white",
             border: "none",
             borderRadius: "20px",
@@ -179,7 +179,7 @@ export function Registrar() {
         },
         submitButtonHover: {
             transform: "scale(1.05)",
-            backgroundColor: "#0056b3",
+            backgroundColor: "#4f0000",
         },
         errorText: {
             color: "red",
