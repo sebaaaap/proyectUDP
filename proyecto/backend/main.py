@@ -29,8 +29,8 @@ def ping(db: Session = Depends(get_db)):
     return {"status": "Conectado a Postgres 🎉"}
 
 
-app.include_router(register.router, prefix="/auth", tags=["Register"])
-app.include_router(login.router, prefix="/auth", tags=["Login"])
+# app.include_router(register.router, prefix="/auth", tags=["Register"])
+# app.include_router(login.router, prefix="/auth", tags=["Login"])
 
 # from fastapi import FastAPI
 # from fastapi.middleware.cors import CORSMiddleware  # Importa el middleware CORS
