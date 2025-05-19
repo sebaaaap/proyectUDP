@@ -1,4 +1,9 @@
-from sqlalchemy import Column, Integer, String, Text, JSON, Date, Float,º
+from sqlalchemy import Column, Integer, String, Text, JSON, Date, Float  # Elimina el símbolo º
+from sqlalchemy import Enum as SqlEnum  # Importa SqlEnum para el ENUM de SQL
+from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import ForeignKey
+import enum  # Necesario para definir el Enum
+from database.db import Base  
 
 class EstadoProyectoDBEnum(enum.Enum):
     propuesto = "propuesto"

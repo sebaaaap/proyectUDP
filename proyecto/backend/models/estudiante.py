@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, Array, JSON, Text
+from sqlalchemy import Column, Integer, String, Date, JSON, Float
 from sqlalchemy.orm import relationship
 from database.db import Base
 
@@ -18,7 +18,7 @@ class Estudiante(Base):
     telefono = Column(String)
     carrera = Column(String)
     facultad = Column(String)
-    promedio_general = Column(float)
+    promedio_general = Column(Float)
     semestre_actual = Column(String)
     experiencia = Column(JSON, nullable=True, default={}) 
     habilidades = Column(JSON)
