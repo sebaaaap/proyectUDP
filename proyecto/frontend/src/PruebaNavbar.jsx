@@ -1,4 +1,3 @@
-//pruebaNavbar.jsx
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
@@ -19,7 +18,8 @@ function PruebaNavbar() {
                 <Navbar expand="lg" className="bg-dark navbar-dark">
                     <Navbar.Toggle aria-controls="navbarScroll" />
                     <Navbar.Collapse id="navbarScroll">
-                        <Nav className="me-auto my-2 my-lg-0" navbarScroll>
+                        {/* Nav IZQUIERDA */}
+                        <Nav className="me-auto my-2 my-lg-0" navbarScroll style={{ alignItems: "center" }}>
                             <NavDropdown
                                 title={
                                     <Button
@@ -38,13 +38,14 @@ function PruebaNavbar() {
                                 }
                                 id="navbarScrollingDropdown"
                             >
-                                <NavDropdown.Item as={Link} to="/">Home</NavDropdown.Item>
                                 <NavDropdown.Item as={Link} to="/login">Login</NavDropdown.Item>
                                 <NavDropdown.Divider />
                                 <NavDropdown.Item as={Link} to="/registrar">Registrarse</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/proyecto-form">Formulario de Proyecto</NavDropdown.Item>
                             </NavDropdown>
+                            <Nav.Link as={Link} to="/">Home</Nav.Link>
+                            <Nav.Link as={Link} to="/proyecto-form">Formulario de Proyecto</Nav.Link>
                         </Nav>
+                        {/* Buscador DERECHA */}
                         <Form className="d-flex">
                             <Row>
                                 <Col xs="auto">
@@ -66,8 +67,7 @@ function PruebaNavbar() {
                     </Navbar.Collapse>
                 </Navbar>
             </header>
-                <Outlet />
-            
+            <Outlet />
         </>
     );
 }
