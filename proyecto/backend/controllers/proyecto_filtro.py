@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, Query
-from database.db import SessionLocal
-from backend.models.proyecto import Proyecto
-from backend.models.profesor import Profesor
-from backend.models.estudiante import Estudiante
+from database.db import get_db
+from models.proyecto import Proyecto
+from models.profesor import Profesor
+from models.estudiante import Estudiante
 from sqlalchemy.orm import joinedload
 from typing import Optional
 
@@ -14,7 +14,7 @@ def filtrar_proyectos(
     profesor: Optional[int] = Query(None),
     carrera: Optional[str] = Query(None)
 ):
-    db = SessionLocal()
+    db = get_db()
     try:
         query = db.query(Proyecto).options(joinedload(Proyecto.profesor), joinedload(Proyecto.estudiante))
 

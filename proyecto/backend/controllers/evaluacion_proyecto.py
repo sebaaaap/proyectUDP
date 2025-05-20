@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException
 from models.evaluacion import Evaluacion           
-from backend.models.proyecto import Proyecto
-from backend.models.estudiante import Estudiante
-from backend.schemas.evaluacion import EvaluacionCreate
-from backend.database.db import SessionLocal
-from backend.utils.notificacion import enviar_correo
+from models.proyecto import Proyecto
+from models.estudiante import Estudiante
+from schemas.evaluacion import EvaluacionCreate
+from database.db import SessionLocal
+from utils.notificacion import enviar_correo
 from sqlalchemy.orm import joinedload
 from datetime import datetime
 

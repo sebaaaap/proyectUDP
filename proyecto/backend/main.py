@@ -35,8 +35,6 @@ def ping(db: Session = Depends(get_db)):
     return {"status": "Conectado a Postgres 🎉"}
 
 
-app.include_router(proyecto_router)
-app.include_router(evaluacion_router)
 
 
 
