@@ -24,6 +24,7 @@ class Estudiante(Base):
     habilidades = Column(JSON)
     
  
-    # Relaciones
-    proyectos_creados = relationship("Proyecto", back_populates="creador")
-    participaciones = relationship("Participacion", back_populates="alumno")
+    # Relaciones corregidas
+    # Relación con Profesor (si cada estudiante tiene un profesor guía)
+    proyectos = relationship("Proyecto", back_populates="creador")
+    

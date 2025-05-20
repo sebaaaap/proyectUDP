@@ -1,12 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
-from services.proyecto_service import ProyectoService
+from services import ProyectoService
 from repository.proyecto_repository import ProyectoRepository
-from schemas.proyecto import ProyectoCreate, ProyectoResponse, ProyectoUpdate
+from schemas import ProyectoCreate, ProyectoResponse
 from database.db import get_db
 
-router = APIRouter(prefix="/proyectos", tags=["proyectos"])
+
+
+router = APIRouter()
 
 @router.post("/", response_model=ProyectoResponse, status_code=status.HTTP_201_CREATED)
 def crear_proyecto(
@@ -34,29 +36,29 @@ def leer_proyecto(
     service = ProyectoService(repo)
     return service.obtener_proyecto(proyecto_id)
 
-@router.patch("/{proyecto_id}", response_model=ProyectoResponse)
-def actualizar_proyecto(
-    proyecto_id: int,
-    proyecto: ProyectoUpdate,
-    db: Session = Depends(get_db)
-):
-    repo = ProyectoRepository(db)
-    service = ProyectoService(repo)
-    return service.actualizar_proyecto(proyecto_id, proyecto)
+# @router.patch("/{proyecto_id}", response_model=ProyectoResponse)
+# def actualizar_proyecto(
+#     proyecto_id: int,
+#     proyecto: ProyectoUpdate,
+#     db: Session = Depends(get_db)
+# ):
+#     repo = ProyectoRepository(db)
+#     service = ProyectoService(repo)
+#     return service.actualizar_proyecto(proyecto_id, proyecto)
 
-@router.delete("/{proyecto_id}", status_code=status.HTTP_204_NO_CONTENT)
-def eliminar_proyecto(
-    proyecto_id: int,
-    db: Session = Depends(get_db)
-):
-    repo = ProyectoRepository(db)
-    proyecto = repo.obtener_proyecto_por_id(proyecto_id)
-    if not proyecto:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Proyecto no encontrado"
-        )
+# @router.delete("/{proyecto_id}", status_code=status.HTTP_204_NO_CONTENT)
+# def eliminar_proyecto(
+#     proyecto_id: int,
+#     db: Session = Depends(get_db)
+# ):
+#     repo = ProyectoRepository(db)
+#     proyecto = repo.obtener_proyecto_por_id(proyecto_id)
+#     if not proyecto:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND,
+#             detail="Proyecto no encontrado"
+#         )
     
-    db.delete(proyecto)
-    db.commit()
-    return JSONResponse(content=None, status_code=status.HTTP_204_NO_CONTENT)
+#     db.delete(proyecto)
+#     db.commit()
+#     return JSONResponse(content=None, status_code=status.HTTP_204_NO_CONTENT)

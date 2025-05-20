@@ -1,5 +1,5 @@
-from repositories.proyecto_repository import ProyectoRepository
-from schemas.proyecto import ProyectoCreate, ProyectoUpdate
+from repository.proyecto_repository import ProyectoRepository
+from schemas.proyecto import ProyectoCreate
 from fastapi import HTTPException, status
 
 class ProyectoService:
@@ -27,6 +27,6 @@ class ProyectoService:
             )
         return proyecto
 
-    def actualizar_proyecto(self, proyecto_id: int, proyecto: ProyectoUpdate):
-        update_data = proyecto.model_dump(exclude_unset=True)
-        return self.repository.actualizar_proyecto(proyecto_id, update_data)
+    # def actualizar_proyecto(self, proyecto_id: int, proyecto: ProyectoUpdate):
+    #     update_data = proyecto.model_dump(exclude_unset=True)
+    #     return self.repository.actualizar_proyecto(proyecto_id, update_data)
