@@ -8,7 +8,7 @@ class EvaluacionBase(BaseModel):
     puntaje: int
     comentarios: Optional[str]
     fecha_evaluacion: date
-    ronda_evaluacion: int
+    
 
 class EvaluacionCreate(EvaluacionBase):
     pass

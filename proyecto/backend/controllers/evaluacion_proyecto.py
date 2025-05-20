@@ -31,10 +31,11 @@ def evaluar_proyecto(evaluacion: EvaluacionCreate):
 
         destinatario = proyecto.estudiante.correo
         asunto = "Resultado de evaluación de tu proyecto"
-        cuerpo = f"Tu proyecto ha sido evaluado.
-
-Puntaje: {evaluacion.puntaje}\nComentarios: {evaluacion.comentarios}"
-
+        cuerpo = f"""Tu proyecto ha sido evaluado.
+        
+        Puntaje: {evaluacion.puntaje}
+        Comentarios: {evaluacion.comentarios}"""
+        
         enviar_correo(destinatario, asunto, cuerpo)
 
         return {"mensaje": "Evaluación registrada y notificación enviada"}
