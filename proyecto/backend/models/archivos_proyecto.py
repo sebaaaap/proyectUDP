@@ -7,7 +7,7 @@ from database.db import Base
 class ArchivoProyecto(Base):
     __tablename__ = "archivos_proyecto"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_proyecto = Column(Integer, ForeignKey("proyectos.id"), nullable=False)  # Corregido a "proyectos.id"
     nombre_archivo = Column(String, nullable=False)
     tipo_archivo = Column(String, nullable=True)
