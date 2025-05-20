@@ -1,3 +1,6 @@
+from controllers.proyecto_filtro import router as proyecto_router
+from controllers.evaluacion_proyecto import router as evaluacion_router
+
 # main.py
 from fastapi import FastAPI, Depends
 from database.db import Base, engine,  SessionLocal
@@ -15,6 +18,9 @@ def get_db():
 
 
 app = FastAPI()
+app.include_router(proyecto_router)
+app.include_router(evaluacion_router)
+
 
 Base.metadata.drop_all(engine)
 # Crear las tablas (si estás usando tu propio engine con SQLite o PostgreSQL)
@@ -46,6 +52,9 @@ def ping(db: Session = Depends(get_db)):
 
 # # Crea la instancia de FastAPI
 # app = FastAPI()
+app.include_router(proyecto_router)
+app.include_router(evaluacion_router)
+
 
 # # Configura CORS
 # app.add_middleware(
@@ -68,5 +77,3 @@ def ping(db: Session = Depends(get_db)):
 # # app.include_router(user_router, prefix="/adecco/users")
 # # Monta las rutas
 # app.include_router(user_router, prefix="/api/alumnos")
-
-
