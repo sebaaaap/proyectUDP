@@ -19,7 +19,7 @@ export const Home = () => {
             />
             <div
                 style={{
-                    background: "#403f3f",
+                    background: "linear-gradient(to bottom, #272627, #000000)",
                     color: "#fff",
                     borderRadius: "16px",
                     padding: "40px",

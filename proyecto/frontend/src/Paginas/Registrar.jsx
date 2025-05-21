@@ -104,34 +104,40 @@ export function Registrar() {
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            background: "#222",
+            background: "linear-gradient(to bottom, #272627, #000000)",
             position: "relative",
             overflow: "hidden",
         },
         centerContainer: {
             width: "100%",
-            maxWidth: "480px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
+            margin: "10px 0 100px 0",
             zIndex: 2,
         },
         h1: {
             color: "#fff",
             fontWeight: "bold",
             fontSize: "2.5rem",
-            margin: "0 0 24px 0",
+            margin: "10px 0 24px 0",
             alignSelf: "center",
         },
         container: {
             width: "100%",
-            maxWidth: "500px",
+            maxWidth: "800px",
             padding: "40px",
             backgroundColor: "#403f3f",
             borderRadius: "20px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
         },
+        formRow: {
+            display: "flex",
+            justifyContent: "space-between",
+            gap: "20px",
+        },
         formGroup: {
+            flex: 1,
             marginBottom: "10px",
         },
         label: {
@@ -207,99 +213,107 @@ export function Registrar() {
                                 <option value="profesor">Profesor</option>
                             </select>
                         </div>
-                        <div style={styles.formGroup}>
-                            <label htmlFor="nombre1" style={styles.label}>Primer Nombre:</label>
-                            <input
-                                type="text"
-                                id="nombre1"
-                                value={nombre1}
-                                onChange={(e) => setNombre1(e.target.value)}
-                                style={styles.input}
-                                placeholder="Ej: Claudio"
-                            />
+                        <div style={styles.formRow}>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="nombre1" style={styles.label}>Primer Nombre:</label>
+                                <input
+                                    type="text"
+                                    id="nombre1"
+                                    value={nombre1}
+                                    onChange={(e) => setNombre1(e.target.value)}
+                                    style={styles.input}
+                                    placeholder="Ej: Claudio"
+                                />
+                            </div>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="nombre2" style={styles.label}>Segundo Nombre:</label>
+                                <input
+                                    type="text"
+                                    id="nombre2"
+                                    value={nombre2}
+                                    onChange={(e) => setNombre2(e.target.value)}
+                                    style={styles.input}
+                                    placeholder="Ej: Andrés"
+                                />
+                            </div>
                         </div>
-                        <div style={styles.formGroup}>
-                            <label htmlFor="nombre2" style={styles.label}>Segundo Nombre:</label>
-                            <input
-                                type="text"
-                                id="nombre2"
-                                value={nombre2}
-                                onChange={(e) => setNombre2(e.target.value)}
-                                style={styles.input}
-                                placeholder="Ej: Andrés"
-                            />
-                        </div>
-                        <div style={styles.formGroup}>
-                            <label htmlFor="apellido1" style={styles.label}>Primer Apellido:</label>
-                            <input
-                                type="text"
-                                id="apellido1"
-                                value={apellido1}
-                                onChange={(e) => setApellido1(e.target.value)}
-                                style={styles.input}
-                                placeholder="Ej: Bravo"
-                            />
-                        </div>
-                        <div style={styles.formGroup}>
-                            <label htmlFor="apellido2" style={styles.label}>Segundo Apellido:</label>
-                            <input
-                                type="text"
-                                id="apellido2"
-                                value={apellido2}
-                                onChange={(e) => setApellido2(e.target.value)}
-                                style={styles.input}
-                                placeholder="Ej: Soto"
-                            />
+                        <div style={styles.formRow}>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="apellido1" style={styles.label}>Primer Apellido:</label>
+                                <input
+                                    type="text"
+                                    id="apellido1"
+                                    value={apellido1}
+                                    onChange={(e) => setApellido1(e.target.value)}
+                                    style={styles.input}
+                                    placeholder="Ej: Bravo"
+                                />
+                            </div>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="apellido2" style={styles.label}>Segundo Apellido:</label>
+                                <input
+                                    type="text"
+                                    id="apellido2"
+                                    value={apellido2}
+                                    onChange={(e) => setApellido2(e.target.value)}
+                                    style={styles.input}
+                                    placeholder="Ej: Soto"
+                                />
+                            </div>
                         </div>
                         {tipo === "estudiante" && (
                             <>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="fechaNacimiento" style={styles.label}>Fecha de Nacimiento:</label>
-                                    <input
-                                        type="date"
-                                        id="fechaNacimiento"
-                                        value={fechaNacimiento}
-                                        onChange={(e) => setFechaNacimiento(e.target.value)}
-                                        style={styles.input}
-                                    />
+                                <div style={styles.formRow}>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="fechaNacimiento" style={styles.label}>Fecha de Nacimiento:</label>
+                                        <input
+                                            type="date"
+                                            id="fechaNacimiento"
+                                            value={fechaNacimiento}
+                                            onChange={(e) => setFechaNacimiento(e.target.value)}
+                                            style={styles.input}
+                                        />
+                                    </div>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="nacionalidad" style={styles.label}>Nacionalidad:</label>
+                                        <input
+                                            type="text"
+                                            id="nacionalidad"
+                                            value={nacionalidad}
+                                            onChange={(e) => setNacionalidad(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="Ej: Chilena"
+                                        />
+                                    </div>
                                 </div>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="nacionalidad" style={styles.label}>Nacionalidad:</label>
-                                    <input
-                                        type="text"
-                                        id="nacionalidad"
-                                        value={nacionalidad}
-                                        onChange={(e) => setNacionalidad(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="Ej: Chilena"
-                                    />
-                                </div>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="genero" style={styles.label}>Género:</label>
-                                    <select
-                                        id="genero"
-                                        value={genero}
-                                        onChange={(e) => setGenero(e.target.value)}
-                                        style={styles.select}
-                                    >
-                                        <option value="">Seleccione su género</option>
-                                        <option value="Masculino">Masculino</option>
-                                        <option value="Femenino">Femenino</option>
-                                        <option value="Otro">Otro</option>
-                                    </select>
-                                </div>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="anioIngreso" style={styles.label}>Año de Ingreso Académico:</label>
-                                    <input
-                                        type="number"
-                                        id="anioIngreso"
-                                        value={anioIngreso}
-                                        onChange={(e) => setAnioIngreso(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="Ej: 2022"
-                                        min="2000"
-                                        max="2025"
-                                    />
+                                <div style={styles.formRow}>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="genero" style={styles.label}>Género:</label>
+                                        <select
+                                            id="genero"
+                                            value={genero}
+                                            onChange={(e) => setGenero(e.target.value)}
+                                            style={styles.select}
+                                        >
+                                            <option value="">Seleccione su género</option>
+                                            <option value="Masculino">Masculino</option>
+                                            <option value="Femenino">Femenino</option>
+                                            <option value="Otro">Otro</option>
+                                        </select>
+                                    </div>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="anioIngreso" style={styles.label}>Año de Ingreso Académico:</label>
+                                        <input
+                                            type="number"
+                                            id="anioIngreso"
+                                            value={anioIngreso}
+                                            onChange={(e) => setAnioIngreso(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="Ej: 2022"
+                                            min="2000"
+                                            max="2025"
+                                        />
+                                    </div>
                                 </div>
                                 <div style={styles.formGroup}>
                                     <label htmlFor="carrera" style={styles.label}>Carrera:</label>
@@ -334,54 +348,58 @@ export function Registrar() {
                         )}
                         {tipo === "profesor" && (
                             <>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="especialidad" style={styles.label}>Especialidad:</label>
-                                    <input
-                                        type="text"
-                                        id="especialidad"
-                                        value={especialidad}
-                                        onChange={(e) => setEspecialidad(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="Ej: Matemáticas"
-                                    />
-                                </div>
-                                <div style={styles.formGroup}>
-                                    <label htmlFor="departamento" style={styles.label}>Departamento:</label>
-                                    <input
-                                        type="text"
-                                        id="departamento"
-                                        value={departamento}
-                                        onChange={(e) => setDepartamento(e.target.value)}
-                                        style={styles.input}
-                                        placeholder="Ej: Ciencias Exactas"
-                                    />
+                                <div style={styles.formRow}>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="especialidad" style={styles.label}>Especialidad:</label>
+                                        <input
+                                            type="text"
+                                            id="especialidad"
+                                            value={especialidad}
+                                            onChange={(e) => setEspecialidad(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="Ej: Matemáticas"
+                                        />
+                                    </div>
+                                    <div style={styles.formGroup}>
+                                        <label htmlFor="departamento" style={styles.label}>Departamento:</label>
+                                        <input
+                                            type="text"
+                                            id="departamento"
+                                            value={departamento}
+                                            onChange={(e) => setDepartamento(e.target.value)}
+                                            style={styles.input}
+                                            placeholder="Ej: Ciencias Exactas"
+                                        />
+                                    </div>
                                 </div>
                             </>
                         )}
-                        <div style={styles.formGroup}>
-                            <label htmlFor="telefono" style={styles.label}>Teléfono:</label>
-                            <input
-                                type="tel"
-                                id="telefono"
-                                value={telefono}
-                                onChange={handleTelefonoChange}
-                                style={styles.input}
-                                placeholder="Ej: 912345678"
-                                maxLength={12}
-                            />
-                        </div>
-                        <div style={styles.formGroup}>
-                            <label htmlFor="rut" style={styles.label}>RUT:</label>
-                            <input
-                                type="text"
-                                id="rut"
-                                value={rut}
-                                onChange={handleRutChange}
-                                style={styles.input}
-                                placeholder="Ej: 12345678k"
-                                minLength={8}
-                                maxLength={9}
-                            />
+                        <div style={styles.formRow}>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="telefono" style={styles.label}>Teléfono:</label>
+                                <input
+                                    type="tel"
+                                    id="telefono"
+                                    value={telefono}
+                                    onChange={handleTelefonoChange}
+                                    style={styles.input}
+                                    placeholder="Ej: 912345678"
+                                    maxLength={12}
+                                />
+                            </div>
+                            <div style={styles.formGroup}>
+                                <label htmlFor="rut" style={styles.label}>RUT:</label>
+                                <input
+                                    type="text"
+                                    id="rut"
+                                    value={rut}
+                                    onChange={handleRutChange}
+                                    style={styles.input}
+                                    placeholder="Ej: 12345678k"
+                                    minLength={8}
+                                    maxLength={9}
+                                />
+                            </div>
                         </div>
                         <div style={styles.formGroup}>
                             <label htmlFor="facultad" style={styles.label}>Facultad:</label>

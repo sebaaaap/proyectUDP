@@ -41,7 +41,7 @@ export function Login() {
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            background: "#272627",
+            background: "linear-gradient(to bottom, #272627, #000000)",
             position: "relative",
         },
         image: {
@@ -149,7 +149,7 @@ export function Login() {
 
     return (
         <div style={styles.page}>
-            <img src="/Proyectoudpnegro.png" alt="Logo UDP" style={styles.image} />
+            <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" style={styles.image} />
             <div style={styles.rightContainer}>
                 <h1 style={styles.h1}>Iniciar Sesión</h1>
                 <div style={styles.container}>

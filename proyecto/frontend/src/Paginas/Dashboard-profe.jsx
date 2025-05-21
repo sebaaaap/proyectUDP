@@ -79,7 +79,7 @@ export function DashboardProfe() {
         : postulaciones.filter(p => p.estado === filtroEstado);
 
     return (
-        <div style={{ padding: "40px", background: "#222", minHeight: "100vh" }}>
+        <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh" }}>
             <h1 style={{ color: "#fff", marginBottom: "24px" }}>Postulaciones de Proyectos</h1>
             
             <div style={{
