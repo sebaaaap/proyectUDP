@@ -254,7 +254,7 @@ export function ProyectoForm() {
   return (
     <Container className="mt-5 mb-5" ref={alertRef}>
       <Row className="justify-content-center">
-        <Col md={12} lg={10}>
+        <Col md={12} lg={20}>
           <Card className="shadow">
             <Card.Header className="text-white" style={{ backgroundColor: '#4f0000' }}>
               <h3 className="text-center">Formulario de Postulación de Proyecto Estudiantil</h3>
@@ -267,7 +267,7 @@ export function ProyectoForm() {
               
               <Form onSubmit={handleSubmit}>
                 {/* Sección 1: Información del estudiante */}
-                <Card className="mb-4">
+                <Card className="mb-4"> 
                   <Card.Header className="bg-light">
                     <h5>INFORMACIÓN DEL ESTUDIANTE</h5>
                   </Card.Header>

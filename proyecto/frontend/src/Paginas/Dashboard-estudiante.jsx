@@ -133,7 +133,7 @@ export function DashboardEstudiante() {
             : proyectos.filter(p => !estaPostulado(p.id));
 
     return (
-        <div style={{ padding: "40px", background: "#222", minHeight: "100vh" }}>
+        <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh" }}>
             <h1 style={{ color: "#fff", marginBottom: "24px" }}>Proyectos Disponibles</h1>
             
             {mostrarFormularioPostulacion && proyectoAPostular && (
