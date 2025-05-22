@@ -22,6 +22,9 @@ class Estudiante(Base):
     semestre_actual = Column(String)
     experiencia = Column(JSON, nullable=True, default={}) 
     habilidades = Column(JSON)
+    email = Column(String, nullable=False, unique=True)
+    password = Column(String, nullable=False)    
+    
     
  
     # Relaciones corregidas

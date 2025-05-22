@@ -22,7 +22,7 @@ app.include_router(proyecto_router)
 app.include_router(evaluacion_router)
 
 
-# Base.metadata.drop_all(engine)
+Base.metadata.drop_all(engine)
 # Crear las tablas (si estás usando tu propio engine con SQLite o PostgreSQL)
 Base.metadata.create_all(bind=engine)
 
