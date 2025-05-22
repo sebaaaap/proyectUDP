@@ -36,6 +36,14 @@ def leer_proyecto(
     service = ProyectoService(repo)
     return service.obtener_proyecto(proyecto_id)
 
+@router.get("/getall", response_model=list[ProyectoResponse])
+def listar_proyectos(
+    db: Session = Depends(get_db)
+):
+    repo = ProyectoRepository(db)
+    service = ProyectoService(repo)
+    return service.listar_proyectos()
+
 # @router.patch("/{proyecto_id}", response_model=ProyectoResponse)
 # def actualizar_proyecto(
 #     proyecto_id: int,

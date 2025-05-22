@@ -26,7 +26,9 @@ class ProyectoService:
                 detail="Proyecto no encontrado"
             )
         return proyecto
-
+    
+    def listar_proyectos(self):
+        return self.repository.listar_proyectos()
     # def actualizar_proyecto(self, proyecto_id: int, proyecto: ProyectoUpdate):
     #     update_data = proyecto.model_dump(exclude_unset=True)
     #     return self.repository.actualizar_proyecto(proyecto_id, update_data)

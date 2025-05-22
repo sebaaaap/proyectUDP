@@ -22,14 +22,18 @@ class ProyectoRepository:
     def obtener_proyecto_por_id(self, proyecto_id: int):
         return self.db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
 
-    def actualizar_proyecto(self, proyecto_id: int, update_data: dict):
-        proyecto = self.db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
-        if not proyecto:
-            return None
+    # def actualizar_proyecto(self, proyecto_id: int, update_data: dict):
+    #     proyecto = self.db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+    #     if not proyecto:
+    #         return None
         
-        for key, value in update_data.items():
-            setattr(proyecto, key, value)
+    #     for key, value in update_data.items():
+    #         setattr(proyecto, key, value)
         
-        self.db.commit()
-        self.db.refresh(proyecto)
-        return proyectos
+    #     self.db.commit()
+    #     self.db.refresh(proyecto)
+    #     return proyectos
+    
+    def listar_proyectos(self):
+        return self.db.query(Proyecto).all()
+    
