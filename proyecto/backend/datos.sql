@@ -2,13 +2,13 @@ INSERT INTO estudiantes (
     id, rut_estudiante, nombre1, nombre2, apellido1, apellido2,
     fecha_nacimiento, nacionalidad, genero, anio__ingreso,
     telefono, carrera, facultad, promedio_general,
-    semestre_actual, experiencia, habilidades
+    semestre_actual, experiencia, habilidades, email, password
 ) VALUES
-(1, '12345678-9', 'Carlos', 'Eduardo', 'Pérez', 'González', '2000-05-15', 'Chilena', 'Masculino', 2019, '912345678', 'Ingeniería Civil', 'Ingeniería', 5.6, '8vo', '{"voluntariado": "Ayuda en campamentos", "tutorías": "Matemáticas"}', '["Python", "SQL", "Comunicación"]'),
-(2, '98765432-1', 'María', 'José', 'López', 'Ramírez', '2001-08-22', 'Chilena', 'Femenino', 2020, '923456789', 'Psicología', 'Ciencias Sociales', 6.1, '6to', '{"prácticas": "Centro comunitario"}', '["Empatía", "Escucha activa", "SPSS"]'),
-(3, '11223344-5', 'Andrés', 'Felipe', 'Rojas', 'Torres', '1999-11-30', 'Colombiana', 'Masculino', 2018, '934567890', 'Derecho', 'Derecho y Humanidades', 5.9, '10mo', '{"asistente de investigación": "Derecho penal"}', '["Redacción", "Investigación", "Oratoria"]'),
-(4, '55667788-0', 'Camila', 'Andrea', 'Martínez', 'Figueroa', '2002-01-10', 'Chilena', 'Femenino', 2021, '945678901', 'Arquitectura', 'Arquitectura y Diseño', 6.3, '4to', '{"talleres": "Diseño urbano"}', '["AutoCAD", "SketchUp", "Creatividad"]'),
-(5, '66778899-2', 'Felipe', 'Ignacio', 'Soto', 'Muñoz', '2000-03-27', 'Chilena', 'Masculino', 2019, '956789012', 'Periodismo', 'Comunicación', 5.4, '7mo', '{"medio universitario": "Editor"}', '["Escritura", "Edición", "Redes sociales"]');
+(1, '12345678-9', 'Carlos', 'Eduardo', 'Pérez', 'González', '2000-05-15', 'Chilena', 'Masculino', 2019, '912345678', 'Ingeniería Civil', 'Ingeniería', 5.6, '8vo', '{"voluntariado": "Ayuda en campamentos", "tutorías": "Matemáticas"}', '["Python", "SQL", "Comunicación", "1@mail.udp.cl", "123"]'),
+(2, '98765432-1', 'María', 'José', 'López', 'Ramírez', '2001-08-22', 'Chilena', 'Femenino', 2020, '923456789', 'Psicología', 'Ciencias Sociales', 6.1, '6to', '{"prácticas": "Centro comunitario"}', '["Empatía", "Escucha activa", "SPSS","2@mail.udp.cl", "123"]'),
+(3, '11223344-5', 'Andrés', 'Felipe', 'Rojas', 'Torres', '1999-11-30', 'Colombiana', 'Masculino', 2018, '934567890', 'Derecho', 'Derecho y Humanidades', 5.9, '10mo', '{"asistente de investigación": "Derecho penal"}', '["Redacción", "Investigación", "Oratoria", "3@mail.udp.cl", "123"]'),
+(4, '55667788-0', 'Camila', 'Andrea', 'Martínez', 'Figueroa', '2002-01-10', 'Chilena', 'Femenino', 2021, '945678901', 'Arquitectura', 'Arquitectura y Diseño', 6.3, '4to', '{"talleres": "Diseño urbano"}', '["AutoCAD", "SketchUp", "Creatividad", "4@mail.udp.cl", "123"]'),
+(5, '66778899-2', 'Felipe', 'Ignacio', 'Soto', 'Muñoz', '2000-03-27', 'Chilena', 'Masculino', 2019, '956789012', 'Periodismo', 'Comunicación', 5.4, '7mo', '{"medio universitario": "Editor"}', '["Escritura", "Edición", "Redes sociales", "5@mail.udp.cl", "123"]');
 
 -----
 -- Datos para la tabla profesores (PostgreSQL)

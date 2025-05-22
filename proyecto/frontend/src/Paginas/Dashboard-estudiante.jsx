@@ -11,44 +11,34 @@ export function DashboardEstudiante() {
     const [filtroEstado, setFiltroEstado] = useState("Todos");
 
     useEffect(() => {
-        // Datos de ejemplo enriquecidos
-        const proyectosEjemplo = [
-            {
-                id: 1,
-                titulo: "Sistema de Gestión Académica",
-                fechaPublicacion: "2025-05-18",
-                descripcion: "Desarrollo de un sistema integral para gestionar toda la información académica de la universidad, incluyendo matrículas, calificaciones y asistencia.",
-                cuposDisponibles: 3,
-                requisitos: "Conocimientos en React, Node.js, MongoDB",
-                profesor: "Dr. Carlos Martínez",
-                departamento: "Informática",
-                fechaLimite: "2025-06-15"
-            },
-            {
-                id: 2,
-                titulo: "App de Tutorías UDP",
-                fechaPublicacion: "2025-05-17",
-                descripcion: "Aplicación móvil para conectar estudiantes con tutores académicos, con sistema de agenda y seguimiento de progreso.",
-                cuposDisponibles: 2,
-                requisitos: "Experiencia en Flutter, Firebase, diseño UX/UI",
-                profesor: "Dra. Ana López",
-                departamento: "Ingeniería",
-                fechaLimite: "2025-06-10"
-            },
-            {
-                id: 3,
-                titulo: "Plataforma de Laboratorios Virtuales",
-                fechaPublicacion: "2025-05-16",
-                descripcion: "Desarrollo de simuladores virtuales para laboratorios de física, química y biología con realidad aumentada.",
-                cuposDisponibles: 5,
-                requisitos: "Conocimientos en Unity, Three.js, WebGL",
-                profesor: "Dr. Javier Rodríguez",
-                departamento: "Ciencias",
-                fechaLimite: "2025-06-20"
-            }
-        ];
+        // Obtener proyectos desde el backend
+        fetch("http://localhost:8000/proyectos/getall")
+            .then(res => res.json())
+            .then(data => {
+                // Ajustar los datos al formato esperado por el frontend
+                const proyectosAdaptados = data.map(p => ({
+                    id: p.id,
+                    titulo: p.titulo,
+                    descripcion: p.descripcion,
+                    problema: p.problema,
+                    objetivo_general: p.objetivo_general,
+                    area_conocimiento: p.area_conocimiento,
+                    estado: p.estado,
+                    fechaInicio: p.fecha_inicio,
+                    fechaFin: p.fecha_fin,
+                    informacionAdicional: p.informacion_adicional,
+                    objetivoEspecificos: p.objetivo_especificos,
+                    idProf: p.id_prof,
+                    idEstudianteCreador: p.id_estudiante_creador
+                }));
+                setProyectos(proyectosAdaptados);
+            })
+            .catch(() => {
+                setProyectos([]);
+            });
 
-        const postulacionesEjemplo = [
+        // Simulación de postulaciones (puedes conectar a tu backend aquí)
+        setPostulaciones([
             {
                 id: 1,
                 proyectoId: 1,
@@ -56,17 +46,13 @@ export function DashboardEstudiante() {
                 fechaPostulacion: "2025-05-19",
                 estadoPostulacion: "En revisión",
                 comentario: "Tengo experiencia previa con React en proyectos académicos.",
-                motivacion: "He trabajado en dos proyectos similares durante mis cursos y estoy interesado en aplicar mis conocimientos en un entorno profesional. Como miembro del equipo de desarrollo, contribuí con el frontend utilizando React y la integración con APIs REST."
+                motivacion: "He trabajado en dos proyectos similares durante mis cursos y estoy interesado en aplicar mis conocimientos en un entorno profesional."
             }
-        ];
-
-        setProyectos(proyectosEjemplo);
-        setPostulaciones(postulacionesEjemplo);
+        ]);
     }, []);
 
     const iniciarPostulacion = (proyecto) => {
         const estaPostulado = postulaciones.some(p => p.proyectoId === proyecto.id && p.estado === "Postulado");
-        
         if (estaPostulado) {
             handleDespostular(proyecto.id);
         } else {
@@ -126,16 +112,16 @@ export function DashboardEstudiante() {
         return postulaciones.some(p => p.proyectoId === proyectoId && p.estado === "Postulado");
     };
 
-    const proyectosFiltrados = filtroEstado === "Todos" 
-        ? proyectos 
-        : filtroEstado === "Postulados" 
+    const proyectosFiltrados = filtroEstado === "Todos"
+        ? proyectos
+        : filtroEstado === "Postulados"
             ? proyectos.filter(p => estaPostulado(p.id))
             : proyectos.filter(p => !estaPostulado(p.id));
 
     return (
-        <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh" }}>
+        <div style={{ padding: "40px", background: "#222", minHeight: "100vh" }}>
             <h1 style={{ color: "#fff", marginBottom: "24px" }}>Proyectos Disponibles</h1>
-            
+
             {mostrarFormularioPostulacion && proyectoAPostular && (
                 <div style={{
                     position: "fixed",
@@ -163,19 +149,19 @@ export function DashboardEstudiante() {
                             </svg>
                             Postulación a: {proyectoAPostular.titulo}
                         </h2>
-                        
-                        <div style={{ 
-                            background: "#555", 
-                            padding: "16px", 
+
+                        <div style={{
+                            background: "#555",
+                            padding: "16px",
                             borderRadius: "8px",
                             margin: "16px 0"
                         }}>
-                            <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>Requisitos:</p>
-                            <p style={{ margin: 0 }}>{proyectoAPostular.requisitos}</p>
+                            <p style={{ margin: "0 0 8px 0", fontWeight: "bold" }}>Área de conocimiento:</p>
+                            <p style={{ margin: 0 }}>{proyectoAPostular.area_conocimiento || "No especificada"}</p>
                         </div>
-                        
+
                         <p style={{ margin: "16px 0" }}>Explica por qué eres el candidato adecuado para este proyecto:</p>
-                        
+
                         <textarea
                             value={motivacion}
                             onChange={(e) => setMotivacion(e.target.value)}
@@ -192,10 +178,10 @@ export function DashboardEstudiante() {
                             }}
                             placeholder="Describe tus habilidades relevantes, experiencia previa y por qué te interesa este proyecto en particular..."
                         />
-                        
+
                         {mensaje && (
-                            <p style={{ 
-                                color: "#f44336", 
+                            <p style={{
+                                color: "#f44336",
                                 marginBottom: "16px",
                                 display: "flex",
                                 alignItems: "center",
@@ -209,7 +195,7 @@ export function DashboardEstudiante() {
                                 {mensaje}
                             </p>
                         )}
-                        
+
                         <div style={{ display: "flex", justifyContent: "flex-end", gap: "16px" }}>
                             <button
                                 onClick={cancelarPostulacion}
@@ -253,7 +239,7 @@ export function DashboardEstudiante() {
                     </div>
                 </div>
             )}
-            
+
             <div style={{
                 background: "#403f3f",
                 borderRadius: "16px",
@@ -263,7 +249,7 @@ export function DashboardEstudiante() {
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                     <h2 style={{ color: "#fff", margin: 0 }}>Explora los proyectos</h2>
-                    
+
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                         <span style={{ color: "#fff" }}>Filtrar:</span>
                         <select
@@ -291,9 +277,10 @@ export function DashboardEstudiante() {
                                 <thead>
                                     <tr style={{ background: "#333" }}>
                                         <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Proyecto</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Profesor</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Cupos</th>
-                                        <th style={{ padding: "12px", textAlign: "center" }}>Estado</th>
+                                        <th style={{ padding: "12px", textAlign: "left" }}>Área</th>
+                                        <th style={{ padding: "12px", textAlign: "left" }}>Estado</th>
+                                        <th style={{ padding: "12px", textAlign: "center" }}>Fecha inicio</th>
+                                        <th style={{ padding: "12px", textAlign: "center" }}>Fecha fin</th>
                                         <th style={{ padding: "12px", textAlign: "center", borderRadius: "0 8px 8px 0" }}>Acción</th>
                                     </tr>
                                 </thead>
@@ -301,21 +288,20 @@ export function DashboardEstudiante() {
                                     {proyectosFiltrados.map((proyecto) => {
                                         const postulado = estaPostulado(proyecto.id);
                                         const estado = getEstadoPostulacion(proyecto.id);
-                                        
+
                                         return (
                                             <tr key={proyecto.id} style={{ background: "#555", borderBottom: "8px solid #403f3f" }}>
                                                 <td style={{ padding: "12px" }}>
                                                     <div style={{ fontWeight: "bold" }}>{proyecto.titulo}</div>
-                                                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>{proyecto.departamento}</div>
+                                                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>{proyecto.objetivo_general}</div>
                                                 </td>
-                                                <td style={{ padding: "12px" }}>{proyecto.profesor}</td>
-                                                <td style={{ padding: "12px" }}>{proyecto.cuposDisponibles}</td>
-                                                <td style={{ padding: "12px", textAlign: "center" }}>
+                                                <td style={{ padding: "12px" }}>{proyecto.area_conocimiento || "No especificada"}</td>
+                                                <td style={{ padding: "12px" }}>
                                                     <span style={{
                                                         display: "inline-block",
                                                         padding: "4px 12px",
                                                         borderRadius: "20px",
-                                                        background: postulado 
+                                                        background: postulado
                                                             ? estado === "Aprobada"
                                                                 ? "rgba(76, 175, 80, 0.2)"
                                                                 : estado === "Rechazada"
@@ -332,9 +318,11 @@ export function DashboardEstudiante() {
                                                         fontWeight: "bold",
                                                         fontSize: "0.85rem"
                                                     }}>
-                                                        {postulado ? estado : "Disponible"}
+                                                        {postulado ? estado : (proyecto.estado || "Propuesto")}
                                                     </span>
                                                 </td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>{proyecto.fechaInicio || "-"}</td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>{proyecto.fechaFin || "-"}</td>
                                                 <td style={{ padding: "12px", textAlign: "center" }}>
                                                     <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
                                                         <button
@@ -400,16 +388,16 @@ export function DashboardEstudiante() {
                         </div>
 
                         {proyectosFiltrados.length === 0 && (
-                            <div style={{ 
-                                background: "#555", 
-                                padding: "24px", 
-                                borderRadius: "8px", 
+                            <div style={{
+                                background: "#555",
+                                padding: "24px",
+                                borderRadius: "8px",
                                 textAlign: "center",
                                 marginTop: "16px"
                             }}>
                                 <p style={{ color: "#fff" }}>
-                                    {filtroEstado === "Todos" 
-                                        ? "No hay proyectos disponibles en este momento." 
+                                    {filtroEstado === "Todos"
+                                        ? "No hay proyectos disponibles en este momento."
                                         : filtroEstado === "Postulados"
                                             ? "No tienes postulaciones activas."
                                             : "No hay proyectos disponibles para postular."}
@@ -440,9 +428,9 @@ export function DashboardEstudiante() {
                             Volver al listado
                         </button>
 
-                        <div style={{ 
-                            background: "#555", 
-                            borderRadius: "12px", 
+                        <div style={{
+                            background: "#555",
+                            borderRadius: "12px",
                             padding: "24px",
                             marginBottom: "24px"
                         }}>
@@ -456,39 +444,60 @@ export function DashboardEstudiante() {
                                 </svg>
                                 {seleccionado.titulo}
                             </h2>
-                            
+
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px", marginBottom: "20px" }}>
                                 <div>
                                     <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Información del Proyecto</h3>
-                                    <p><strong>Profesor responsable:</strong> {seleccionado.profesor}</p>
-                                    <p><strong>Departamento:</strong> {seleccionado.departamento}</p>
-                                    <p><strong>Cupos disponibles:</strong> {seleccionado.cuposDisponibles}</p>
+                                    <p><strong>Área de conocimiento:</strong> {seleccionado.area_conocimiento || "No especificada"}</p>
+                                    <p><strong>Estado:</strong> {seleccionado.estado || "Propuesto"}</p>
+                                    <p><strong>Fecha inicio:</strong> {seleccionado.fechaInicio || "-"}</p>
+                                    <p><strong>Fecha fin:</strong> {seleccionado.fechaFin || "-"}</p>
                                 </div>
-                                
+
                                 <div>
-                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Detalles</h3>
-                                    <p><strong>Publicado:</strong> {seleccionado.fechaPublicacion}</p>
-                                    <p><strong>Fecha límite:</strong> {seleccionado.fechaLimite}</p>
-                                    <p><strong>Requisitos:</strong> {seleccionado.requisitos}</p>
+                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Objetivos</h3>
+                                    <p><strong>General:</strong> {seleccionado.objetivo_general || "-"}</p>
+                                    <p><strong>Específicos:</strong></p>
+                                    <ul>
+                                        {seleccionado.objetivoEspecificos && seleccionado.objetivoEspecificos.length > 0
+                                            ? seleccionado.objetivoEspecificos.map((obj, idx) => (
+                                                <li key={idx}>{obj}</li>
+                                            ))
+                                            : <li>-</li>
+                                        }
+                                    </ul>
                                 </div>
                             </div>
-                            
+
                             <div style={{ marginTop: "24px" }}>
                                 <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Descripción</h3>
-                                <div style={{ 
-                                    background: "#444", 
-                                    padding: "16px", 
+                                <div style={{
+                                    background: "#444",
+                                    padding: "16px",
                                     borderRadius: "8px",
                                     lineHeight: "1.6"
                                 }}>
                                     {seleccionado.descripcion}
                                 </div>
                             </div>
+                            {seleccionado.problema && (
+                                <div style={{ marginTop: "24px" }}>
+                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Problema</h3>
+                                    <div style={{
+                                        background: "#444",
+                                        padding: "16px",
+                                        borderRadius: "8px",
+                                        lineHeight: "1.6"
+                                    }}>
+                                        {seleccionado.problema}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <div style={{ 
-                            background: "#555", 
-                            borderRadius: "12px", 
+                        <div style={{
+                            background: "#555",
+                            borderRadius: "12px",
                             padding: "24px"
                         }}>
                             <h3 style={{ marginTop: 0, marginBottom: "16px", display: "flex", alignItems: "center", gap: "8px" }}>
@@ -499,12 +508,12 @@ export function DashboardEstudiante() {
                                 </svg>
                                 Mi Postulación
                             </h3>
-                            
+
                             {estaPostulado(seleccionado.id) ? (
                                 <>
-                                    <div style={{ 
-                                        background: "#444", 
-                                        padding: "16px", 
+                                    <div style={{
+                                        background: "#444",
+                                        padding: "16px",
                                         borderRadius: "8px",
                                         marginBottom: "20px"
                                     }}>
@@ -535,12 +544,12 @@ export function DashboardEstudiante() {
                                                 <p>{postulaciones.find(p => p.proyectoId === seleccionado.id)?.fechaPostulacion}</p>
                                             </div>
                                         </div>
-                                        
+
                                         <div style={{ marginTop: "16px" }}>
                                             <p><strong>Mi motivación:</strong></p>
-                                            <div style={{ 
-                                                background: "#333", 
-                                                padding: "12px", 
+                                            <div style={{
+                                                background: "#333",
+                                                padding: "12px",
                                                 borderRadius: "8px",
                                                 marginTop: "8px",
                                                 lineHeight: "1.6"
@@ -549,7 +558,7 @@ export function DashboardEstudiante() {
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <button
                                         style={{
                                             padding: "12px 24px",

@@ -43,8 +43,6 @@ class ProyectoResponse(ProyectoBase):
     fecha_inicio: Optional[date]
     fecha_fin: Optional[date]
     presupuesto_asignado: Optional[float]
-    informacion_adicional: Optional[Dict[str, Any]] = {}
-    objetivo_especificos: Optional[List[str]] = []
     id_prof: Optional[int]
     id_estudiante_creador: Optional[int]
 

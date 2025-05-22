@@ -1,6 +1,6 @@
 from controllers.proyecto_filtro import router as proyecto_router
 from controllers.evaluacion_proyecto import router as evaluacion_router
-
+from fastapi.middleware.cors import CORSMiddleware
 # main.py
 from fastapi import FastAPI, Depends
 from database.db import Base, engine,  SessionLocal
@@ -18,6 +18,16 @@ def get_db():
 
 
 app = FastAPI()
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # En desarrollo puedes usar "*". En producción, especifica el dominio de tu frontend.
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(proyecto_router)
 app.include_router(evaluacion_router)
 
