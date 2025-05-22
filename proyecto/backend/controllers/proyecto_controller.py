@@ -26,6 +26,14 @@ def crear_proyecto(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=str(e)
         )
+        
+@router.get("/getall", response_model=list[ProyectoResponse])
+def listar_proyectos(
+    db: Session = Depends(get_db)
+):
+    repo = ProyectoRepository(db)
+    service = ProyectoService(repo)
+    return service.listar_proyectos()
 
 @router.get("/{proyecto_id}", response_model=ProyectoResponse)
 def leer_proyecto(
@@ -36,13 +44,7 @@ def leer_proyecto(
     service = ProyectoService(repo)
     return service.obtener_proyecto(proyecto_id)
 
-@router.get("/getall", response_model=list[ProyectoResponse])
-def listar_proyectos(
-    db: Session = Depends(get_db)
-):
-    repo = ProyectoRepository(db)
-    service = ProyectoService(repo)
-    return service.listar_proyectos()
+
 
 # @router.patch("/{proyecto_id}", response_model=ProyectoResponse)
 # def actualizar_proyecto(
