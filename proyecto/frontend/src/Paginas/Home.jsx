@@ -40,7 +40,7 @@ export const Home = () => {
                     Permite a estudiantes con ideas de proyectos interdisciplinarios postularlas para que un profesor las valide y defina el equipo necesario. Una vez aprobado, el proyecto queda visible para que otros estudiantes postulen o sean invitados según su perfil.
                 </p>
                 <p>
-                    Durante el semestre, los equipos deben subir avances en PDF, y al final pueden recibir una evaluación con calificación y feedback. Anual o semestralmente, se genera un ranking con los mejores proyectos.
+                    Durante el semestre, los equipos podran subir distintos tipos de archivos en la plataforma (PDF, .docs, xls, etc), para complementar el proyecto o recibir una evaluación con calificación y feedback. Anual o semestralmente, se genera un ranking con los mejores proyectos.
                 </p>
             </div>
         </div>
