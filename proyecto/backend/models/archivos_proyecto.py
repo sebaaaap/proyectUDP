@@ -14,6 +14,9 @@ class ArchivoProyecto(Base):
     url = Column(String, nullable=False)
     fecha_subida = Column(DateTime, default=datetime.utcnow)
     descripcion = Column(String)
+    id_estudiante = Column(Integer, ForeignKey("participaciones.id"), nullable=False)
+
     
+    participacion = relationship("Participacion", back_populates="archivos")
 
     proyecto = relationship("Proyecto", back_populates="archivos")
