@@ -99,7 +99,7 @@ export function Registrar() {
     const styles = {
         page: {
             minHeight: "100vh",
-            width: "100vw",
+            width: "100%",
             display: "flex",
             flexDirection: "column",
             justifyContent: "center",

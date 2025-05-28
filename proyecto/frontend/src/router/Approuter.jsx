@@ -3,6 +3,7 @@ import PruebaNavbar from "../PruebaNavbar";
 import { Login, Registrar, Home, ProyectoForm} from "../Paginas";
 import { DashboardProfe } from "../Paginas/Dashboard-profe"; 
 import { DashboardEstudiante } from "../Paginas/Dashboard-estudiante"; 
+import { MisProyectosEstudiante } from "../Paginas/MisProyectosEstudiante";
 
 export const Approuter = () => {
     return (
@@ -12,8 +13,9 @@ export const Approuter = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="registrar" element={<Registrar />} />
                 <Route path="proyecto-form" element={<ProyectoForm />} />
-                <Route path="dashboard-profe" element={<DashboardProfe />} /> {/* Ruta para el dashboard del profesor */}
-                <Route path="dashboard-estudiante" element={<DashboardEstudiante />} /> {/* Ruta para el dashboard del estudiante */}
+                <Route path="dashboard-profe" element={<DashboardProfe />} /> 
+                <Route path="dashboard-estudiante" element={<DashboardEstudiante />} /> 
+                <Route path="mis-proyectos" element={<MisProyectosEstudiante />} /> 
             </Route>
         </Routes>
     );

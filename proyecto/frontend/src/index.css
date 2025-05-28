@@ -6,3 +6,9 @@ body {
     font-family: Arial, sans-serif; 
     min-height: 100vh; 
 }   
+
+html, body, #root {
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
