@@ -24,7 +24,7 @@ INSERT INTO profesores (
     departamento
 ) VALUES
 (
-    '12345678-9', 
+    '12345478-9', 
     'Juan', 
     'Carlos', 
     'Gómez', 
@@ -35,7 +35,7 @@ INSERT INTO profesores (
     'Ciencias de la Computación'
 ),
 (
-    '23456789-0', 
+    '23356789-0', 
     'María', 
     'Fernanda', 
     'López', 
@@ -46,7 +46,7 @@ INSERT INTO profesores (
     'Biología Molecular'
 ),
 (
-    '34567890-1', 
+    '34887890-1', 
     'Pedro', 
     'Alberto', 
     'Martínez', 
@@ -57,7 +57,7 @@ INSERT INTO profesores (
     'Ciencias Neurológicas'
 ),
 (
-    '45678901-2', 
+    '45676601-2', 
     'Ana', 
     'María', 
     'Torres', 
@@ -68,7 +68,7 @@ INSERT INTO profesores (
     'Lengua y Literatura'
 ),
 (
-    '56789012-3', 
+    '56780012-3', 
     'Luis', 
     'Miguel', 
     'Hernández', 
@@ -374,7 +374,11 @@ INSERT INTO participaciones (
 (
     1,
     1,
+<<<<<<< HEAD
     'lider',
+=======
+    'co_lider',
+>>>>>>> 31a0ff2 (backend: firebase al 80% falta activar la cuenta)
     '2023-02-01',
     '2023-11-30',
     'aprobado'

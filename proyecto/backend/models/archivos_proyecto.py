@@ -1,5 +1,4 @@
-# models/archivo_proyecto.py
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database.db import Base
@@ -14,9 +13,20 @@ class ArchivoProyecto(Base):
     url = Column(String, nullable=False)
     fecha_subida = Column(DateTime, default=datetime.utcnow)
     descripcion = Column(String)
-    id_estudiante = Column(Integer, ForeignKey("participaciones.id"), nullable=False)
+    id_estudiante = Column(Integer, nullable=False)  # Eliminada la FK incorrecta
 
-    
-    participacion = relationship("Participacion", back_populates="archivos")
+    # Relación compuesta correcta
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['id_proyecto', 'id_estudiante'],
+            ['participaciones.id_proyecto', 'participaciones.id_estudiante']
+        ),
+    )
+
+    participacion = relationship(
+        "Participacion",
+        foreign_keys=[id_proyecto, id_estudiante],
+        back_populates="archivos"
+    )
 
     proyecto = relationship("Proyecto", back_populates="archivos")

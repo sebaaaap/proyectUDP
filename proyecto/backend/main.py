@@ -5,6 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi import FastAPI, Depends
 from database.db import Base, engine,  SessionLocal
 from controllers import register, login, proyecto_controller
+from controllers import archivos_proyectos
 import models  # Esto activa los modelos vía models/__init__.py
 
 from sqlalchemy.orm import Session
@@ -41,6 +42,7 @@ def read_root():
     return {"message": "Hola mundo"}
 
 
+app.include_router(archivos_proyectos.router)
 
 
 
