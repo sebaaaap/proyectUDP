@@ -15,6 +15,8 @@ services:
   backend:
     build: ./backend
     volumes:
+      # - ./backend/llave.json:/app/llave.json:ro  # Montaje explícito y seguro
+      - uploads_volume:/app/uploads
       - ./backend:/app
     ports:
       - "8000:8000"
@@ -41,3 +43,4 @@ services:
 
 volumes:
   postgres_data:
+  uploads_volume:
