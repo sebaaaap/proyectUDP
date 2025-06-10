@@ -24,10 +24,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(proyecto_router)
-app.include_router(evaluacion_router)
-
-
 # Base.metadata.drop_all(engine)
 # Crear las tablas (si estás usando tu propio engine con SQLite o PostgreSQL)
 Base.metadata.create_all(bind=engine)
@@ -36,7 +32,8 @@ Base.metadata.create_all(bind=engine)
 def read_root():
     return {"message": "Hola mundo"}
 
-
+app.include_router(proyecto_router)
+app.include_router(evaluacion_router)
 app.include_router(archivos_proyectos.router)
 app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
 
