@@ -2,13 +2,16 @@ INSERT INTO estudiantes (
     id, rut_estudiante, nombre1, nombre2, apellido1, apellido2,
     fecha_nacimiento, nacionalidad, genero, anio__ingreso,
     telefono, carrera, facultad, promedio_general,
-    semestre_actual, experiencia, habilidades, email, password
+    semestre_actual, experiencia, habilidades, email
 ) VALUES
-(1, '12345678-9', 'Carlos', 'Eduardo', 'Pérez', 'González', '2000-05-15', 'Chilena', 'Masculino', 2019, '912345678', 'Ingeniería Civil', 'Ingeniería', 5.6, '8vo', '{"voluntariado": "Ayuda en campamentos", "tutorías": "Matemáticas"}', '["Python", "SQL", "Comunicación", "1@mail.udp.cl", "123"]'),
-(2, '98765432-1', 'María', 'José', 'López', 'Ramírez', '2001-08-22', 'Chilena', 'Femenino', 2020, '923456789', 'Psicología', 'Ciencias Sociales', 6.1, '6to', '{"prácticas": "Centro comunitario"}', '["Empatía", "Escucha activa", "SPSS","2@mail.udp.cl", "123"]'),
-(3, '11223344-5', 'Andrés', 'Felipe', 'Rojas', 'Torres', '1999-11-30', 'Colombiana', 'Masculino', 2018, '934567890', 'Derecho', 'Derecho y Humanidades', 5.9, '10mo', '{"asistente de investigación": "Derecho penal"}', '["Redacción", "Investigación", "Oratoria", "3@mail.udp.cl", "123"]'),
-(4, '55667788-0', 'Camila', 'Andrea', 'Martínez', 'Figueroa', '2002-01-10', 'Chilena', 'Femenino', 2021, '945678901', 'Arquitectura', 'Arquitectura y Diseño', 6.3, '4to', '{"talleres": "Diseño urbano"}', '["AutoCAD", "SketchUp", "Creatividad", "4@mail.udp.cl", "123"]'),
-(5, '66778899-2', 'Felipe', 'Ignacio', 'Soto', 'Muñoz', '2000-03-27', 'Chilena', 'Masculino', 2019, '956789012', 'Periodismo', 'Comunicación', 5.4, '7mo', '{"medio universitario": "Editor"}', '["Escritura", "Edición", "Redes sociales", "5@mail.udp.cl", "123"]');
+(1, '12345678-9', 'Carlos', 'Eduardo', 'Pérez', 'González', '2000-05-15', 'Chilena', 'Masculino', 2019, 
+ '912345678', 'Ingeniería Civil', 'Ingeniería', 5.6, '8vo', 
+ '{"voluntariado": "Ayuda en campamentos", "tutorías": "Matemáticas"}', 
+ '["Python", "SQL", "Comunicación"]', '1@mail.udp.cl'),  -- Email separado del array
+(2, '98765432-1', 'María', 'José', 'López', 'Ramírez', '2001-08-22', 'Chilena', 'Femenino', 2020, 
+ '923456789', 'Psicología', 'Ciencias Sociales', 6.1, '6to', 
+ '{"prácticas": "Centro comunitario"}', 
+ '["Empatía", "Escucha activa", "SPSS"]', '2@mail.udp.cl');  -- Email separado del array
 
 -----
 -- Datos para la tabla profesores (PostgreSQL)
@@ -21,7 +24,8 @@ INSERT INTO profesores (
     telefono, 
     facultad, 
     especialidad, 
-    departamento
+    departamento,
+    email
 ) VALUES
 (
     '12345478-9', 
@@ -32,7 +36,8 @@ INSERT INTO profesores (
     '+56987654321', 
     'Ingeniería', 
     'Inteligencia Artificial', 
-    'Ciencias de la Computación'
+    'Ciencias de la Computación',
+    '3@mail.udp.cl'
 ),
 (
     '23356789-0', 
@@ -43,40 +48,8 @@ INSERT INTO profesores (
     '+56976543210', 
     'Ciencias', 
     'Bioquímica', 
-    'Biología Molecular'
-),
-(
-    '34887890-1', 
-    'Pedro', 
-    'Alberto', 
-    'Martínez', 
-    'Silva', 
-    '+56965432109', 
-    'Medicina', 
-    'Neurología', 
-    'Ciencias Neurológicas'
-),
-(
-    '45676601-2', 
-    'Ana', 
-    'María', 
-    'Torres', 
-    'García', 
-    '+56954321098', 
-    'Humanidades', 
-    'Literatura Contemporánea', 
-    'Lengua y Literatura'
-),
-(
-    '56780012-3', 
-    'Luis', 
-    'Miguel', 
-    'Hernández', 
-    'Vargas', 
-    '+56943210987', 
-    'Arquitectura', 
-    'Diseño Urbano', 
-    'Urbanismo y Ordenamiento Territorial'
+    'Biología Molecular',
+    '4@mail.udp.cl'
 );
 
 ----
@@ -121,106 +94,6 @@ INSERT INTO proyectos (
     }', 
     1, 
     2
-),
-(
-    'Plataforma de Aprendizaje Adaptativo', 
-    'Sistema que personaliza contenidos educativos según progreso del estudiante', 
-    'Enseñanza estandarizada no considera diferencias individuales', 
-    'Mejorar resultados académicos mediante personalización', 
-    'Educación', 
-    '2023-04-15', 
-    '2024-06-20', 
-    'propuesto', 
-    12000.00, 
-    '{
-        "justificacion": "Brecha de aprendizaje aumentó post-pandemia",
-        "metodologia": "Diseño centrado en usuario + machine learning",
-        "impacto_academico": "Mejorará indicadores de retención",
-        "impacto_social": "Reducirá desigualdad en aprendizaje",
-        "perfil_profesor": "Especialista en pedagogía y algoritmos adaptativos"
-    }', 
-    '{
-        "1": "Modelar estilos de aprendizaje",
-        "2": "Desarrollar motor de recomendación",
-        "3": "Validar con 3 cursos piloto"
-    }', 
-    2, 
-    3
-),
-(
-    'Análisis Genómico de Cultivos Andinos', 
-    'Investigación de marcadores genéticos para mejorar resistencia a sequía', 
-    'Cambio climático afecta producción agrícola tradicional', 
-    'Identificar variantes genéticas para resiliencia climática', 
-    'Biotecnología', 
-    '2022-09-10', 
-    '2023-08-15', 
-    'finalizado', 
-    18000.50, 
-    '{
-        "justificacion": "Seguridad alimentaria en riesgo por cambio climático",
-        "metodologia": "Secuenciación masiva + bioinformática",
-        "impacto_academico": "Fortalecerá investigación en agrobiotecnología",
-        "impacto_social": "Beneficiará a pequeños agricultores",
-        "perfil_profesor": "Doctor en genómica vegetal"
-    }', 
-    '{
-        "1": "Recolectar 50 muestras de variedades nativas",
-        "2": "Secuenciar genomas completos",
-        "3": "Analizar correlaciones genotipo-fenotipo"
-    }', 
-    3, 
-    4
-),
-(
-    'Realidad Virtual para Terapias de Fobia', 
-    'Desarrollo de entornos inmersivos para tratamiento de fobias específicas', 
-    'Terapias tradicionales tienen limitaciones de acceso y costo', 
-    'Crear solución escalable para trastornos de ansiedad', 
-    'Psicología Clínica', 
-    '2023-03-01', 
-    '2023-12-15', 
-    'en_desarrollo', 
-    9500.75, 
-    '{
-        "justificacion": "40% de pacientes con fobias no completan tratamiento",
-        "metodologia": "Diseño iterativo con profesionales de salud mental",
-        "impacto_academico": "Nuevo campo de investigación interdisciplinaria",
-        "impacto_social": "Reducirá costos de tratamiento psicológico",
-        "perfil_profesor": "Experto en psicología cognitiva y desarrollo VR"
-    }', 
-    '{
-        "1": "Modelar 5 escenarios de fobias comunes",
-        "2": "Implementar sistema de biofeedback",
-        "3": "Validar con estudio clínico controlado"
-    }', 
-    4, 
-    5
-),
-(
-    'Blockchain para Gestión Académica', 
-    'Sistema descentralizado para verificación automática de credenciales', 
-    'Procesos manuales de verificación son lentos y propensos a fraude', 
-    'Automatizar la emisión y verificación de títulos académicos', 
-    'Tecnologías de Información', 
-    '2023-01-10', 
-    '2023-10-31', 
-    'en_desarrollo', 
-    15000.00, 
-    '{
-        "justificacion": "Aumento de fraudes en documentos académicos",
-        "metodologia": "Desarrollo de smart contracts en Ethereum",
-        "impacto_academico": "Posicionará a la universidad como innovadora",
-        "impacto_social": "Transparencia en procesos académicos",
-        "perfil_profesor": "Especialista en blockchain y criptografía"
-    }', 
-    '{
-        "1": "Diseñar arquitectura de red permisada",
-        "2": "Implementar módulo de emisión de diplomas",
-        "3": "Integrar con sistema académico existente"
-    }', 
-    5, 
-    1
 );
 -----
 -- Datos para la tabla archivos_proyecto (PostgreSQL)

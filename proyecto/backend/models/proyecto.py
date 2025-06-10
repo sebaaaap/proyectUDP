@@ -33,7 +33,7 @@ class Proyecto(Base):
 
     # Relaciones corregidas
     profesor = relationship("Profesor")
-    creador = relationship("Estudiante", back_populates="proyectos_creados")  # Nueva relación
+    creador = relationship("Estudiante", back_populates="proyectos")  # Nueva relación
     
     archivos = relationship(
         "ArchivoProyecto", 

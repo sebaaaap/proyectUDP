@@ -15,6 +15,8 @@ class Profesor(Base):
     facultad = Column(String)
     especialidad = Column(String)
     departamento = Column(String)
+    email = Column(String, unique=True, nullable=False)
+        
 
     proyecto = relationship("Proyecto", back_populates="profesor")
     # evaluacion = relationship("Evaluacion", back_populates="profesor")

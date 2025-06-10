@@ -23,7 +23,7 @@ class Estudiante(Base):
     experiencia = Column(JSON, nullable=True, default={}) 
     habilidades = Column(JSON)
     email = Column(String, nullable=False, unique=True)
-    password = Column(String, nullable=False)    
+    
     
     
  
