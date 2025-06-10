@@ -2,20 +2,15 @@ from controllers.proyecto_filtro import router as proyecto_router
 from controllers.evaluacion_proyecto import router as evaluacion_router
 from fastapi.middleware.cors import CORSMiddleware
 # main.py
-from fastapi import FastAPI, Depends
-from database.db import Base, engine,  SessionLocal
-from controllers import register, login, proyecto_controller
+from fastapi import FastAPI
+from database.db import Base, engine  
+from controllers import proyecto_controller, archivos_proyectos
 from controllers import archivos_proyectos
 import models  # Esto activa los modelos vía models/__init__.py
 
-from sqlalchemy.orm import Session
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
+
+
 
 
 app = FastAPI()
@@ -43,11 +38,6 @@ def read_root():
 
 
 app.include_router(archivos_proyectos.router)
-
-
-
-
-
 app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
 
 

@@ -30,4 +30,4 @@ class Estudiante(Base):
     # Relaciones corregidas
     # Relación con Profesor (si cada estudiante tiene un profesor guía)
     proyectos = relationship("Proyecto", back_populates="creador")
-    
+    participaciones = relationship("Participacion", back_populates="alumno")

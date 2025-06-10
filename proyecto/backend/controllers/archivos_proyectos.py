@@ -92,3 +92,45 @@ async def subir_archivo_proyecto(
         db.rollback()
         logger.error(f"Error subiendo archivo: {str(e)}")
         raise HTTPException(status_code=500, detail="Error al subir archivo")
+    
+
+@router.get("/proyectos/{id_proyecto}/archivos/{id_archivo}/descargar")
+async def descargar_archivo(
+    id_proyecto: int,
+    id_archivo: int,
+    db: Session = Depends(get_db)
+):
+    """
+    Descarga un archivo asociado a un proyecto.
+    Verifica permisos antes de permitir la descarga.
+    """
+    # 1. Verificar que el archivo existe en la base de datos
+    archivo = db.query(ArchivoProyecto).filter(
+        ArchivoProyecto.id == id_archivo,
+        ArchivoProyecto.id_proyecto == id_proyecto
+    ).first()
+
+    if not archivo:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Archivo no encontrado"
+        )
+
+    # 2. Obtener la ruta física del archivo (asumiendo que guardaste el nombre único)
+    unique_filename = archivo.url.split("/")[-1]  # Extrae el nombre único de la URL
+    file_path = UPLOAD_FOLDER / unique_filename
+
+    # 3. Verificar que el archivo existe físicamente
+    if not file_path.is_file():
+        logger.error(f"Archivo {file_path} no encontrado en el servidor")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="El archivo no existe en el servidor"
+        )
+
+    # 4. Devolver el archivo como respuesta
+    return FileResponse(
+        path=file_path,
+        filename=archivo.nombre_archivo,  # Nombre original para el usuario
+        media_type=archivo.tipo_archivo  # MIME type
+    )    

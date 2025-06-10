@@ -112,38 +112,6 @@ INSERT INTO archivos_proyecto (
     'https://storage.edu/proyectos/1/propuesta.pdf', 
     '2023-02-15 10:30:45', 
     'Documento de propuesta inicial del proyecto'
-),
-(
-    1, 
-    'diagrama_arquitectura.png', 
-    'image/png', 
-    'https://storage.edu/proyectos/1/diagrama.png', 
-    '2023-03-01 14:22:10', 
-    'Diagrama de componentes del sistema'
-),
-(
-    2, 
-    'protocolo_investigacion.docx', 
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
-    'https://storage.edu/proyectos/2/protocolo.docx', 
-    '2023-04-20 09:15:33', 
-    'Protocolo de investigación aprobado por comité'
-),
-(
-    3, 
-    'datos_muestras.csv', 
-    'text/csv', 
-    'https://storage.edu/proyectos/3/muestras.csv', 
-    '2022-10-05 16:45:21', 
-    'Dataset con resultados preliminares de laboratorio'
-),
-(
-    4, 
-    'demo_vr.mp4', 
-    'video/mp4', 
-    'https://storage.edu/proyectos/4/demo.mp4', 
-    '2023-05-12 11:20:15', 
-    'Video demostrativo del entorno de realidad virtual'
 );
 -------
 -- Datos para la tabla cfg_equivalencias (PostgreSQL)
@@ -160,34 +128,6 @@ INSERT INTO cfg_equivalencias (
     5,
     'aprobado',
     '2023-03-15'
-),
-(
-    1,
-    'ING-DAT-301',
-    3,
-    'pendiente',
-    NULL
-),
-(
-    2,
-    'BIO-401',
-    4,
-    'rechazado',
-    '2023-04-20'
-),
-(
-    3,
-    'PSI-VR-101',
-    6,
-    'aprobado',
-    '2023-01-10'
-),
-(
-    4,
-    'TIC-BLK-205',
-    4,
-    'aprobado',
-    '2023-02-28'
 );
 -----
 -- Datos para la tabla evaluaciones (PostgreSQL)
@@ -204,34 +144,6 @@ INSERT INTO evaluaciones (
     85,
     'Excelente planteamiento técnico, pero necesita mayor claridad en el plan de implementación',
     '2023-04-10'
-),
-(
-    2,  -- Proyecto: Plataforma de Aprendizaje Adaptativo
-    3,  -- Profesor: Pedro Alberto Martínez Silva
-    92,
-    'Innovadora propuesta con alto impacto educativo. Validar con pilotos antes de escalar',
-    '2023-05-15'
-),
-(
-    3,  -- Proyecto: Análisis Genómico de Cultivos Andinos
-    4,  -- Profesor: Ana María Torres García
-    78,
-    'Metodología sólida pero ampliar muestra de estudio para mayor significancia estadística',
-    '2022-11-20'
-),
-(
-    4,  -- Proyecto: Realidad Virtual para Terapias de Fobia
-    5,  -- Profesor: Luis Miguel Hernández Vargas
-    88,
-    'Enfoque interdisciplinario muy valioso. Considerar aspectos éticos en el uso de datos clínicos',
-    '2023-06-05'
-),
-(
-    1,  -- Proyecto: Sistema Inteligente de Gestión Energética
-    1,  -- Profesor: Juan Carlos Gómez Pérez
-    90,
-    'Solución bien fundamentada técnicamente con clara aplicabilidad institucional',
-    '2023-04-18'
 );
 ----
 -- Datos para la tabla participaciones (PostgreSQL)
@@ -247,92 +159,8 @@ INSERT INTO participaciones (
 (
     1,
     1,
-<<<<<<< HEAD
-    'lider',
-=======
     'co_lider',
->>>>>>> 31a0ff2 (backend: firebase al 80% falta activar la cuenta)
     '2023-02-01',
     '2023-11-30',
-    'aprobado'
-),
-(
-    1,
-    2,
-    'co_lider',
-    '2023-02-15',
-    '2023-11-30',
-    'aprobado'
-),
-(
-    1,
-    3,
-    'colaborador',
-    '2023-03-01',
-    NULL,  -- Fecha término abierta
-    'pendiente'
-),
-
--- Proyecto 2 (Plataforma de Aprendizaje Adaptativo)
-(
-    2,
-    4,
-    'lider',
-    '2023-04-15',
-    '2024-06-20',
-    'aprobado'
-),
-(
-    2,
-    5,
-    'colaborador',
-    '2023-05-01',
-    '2024-06-20',
-    'rechazado'
-),
-
--- Proyecto 3 (Análisis Genómico de Cultivos Andinos)
-(
-    3,
-    1,
-    'co_lider',
-    '2022-09-10',
-    '2023-08-15',
-    'aprobado'
-),
-(
-    3,
-    3,
-    'colaborador',
-    '2022-10-01',
-    '2023-08-15',
-    'aprobado'
-),
-
--- Proyecto 4 (Realidad Virtual para Terapias de Fobia)
-(
-    4,
-    2,
-    'lider',
-    '2023-03-01',
-    '2023-12-15',
-    'aprobado'
-),
-(
-    4,
-    4,
-    'colaborador',
-    '2023-04-01',
-    NULL,  -- Fecha término abierta
-    'pendiente'
-),
-
--- Proyecto 5 (Blockchain para Gestión Académica)
-(
-    5,
-    5,
-    'lider',
-    '2023-01-10',
-    '2023-10-31',
     'aprobado'
 );
