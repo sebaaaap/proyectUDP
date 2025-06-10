@@ -32,16 +32,18 @@ class Proyecto(Base):
 
 
     # Relaciones corregidas
-    profesor = relationship("Profesor", back_populates = "proyecto")
-    creador = relationship("Estudiante", back_populates="proyectos")  # Nueva relación
-    archivos = relationship("ArchivoProyecto", back_populates="proyecto", cascade="all, delete-orphan")
-    participaciones = relationship("Participacion",back_populates="proyectos")
-
-# { campos info_adicional
+    profesor = relationship("Profesor")
+    creador = relationship("Estudiante", back_populates="proyectos_creados")  # Nueva relación
     
-#     "justificacion": "Texto de justificación...",
-#     "metodologia": "Metodología...",
-#     "impacto_academico": "Impacto académico...",
-#     "impacto_social": "Impacto social...",
-#     "perfil_profesor": "Perfil deseado...",
-# }
+    archivos = relationship(
+        "ArchivoProyecto", 
+        back_populates="proyecto", 
+        cascade="all, delete-orphan",
+        overlaps="participacion,archivos"
+    )
+    
+    participantes = relationship(
+        "Participacion", 
+        back_populates="proyecto_rel",
+        cascade="all, delete-orphan"
+    )

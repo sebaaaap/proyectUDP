@@ -23,10 +23,17 @@ class ArchivoProyecto(Base):
         ),
     )
 
+    # participacion = relationship(
+    #     "Participacion",
+    #     foreign_keys=[id_proyecto, id_estudiante],
+    #     back_populates="archivos"
+    # )
     participacion = relationship(
         "Participacion",
         foreign_keys=[id_proyecto, id_estudiante],
-        back_populates="archivos"
+        back_populates="archivos",
+        overlaps="archivos,proyecto",
+        viewonly=True  # Marcamos como solo lectura
     )
 
     proyecto = relationship("Proyecto", back_populates="archivos")

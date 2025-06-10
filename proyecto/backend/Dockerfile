@@ -19,6 +19,8 @@ COPY requirements.txt .
 # Instala las dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN mkdir -p /app/uploads
+
 # Copia el código fuente al contenedor
 COPY . .
 

@@ -34,9 +34,18 @@ class Participacion(Base):
     # Relaciones
     alumno = relationship("Estudiante", back_populates="participaciones")
     proyecto_rel = relationship("Proyecto", back_populates="participantes")
+    
+    # archivos = relationship(
+    #     "ArchivoProyecto",
+    #     foreign_keys="[ArchivoProyecto.id_proyecto, ArchivoProyecto.id_estudiante]",
+    #     back_populates="participacion",
+    #     cascade="all, delete-orphan"
+    # )
+    
     archivos = relationship(
         "ArchivoProyecto",
         foreign_keys="[ArchivoProyecto.id_proyecto, ArchivoProyecto.id_estudiante]",
         back_populates="participacion",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
+        overlaps="proyecto,participacion"
     )
