@@ -10,8 +10,4 @@ node_modules/
 dist/
 .vscode/
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 5d23474 (backend: archivos almacenados en contenedor)
 uploads/
