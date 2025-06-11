@@ -9,5 +9,6 @@ node_modules/
 *.log
 dist/
 .vscode/
+*.env
 
 uploads/
