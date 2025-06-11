@@ -3,7 +3,10 @@ uvicorn[standard]
 pydantic
 sqlalchemy
 psycopg2-binary
-firebase-admin
 python-multipart
-
+fastapi-authlib
+httpx
+python-dotenv
+jinja2
+python-jose
 

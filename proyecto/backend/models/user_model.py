@@ -1,6 +1,6 @@
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String
-from ..database.db import Base
+from sqlalchemy import Column, ForeignKey, Integer, String
+from database.db import Base
 from sqlalchemy import Enum as SqlEnum
 import enum
 
@@ -15,7 +15,13 @@ class Usuario(Base):
     nombre = Column(String)
     apellido = Column(String)
     correo = Column(String, unique=True, index=True)
-    rol = Column(SqlEnum(RolEnum), nullable=False)
+    rol_plataforma = Column(SqlEnum(RolEnum), nullable=False)
+    
+    estudiante_id = Column(Integer, ForeignKey("estudiantes.id"), nullable=True)
+    profesor_id = Column(Integer, ForeignKey("profesores.id"), nullable=True)
 
-    proyectos = relationship("Proyecto", back_populates="creador")
-    postulaciones = relationship("Postulacion", back_populates="estudiante")
+    estudiante = relationship("Estudiante", backref="usuario", uselist=False)
+    profesor = relationship("Profesor", backref="usuario", uselist=False)
+
+    # proyectos = relationship("Proyecto", back_populates="creador")
+    # postulaciones = relationship("Postulacion", back_populates="estudiante")

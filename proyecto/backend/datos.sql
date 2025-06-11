@@ -16,11 +16,7 @@ INSERT INTO estudiantes (
 -----
 -- Datos para la tabla profesores (PostgreSQL)
 INSERT INTO profesores (
-    rut, 
-    nombre1, 
-    nombre2, 
-    apellido1, 
-    apellido2, 
+    rut,  
     telefono, 
     facultad, 
     especialidad, 
@@ -29,23 +25,13 @@ INSERT INTO profesores (
 ) VALUES
 (
     '12345478-9', 
-    'Juan', 
-    'Carlos', 
-    'Gómez', 
-    'Pérez', 
-    '+56987654321', 
     'Ingeniería', 
     'Inteligencia Artificial', 
     'Ciencias de la Computación',
     '3@mail.udp.cl'
 ),
 (
-    '23356789-0', 
-    'María', 
-    'Fernanda', 
-    'López', 
-    'Rodríguez', 
-    '+56976543210', 
+    '23356789-0',  
     'Ciencias', 
     'Bioquímica', 
     'Biología Molecular',

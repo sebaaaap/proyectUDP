@@ -6,12 +6,7 @@ class Profesor(Base):
     __tablename__ = "profesores"
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    rut = Column(String, unique=True, nullable=False)
-    nombre1 = Column(String)
-    nombre2 = Column(String)
-    apellido1 = Column(String)
-    apellido2 = Column(String)
-    telefono = Column(String)
+    rut_profesor = Column(String, unique=True, nullable=False)
     facultad = Column(String)
     especialidad = Column(String)
     departamento = Column(String)

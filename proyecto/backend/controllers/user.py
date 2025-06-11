@@ -4,9 +4,10 @@ from sqlalchemy.sql import text
 from starlette.requests import Request
 from starlette.responses import RedirectResponse, JSONResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
-from ..config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-from ..models.user_model import Usuario, RolEnum
-from ..helpers.jwtAuth import crear_token
+from config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
+from models.user_model import Usuario, RolEnum
+from helpers.jwtAuth import crear_token
+from database.db import get_db
 
 router = APIRouter()
 
