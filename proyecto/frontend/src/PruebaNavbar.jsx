@@ -45,14 +45,13 @@ function PruebaNavbar() {
                                 }
                                 id="navbarScrollingDropdown"
                             >
-                                <NavDropdown.Item as={Link} to="/login" style={{ fontSize: '18px' }}>Login</NavDropdown.Item>
-                                <NavDropdown.Item as={Link} to="/registrar" style={{ fontSize: '18px' }}>Registrarse</NavDropdown.Item>
-                                <NavDropdown.Divider />
-                                <NavDropdown.Item as={Link} to="/mis-proyectos" style={{ fontSize: '18px' }}>Mis proyectos</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/login" style={{ fontSize: '18px' }}>Cerrar Sección</NavDropdown.Item>
                             </NavDropdown>
                             <Nav.Link as={Link} to="/" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
                             <Nav.Link as={Link} to="/proyecto-form" style={{ fontSize: '20px', color: "white" }}>Formulario de Proyecto</Nav.Link>
+                            <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                            <Nav.Link as={Link} to="/mis-proyectos" style={{ fontSize: '20px', color: "white" }}>Mis proyectos</Nav.Link>
                         </Nav>
                         {/* Buscador y Notificaciones DERECHA */}
                         <div className="ms-auto d-flex align-items-center" style={{ gap: 20 }}>

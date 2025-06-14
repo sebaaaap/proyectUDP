@@ -4,68 +4,31 @@ import { ProyectoDetalle } from "./ProyectoDetalle";
 export function MisProyectosEstudiante() {
     const [proyectos, setProyectos] = useState([]);
     const [seleccionado, setSeleccionado] = useState(null);
+    const estudianteId = 1; // <-- Hardcodeado por ahora, debería venir de sesión o contexto
 
-    // Adaptado exclusivamente a DD-MM-AAAA
+    // Función para parsear fechas del backend (formato ISO) a DD-MM-AAAA
     function parseFecha(fecha) {
-        if (!fecha) return new Date(0);
-        const [d, m, y] = fecha.split("-");
-         return new Date(`${y}-${m}-${d}T12:00:00`);
+        if (!fecha) return "";
+        const date = new Date(fecha);
+        const dia = String(date.getDate()).padStart(2, "0");
+        const mes = String(date.getMonth() + 1).padStart(2, "0");
+        const año = date.getFullYear();
+        return `${dia}-${mes}-${año}`;
     }
 
-    function getFechaMasReciente(archivos) {
-        if (!archivos || archivos.length === 0) return new Date(0);
-        return archivos
-            .map(a => parseFecha(a.fecha))
-            .reduce((max, fecha) => (fecha > max ? fecha : max), new Date(0));
-    }
-
+    // Petición al backend para obtener proyectos del estudiante
     useEffect(() => {
-        // Simulación de fetch con orden de archivos incluido
-        const datos = [
-            {
-                id: 1,
-                titulo: "Sistema de Gestión de Tesis",
-                descripcion: "Plataforma para gestionar proyectos de titulación.",
-                integrantes: [
-                     { nombre: "Juan", rol: "Profesor" },
-                     { nombre: "Ana", rol: "Product Owner" },
-                     { nombre: "Pedro", rol: "Development Team" },
-                     { nombre: "Diego Caña", rol: "Development Team" }
-            ],
-                archivos: [
-                    { id: 1, nombre: "avance1.pdf", fecha: "01-05-2025" },
-                    { id: 2, nombre: "informe_final.pdf", fecha: "20-05-2025" },
-                    { id: 3, nombre: "informe_finalfinal.pdf", fecha: "04-05-2025" }
-                ]
-            },
-            {
-                id: 2,
-                titulo: "App de Tutorías",
-                descripcion: "Aplicación para coordinar tutorías entre estudiantes.",
-                integrantes: ["María", "Luis"],
-                archivos: [
-                    { id: 1, nombre: "propuesta.pdf", fecha: "10-05-2025" }
-                ]
-            }
-        ];
-
-        // Ordenamos los archivos por fecha (más reciente primero)
-        const proyectosConArchivosOrdenados = datos.map(proy => ({
-            ...proy,
-            archivos: [...proy.archivos].sort(
-                (a, b) => parseFecha(b.fecha) - parseFecha(a.fecha)
-            )
-        }));
-
-        setProyectos(proyectosConArchivosOrdenados);
+        fetch(`http://localhost:8000/proyectos/estudiante/${estudianteId}`)
+            .then((res) => res.json())
+            .then((data) => {
+                setProyectos(data);
+            })
+            .catch((error) => {
+                console.error("Error al obtener los proyectos:", error);
+            });
     }, []);
 
-    const proyectosOrdenados = [...proyectos].sort((a, b) => {
-        const fechaA = getFechaMasReciente(a.archivos);
-        const fechaB = getFechaMasReciente(b.archivos);
-        return fechaB - fechaA; // más nuevo primero
-    });
-
+    // Si se selecciona un proyecto, mostrar su detalle
     if (seleccionado) {
         return (
             <ProyectoDetalle
@@ -75,31 +38,29 @@ export function MisProyectosEstudiante() {
         );
     }
 
+    // Listado de proyectos del estudiante
     return (
-        <div style={{ padding: 32 }}>
-            <h1 style={{ marginTop: 0, color: "#bbb" }}>Mis Proyectos</h1>
-            <ul style={{ listStyle: "none", padding: 0 }}>
-                {proyectosOrdenados.map(proy => (
-                    <li
-                        key={proy.id}
-                        style={{
-                            background: "#444",
-                            color: "#fff",
-                            marginBottom: 16,
-                            padding: 16,
-                            borderRadius: 8,
-                            cursor: "pointer"
-                        }}
-                        onClick={() => setSeleccionado(proy)}
-                    >
-                        <h3>{proy.titulo}</h3>
-                        <p>{proy.descripcion}</p>
-                        <p style={{ fontSize: "0.9em", color: "#ccc" }}>
-                            Última actualización: {getFechaMasReciente(proy.archivos).toLocaleDateString()}
-                        </p>
-                    </li>
-                ))}
-            </ul>
+        <div className="p-4">
+            <h1 className="text-2xl font-bold mb-4">Mis Proyectos</h1>
+            {proyectos.length === 0 ? (
+                <p>No hay proyectos asociados.</p>
+            ) : (
+                <ul className="space-y-4">
+                    {proyectos.map((proyecto) => (
+                        <li
+                            key={proyecto.id}
+                            className="border rounded-xl p-4 hover:bg-gray-100 cursor-pointer"
+                            onClick={() => setSeleccionado(proyecto)}
+                        >
+                            <h2 className="text-xl font-semibold">{proyecto.nombre}</h2>
+                            <p className="text-gray-600">{proyecto.descripcion}</p>
+                            <p className="text-sm text-gray-500">
+                                Desde {parseFecha(proyecto.fecha_inicio)} hasta {parseFecha(proyecto.fecha_termino)}
+                            </p>
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     );
 }
