@@ -273,7 +273,7 @@ export function DashboardEstudiante() {
                 {!seleccionado ? (
                     <>
                         <div style={{ overflowX: "auto" }}>
-                            <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse", minWidth: "800px" }}>
+                            <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse" }}>
                                 <thead>
                                     <tr style={{ background: "#333" }}>
                                         <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Proyecto</th>
