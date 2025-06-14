@@ -20,7 +20,6 @@ class Proyecto(Base):
     objetivo_general = Column(Text) 
     area_conocimiento = Column(String)
     duracion_estimada = Column(Date)
-    presupuesto_asignado = Column(Float, nullable=True)
     informacion_adicional = Column(JSON, nullable=True, default={}) 
     objetivo_especificos = Column(JSON, nullable=True, default={}) 
 

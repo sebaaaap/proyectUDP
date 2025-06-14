@@ -6,9 +6,7 @@ class Estudiante(Base):
     __tablename__ = "estudiantes"
     
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    rut_estudiante = Column(String, nullable=False, unique=True)
     fecha_nacimiento = Column(Date)
-    nacionalidad = Column(String)
     genero = Column(String)
     anio__ingreso = Column(Integer)
     carrera = Column(String)
