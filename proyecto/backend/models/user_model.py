@@ -14,7 +14,7 @@ class Usuario(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String)
     apellido = Column(String)
-    correo = Column(String, unique=True, index=True)
+    email = Column(String, unique=True, index=True)
     rol_plataforma = Column(SqlEnum(RolEnum), nullable=False)
     
     estudiante_id = Column(Integer, ForeignKey("estudiantes.id"), nullable=True)

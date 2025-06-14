@@ -50,21 +50,21 @@ async def auth(request: Request, db: Session = Depends(get_db)):
 
     # Verificar si el correo pertenece a un profesor para asignarle el rol
     profesor = db.execute(
-        text("SELECT 1 FROM profesor WHERE correo = :correo"),
-        {"correo": email}
+        text("SELECT 1 FROM profesores WHERE email = :email"),
+        {"email": email}
     ).fetchone()
     # Asignarle el rol dependiendo de lo anterior
-    rol = RolEnum.profesor if profesor else RolEnum.estudiante
+    rol_plataforma = RolEnum.profesor if profesor else RolEnum.estudiante
 
-    usuario = db.query(Usuario).filter(Usuario.correo == email).first()
+    usuario = db.query(Usuario).filter(Usuario.email == email).first()
 
     if not usuario:
         # Crear nuevo usuario en la base de datos
         usuario = Usuario(
             nombre=nombre,
             apellido=apellido,
-            correo=email,
-            rol=rol
+            email=email,
+            rol_plataforma=rol_plataforma
         )
         db.add(usuario)
         db.commit()
@@ -73,13 +73,13 @@ async def auth(request: Request, db: Session = Depends(get_db)):
     request.session['user'] = {
         'nombre': usuario.nombre,
         'apellido': usuario.apellido,
-        'correo': usuario.correo,
-        'rol': usuario.rol.value,
+        'email': usuario.email,
+        'rol_plataforma': usuario.rol_plataforma.value,
     }
 
     token = crear_token({
-        "sub": usuario.correo,
-        "rol": usuario.rol.value,
+        "sub": usuario.email,
+        "rol_plataforma": usuario.rol_plataforma.value,
     })
 
     return JSONResponse({'token': token, "token_type": "bearer"})

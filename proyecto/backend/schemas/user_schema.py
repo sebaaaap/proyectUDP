@@ -8,8 +8,8 @@ class RolEnum(str, Enum):
 class UsuarioBase(BaseModel):
     nombre: str
     apellido: str
-    correo: str
-    rol: RolEnum
+    email: str
+    rol_plataforma: RolEnum
 
 class UsuarioResponse(UsuarioBase):
     id: int
