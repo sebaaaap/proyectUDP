@@ -50,7 +50,7 @@ async def auth(request: Request, db: Session = Depends(get_db)):
 
     # Verificar si el correo pertenece a un profesor para asignarle el rol
     profesor = db.execute(
-        text("SELECT 1 FROM correo_profesores WHERE correo = :correo"),
+        text("SELECT 1 FROM profesor WHERE correo = :correo"),
         {"correo": email}
     ).fetchone()
     # Asignarle el rol dependiendo de lo anterior
