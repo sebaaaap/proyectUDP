@@ -1,5 +1,6 @@
 from sqlalchemy.orm import Session
 from models.proyecto import Proyecto
+from models.participacion import Participacion
 from datetime import datetime
 
 class ProyectoRepository:
@@ -37,3 +38,16 @@ class ProyectoRepository:
     def listar_proyectos(self):
         return self.db.query(Proyecto).all()
     
+    def obtener_proyectos_por_estudiante(self, id_estudiante: int):
+        return (
+            self.db.query(Proyecto)
+            .join(Participacion, Proyecto.id == Participacion.id_proyecto)
+            .filter(Participacion.id_estudiante == id_estudiante)
+            .all()
+        )
+        
+    def obtener_archivos_por_proyecto(self, id_proyecto: int):
+        proyecto = self.db.query(Proyecto).filter(Proyecto.id == id_proyecto).first()
+        if not proyecto:
+            return None
+        return proyecto.archivos if proyecto.archivos else []

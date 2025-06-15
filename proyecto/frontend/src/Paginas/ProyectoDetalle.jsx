@@ -1,225 +1,221 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export function ProyectoDetalle({ proyecto, volver }) {
+export function ProyectoDetalle({ proyecto, estudianteId, volver }) {
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
-    const [archivos, setArchivos] = useState(proyecto.archivos);
+    const [archivos, setArchivos] = useState([]);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState(null);
+    const [subiendoArchivo, setSubiendoArchivo] = useState(false);
 
-    // Estado para mensajes de chat por archivo
-    const [mensajesPorArchivo, setMensajesPorArchivo] = useState({});
-    const [mensajeInput, setMensajeInput] = useState("");
+    // Cargar archivos al montar el componente
+    useEffect(() => {
+        const cargarArchivos = async () => {
+            try {
+                setCargando(true);
+                setError(null);
+                
+                const response = await fetch(`http://localhost:8000/proyectos/${proyecto.id}/archivos`);
+                
+                if (!response.ok) {
+                    throw new Error(`Error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                setArchivos(data);
+            } catch (err) {
+                console.error("Error cargando archivos:", err);
+                setError(err.message);
+            } finally {
+                setCargando(false);
+            }
+        };
+        
+        cargarArchivos();
+    }, [proyecto.id]);
 
-    const handleSubirArchivo = (e) => {
+    const handleSubirArchivo = async (e) => {
         const file = e.target.files[0];
-        const maxSize = 10 * 1024 * 1024; // 10 MB
+        if (!file) return;
 
-        if (file) {
-            const allowedTypes = [
-                "application/pdf",
-                "application/zip",
-            ];
-            const allowedExtensions = [".pdf", ".zip"];
+        setSubiendoArchivo(true);
+        setError(null);
 
-            const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+        try {
+            const formData = new FormData();
+            formData.append('archivo', file);
+            formData.append('descripcion', `Subido por estudiante ${estudianteId}`);
+            formData.append('estudiante_id', estudianteId);
 
-            if (!allowedTypes.includes(file.type) && !allowedExtensions.includes(fileExtension)) {
-                alert("Solo se permiten archivos PDF o ZIP.");
-                return;
+            const response = await fetch(`http://localhost:8000/proyectos/${proyecto.id}/archivos`, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.detail || `Error ${response.status}`);
             }
-            if (file.size > maxSize) {
-                alert("El archivo no debe superar los 10 MB.");
-                return;
-            }
-            setArchivos([
-                ...archivos,
-                { id: archivos.length + 1, nombre: file.name, fecha: new Date().toISOString().split("T")[0] }
-            ]);
+
+            const nuevoArchivo = await response.json();
+            setArchivos(prev => [...prev, nuevoArchivo]);
+            
+            // Resetear input
+            e.target.value = '';
+        } catch (err) {
+            console.error("Error subiendo archivo:", err);
+            setError(err.message);
+        } finally {
+            setSubiendoArchivo(false);
         }
     };
 
-    // Formatea la fecha para mostrar hora y día, y semanas si corresponde
-    function formatearFecha(fecha) {
-        const d = new Date(fecha);
-        const ahora = new Date();
-
-        // Normalizar fechas a medianoche para comparar solo días
-        const dSinHora = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-        const ahoraSinHora = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate());
-
-        const diffMs = ahoraSinHora - dSinHora;
-        const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const opcionesHora = { hour: '2-digit', minute: '2-digit' };
-
-        if (diffDias === 0) {
-            return d.toLocaleTimeString([], opcionesHora) + " hoy";
-        } else if (diffDias === 1) {
-            return d.toLocaleTimeString([], opcionesHora) + " hace 1 día";
-        } else if (diffDias < 7) {
-            return d.toLocaleTimeString([], opcionesHora) + ` hace ${diffDias} días`;
-        } else {
-            const semanas = Math.floor(diffDias / 7);
-            return d.toLocaleTimeString([], opcionesHora) + ` hace ${semanas} semana${semanas > 1 ? "s" : ""}`;
-        }
+    // Renderizado seguro
+    if (!proyecto) {
+        return (
+            <div style={styles.container}>
+                <p>Proyecto no encontrado</p>
+                <button onClick={volver} style={styles.botonVolver}>
+                    Volver
+                </button>
+            </div>
+        );
     }
 
-    // Agrupa los integrantes por rol
-    const roles = ["Profesor", "Product Owner", "Development Team"];
-    const integrantesPorRol = roles.map(rol => ({
-        rol,
-        integrantes: (proyecto.integrantes || []).filter(i => i.rol === rol)
-    }));
-
-    // Manejar envío de mensaje en el chat
-    const enviarMensaje = () => {
-        if (!mensajeInput.trim() || !archivoSeleccionado) return;
-        setMensajesPorArchivo(prev => {
-            const prevMensajes = prev[archivoSeleccionado] || [];
-            return {
-                ...prev,
-                [archivoSeleccionado]: [
-                    ...prevMensajes,
-                    { autor: "Yo", texto: mensajeInput, fecha: new Date().toISOString() }
-                ]
-            };
-        });
-        setMensajeInput("");
-    };
-
     return (
-        <div style={{ display: "flex", height: "90vh", background: "#222", color: "#fff", borderRadius: 12 }}>
-            <div style={{ width: 220, background: "#333", padding: 24, borderRadius: "12px 0 0 12px" }}>
-                <h3 style={{ fontSize: 18, marginBottom: 16 }}>Integrantes</h3>
-                {integrantesPorRol.map(grupo => (
-                    <div key={grupo.rol} style={{ marginBottom: 16 }}>
-                        <b style={{ color: "#bbb" }}>{grupo.rol}</b>
-                        <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
-                            {grupo.integrantes.map((i, idx) => (
-                                <li key={idx} style={{ marginBottom: 8, background: "#272627", borderRadius: 12, padding: 5 }}>
-                                    {i.nombre}
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
-                ))}
-                <button onClick={volver} style={{
-                    position: "absolute",
-                    left: 24,
-                    bottom: 42,
-                    background: "#4f0000",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 8,
-                    padding: "8px 16px",
-                    cursor: "pointer"
-                }}>Volver</button>
+        <div style={styles.container}>
+            {/* Panel de integrantes */}
+            <div style={styles.panelIntegrantes}>
+                <h3 style={styles.tituloSeccion}>Integrantes</h3>
+                {/* ... renderizado de integrantes ... */}
+                <button onClick={volver} style={styles.botonVolver}>
+                    Volver
+                </button>
             </div>
 
-            <div style={{ flex: 1, padding: 24, position: "relative", display: "flex", flexDirection: "column" }}>
-                <h2 style={{ marginTop: 0 }}>{proyecto.titulo}</h2>
-                <h4 style={{ marginTop: 0, color: "#bbb" }}>Archivos subidos</h4>
-                <ul style={{ listStyle: "none", padding: 0, marginBottom: 24 }}>
-                    {archivos.map(arch => (
-                        <li key={arch.id}
-                            style={{
-                                background: archivoSeleccionado === arch.id ? "#555" : "#444",
-                                marginBottom: 10,
-                                padding: 12,
-                                borderRadius: 8,
-                                cursor: "pointer"
-                            }}
-                            onClick={() => setArchivoSeleccionado(arch.id)}
-                        >
-                            <span>{arch.nombre}</span>
-                            <span style={{ float: "right", color: "#aaa" }}>{arch.fecha}</span>
-                        </li>
-                    ))}
-                </ul>
-
-                {archivoSeleccionado && (
-                    <div style={{
-                        background: "#333",
-                        borderRadius: 8,
-                        padding: 16,
-                        marginBottom: 16,
-                        marginTop: "auto"
-                    }}>
-                        <h5>Chat sobre <span style={{ color: "#4f0000" }}>
-                            {archivos.find(a => a.id === archivoSeleccionado)?.nombre}
-                        </span></h5>
-                        <div style={{
-                            maxHeight: 150,
-                            overflowY: "auto",
-                            background: "#222",
-                            borderRadius: 6,
-                            padding: 8,
-                            marginBottom: 8
-                        }}>
-                            {(mensajesPorArchivo[archivoSeleccionado] || []).map((msg, i) => (
-                                <div key={i} style={{ marginBottom: 4 }}>
-                                    <b>{msg.autor}</b> ({formatearFecha(msg.fecha)}): {msg.texto}
-                                </div>
-                            ))}
-                        </div>
-                        <div style={{ display: "flex" }}>
-                            <input
-                                type="text"
-                                value={mensajeInput}
-                                onChange={e => setMensajeInput(e.target.value)}
-                                placeholder="Escribe un mensaje..."
+            {/* Panel principal */}
+            <div style={styles.panelPrincipal}>
+                <h2 style={styles.tituloProyecto}>{proyecto.nombre || 'Proyecto sin nombre'}</h2>
+                <p style={styles.descripcion}>{proyecto.descripcion || 'Sin descripción'}</p>
+                
+                <h4 style={styles.tituloSeccion}>Archivos subidos</h4>
+                
+                {cargando ? (
+                    <p>Cargando archivos...</p>
+                ) : error ? (
+                    <p style={styles.error}>{error}</p>
+                ) : archivos.length === 0 ? (
+                    <p>No hay archivos subidos aún</p>
+                ) : (
+                    <ul style={styles.listaArchivos}>
+                        {archivos.map(archivo => (
+                            <li 
+                                key={archivo.id}
                                 style={{
-                                    flex: 1,
-                                    borderRadius: 6,
-                                    border: "1px solid #555",
-                                    background: "#222",
-                                    color: "#fff",
-                                    padding: 6,
-                                    marginRight: 8
+                                    ...styles.itemArchivo,
+                                    backgroundColor: archivoSeleccionado === archivo.id ? '#555' : '#444'
                                 }}
-                                onKeyDown={e => {
-                                    if (e.key === "Enter") enviarMensaje();
-                                }}
-                            />
-                            <button
-                                style={{
-                                    background: "#4f0000",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: 6,
-                                    padding: "6px 16px",
-                                    cursor: "pointer"
-                                }}
-                                onClick={enviarMensaje}
+                                onClick={() => setArchivoSeleccionado(archivo.id)}
                             >
-                                Enviar
-                            </button>
-                        </div>
-                    </div>
+                                <span>{archivo.nombre}</span>
+                                <span style={styles.fechaArchivo}>
+                                    {new Date(archivo.fecha_subida).toLocaleDateString()}
+                                </span>
+                            </li>
+                        ))}
+                    </ul>
                 )}
 
-                <label style={{
-                    position: "absolute",
-                    right: 24,
-                    bottom: 24,
-                    background: "#4f0000",
-                    color: "#fff",
-                    borderRadius: "50%",
-                    width: 48,
-                    height: 48,
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    fontSize: 32,
-                    cursor: "pointer",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
-                }}>
-                    +
+                {/* Botón para subir archivos */}
+                <label style={styles.botonSubir}>
+                    {subiendoArchivo ? 'Subiendo...' : '+'}
                     <input
                         type="file"
                         accept=".pdf,.zip"
-                        style={{ display: "none" }}
+                        style={{ display: 'none' }}
                         onChange={handleSubirArchivo}
+                        disabled={subiendoArchivo}
                     />
                 </label>
             </div>
         </div>
     );
 }
+
+// Estilos como objeto JavaScript
+const styles = {
+    container: {
+        display: 'flex',
+        minHeight: '100vh',
+        backgroundColor: '#222',
+        color: '#fff'
+    },
+    panelIntegrantes: {
+        width: '250px',
+        backgroundColor: '#333',
+        padding: '20px',
+        borderRight: '1px solid #444'
+    },
+    panelPrincipal: {
+        flex: 1,
+        padding: '20px',
+        position: 'relative'
+    },
+    tituloProyecto: {
+        fontSize: '24px',
+        marginBottom: '10px'
+    },
+    descripcion: {
+        color: '#bbb',
+        marginBottom: '20px'
+    },
+    tituloSeccion: {
+        fontSize: '18px',
+        color: '#bbb',
+        marginBottom: '15px'
+    },
+    listaArchivos: {
+        listStyle: 'none',
+        padding: 0,
+        maxHeight: '60vh',
+        overflowY: 'auto'
+    },
+    itemArchivo: {
+        padding: '12px',
+        marginBottom: '10px',
+        borderRadius: '6px',
+        cursor: 'pointer',
+        display: 'flex',
+        justifyContent: 'space-between'
+    },
+    fechaArchivo: {
+        color: '#999',
+        fontSize: '12px'
+    },
+    botonSubir: {
+        position: 'fixed',
+        right: '30px',
+        bottom: '30px',
+        backgroundColor: '#4f0000',
+        color: '#fff',
+        width: '50px',
+        height: '50px',
+        borderRadius: '50%',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '24px',
+        cursor: 'pointer'
+    },
+    botonVolver: {
+        backgroundColor: '#4f0000',
+        color: '#fff',
+        border: 'none',
+        padding: '8px 16px',
+        borderRadius: '4px',
+        cursor: 'pointer',
+        marginTop: '20px'
+    },
+    error: {
+        color: '#ff6b6b'
+    }
+};

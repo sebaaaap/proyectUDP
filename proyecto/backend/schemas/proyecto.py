@@ -2,6 +2,11 @@ from pydantic import BaseModel, Field, validator
 from typing import Optional, List, Dict, Any
 from datetime import date
 from enum import Enum
+from schemas.archivos_proyecto_schemas import ArchivoProyectoResponse
+
+
+
+
 
 class EstadoProyectoEnum(str, Enum):
     propuesto = "propuesto"
@@ -23,6 +28,7 @@ class ProyectoBase(BaseModel):
     area_conocimiento: Optional[str] = None
     estado: Optional[EstadoProyectoEnum] = EstadoProyectoEnum.propuesto
 
+
 class ProyectoCreate(ProyectoBase):
     fecha_inicio: Optional[date] = None
     fecha_fin: Optional[date] = None
@@ -40,11 +46,11 @@ class ProyectoCreate(ProyectoBase):
 
 class ProyectoResponse(ProyectoBase):
     id: int
-    fecha_inicio: Optional[date]
-    fecha_fin: Optional[date]
-    presupuesto_asignado: Optional[float]
+
+    
     id_prof: Optional[int]
     id_estudiante_creador: Optional[int]
+    archivos: List[ArchivoProyectoResponse] = []
 
     class Config:
         from_attributes = True
@@ -52,3 +58,5 @@ class ProyectoResponse(ProyectoBase):
             date: lambda v: v.isoformat(),
             Dict: lambda v: dict(v),
         }
+        
+

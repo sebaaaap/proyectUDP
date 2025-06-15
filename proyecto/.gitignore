@@ -11,3 +11,5 @@ dist/
 .vscode/
 
 uploads/
+
+*backend/.env

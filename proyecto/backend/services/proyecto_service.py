@@ -32,3 +32,15 @@ class ProyectoService:
     # def actualizar_proyecto(self, proyecto_id: int, proyecto: ProyectoUpdate):
     #     update_data = proyecto.model_dump(exclude_unset=True)
     #     return self.repository.actualizar_proyecto(proyecto_id, update_data)
+    
+    def listar_proyectos_por_estudiante(self, id_estudiante: int):
+        return self.repository.obtener_proyectos_por_estudiante(id_estudiante)
+    
+    def listar_archivos_por_proyecto(self, id_proyecto: int):
+        proyecto = self.repository.obtener_proyecto_por_id(id_proyecto)
+        if not proyecto:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Proyecto no encontrado"
+            )
+        return proyecto.archivos if proyecto.archivos else []

@@ -96,6 +96,25 @@ INSERT INTO proyectos (
     2
 );
 -----
+---parucipanciones
+INSERT INTO participaciones (
+    id_proyecto,
+    id_estudiante,
+    rol,
+    fecha_inicio,
+    fecha_termino,
+    estado_aprobacion
+) VALUES
+-- Proyecto 1 (Sistema Inteligente de Gestión Energética)
+(
+    1,
+    1,
+    'co_lider',
+    '2023-02-01',
+    '2023-11-30',
+    'aprobado'
+);
+-----
 -- Datos para la tabla archivos_proyecto (PostgreSQL)
 INSERT INTO archivos_proyecto (
     id_proyecto, 
@@ -147,20 +166,3 @@ INSERT INTO evaluaciones (
 );
 ----
 -- Datos para la tabla participaciones (PostgreSQL)
-INSERT INTO participaciones (
-    id_proyecto,
-    id_estudiante,
-    rol,
-    fecha_inicio,
-    fecha_termino,
-    estado_aprobacion
-) VALUES
--- Proyecto 1 (Sistema Inteligente de Gestión Energética)
-(
-    1,
-    1,
-    'co_lider',
-    '2023-02-01',
-    '2023-11-30',
-    'aprobado'
-);
