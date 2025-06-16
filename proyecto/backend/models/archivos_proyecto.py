@@ -8,7 +8,7 @@ class ArchivoProyecto(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     id_proyecto = Column(Integer, ForeignKey("proyectos.id"), nullable=False)  # Corregido a "proyectos.id"
-    nombre_archivo = Column(String, nullable=False)
+    nombre_archivo = Column(String, nullable=False, unique=True)
     tipo_archivo = Column(String, nullable=True)
     url = Column(String, nullable=False)
     fecha_subida = Column(DateTime, default=datetime.utcnow)

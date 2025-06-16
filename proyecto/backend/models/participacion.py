@@ -26,7 +26,7 @@ class Participacion(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_proyecto = Column(Integer, ForeignKey("proyectos.id"))
     id_estudiante = Column(Integer, ForeignKey("estudiantes.id")) 
-    rol = Column(SqlEnum(RolParticipanteEnum))
+    rol_proyecto = Column(SqlEnum(RolParticipanteEnum))
     fecha_inicio = Column(Date)
     fecha_termino = Column(Date)
     estado_aprobacion = Column(SqlEnum(EstadoParticipacionEnum))

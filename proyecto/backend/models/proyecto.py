@@ -19,10 +19,7 @@ class Proyecto(Base):
     problema = Column(Text)
     objetivo_general = Column(Text) 
     area_conocimiento = Column(String)
-    fecha_inicio = Column(Date)
-    fecha_fin = Column(Date)
-    estado = Column(SqlEnum(EstadoProyectoDBEnum, name="estado_proyecto_enum"), default=EstadoProyectoDBEnum.propuesto)
-    presupuesto_asignado = Column(Float, nullable=True)
+    duracion_estimada = Column(Date)
     informacion_adicional = Column(JSON, nullable=True, default={}) 
     objetivo_especificos = Column(JSON, nullable=True, default={}) 
 

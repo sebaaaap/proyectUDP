@@ -4,9 +4,10 @@ from fastapi.middleware.cors import CORSMiddleware
 # main.py
 from fastapi import FastAPI
 from database.db import Base, engine  
-from controllers import proyecto_controller, archivos_proyectos
-from controllers import archivos_proyectos
-import models  # Esto activa los modelos vía models/__init__.py
+from controllers import proyecto_controller, archivos_proyectos, user
+from starlette.middleware.sessions import SessionMiddleware
+from fastapi.staticfiles import StaticFiles
+import models# Esto activa los modelos vía models/__init__.py
 
 
 
@@ -39,4 +40,6 @@ app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proye
 
 
 
-
+app.include_router(user.router)
+app.add_middleware(SessionMiddleware, secret_key="add any string...")
+app.mount("/static", StaticFiles(directory="static"), name="static")
