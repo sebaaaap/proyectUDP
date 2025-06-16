@@ -5,12 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="87ae6170-7791-4e21-91ab-8f9a2a329174" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/proyecto/backend/schemas/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/proyecto/backend/schemas/user.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Python Script" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -19,6 +26,9 @@
   &quot;associatedIndex&quot;: 1
 }</component>
   <component name="ProjectId" id="2y4L1KkR5ay1h6Untvi6LHyHyAV" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
@@ -57,6 +67,9 @@
       <workItem from="1749326753306" duration="1020000" />
       <workItem from="1749486103966" duration="1427000" />
       <workItem from="1749522154943" duration="1077000" />
+      <workItem from="1749569236553" duration="3574000" />
+      <workItem from="1749607943721" duration="3873000" />
+      <workItem from="1749959941372" duration="214000" />
     </task>
     <servers />
   </component>
