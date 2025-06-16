@@ -31,17 +31,17 @@ async def login(request: Request):
     return await oauth.google.authorize_redirect(request, url)
 
 
+# En tu router de autenticación (FastAPI)
 @router.get('/auth')
 async def auth(request: Request, db: Session = Depends(get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as e:
-        return OAuthError(str(e))
-
+        return RedirectResponse('/?error=auth_failed')
 
     userinfo = token.get('userinfo')
     if not userinfo:
-        return RedirectResponse('/')
+        return RedirectResponse('/?error=no_user_info')
 
     email = userinfo['email']
     nombre_completo = userinfo.get('name', '')
@@ -53,13 +53,11 @@ async def auth(request: Request, db: Session = Depends(get_db)):
         text("SELECT 1 FROM profesores WHERE email = :email"),
         {"email": email}
     ).fetchone()
-    # Asignarle el rol dependiendo de lo anterior
     rol_plataforma = RolEnum.profesor if profesor else RolEnum.estudiante
 
     usuario = db.query(Usuario).filter(Usuario.email == email).first()
 
     if not usuario:
-        # Crear nuevo usuario en la base de datos
         usuario = Usuario(
             nombre=nombre,
             apellido=apellido,
@@ -70,16 +68,11 @@ async def auth(request: Request, db: Session = Depends(get_db)):
         db.commit()
         db.refresh(usuario)
 
-    request.session['user'] = {
-        'nombre': usuario.nombre,
-        'apellido': usuario.apellido,
-        'email': usuario.email,
-        'rol_plataforma': usuario.rol_plataforma.value,
-    }
-
-    token = crear_token({
+    token_jwt = crear_token({
         "sub": usuario.email,
         "rol_plataforma": usuario.rol_plataforma.value,
     })
 
-    return JSONResponse({'token': token, "token_type": "bearer"})
+    # Redirigir al frontend con el token en la URL
+    frontend_url = f"http://localhost:3000/callback#token={token_jwt}"
+    return RedirectResponse(url=frontend_url)

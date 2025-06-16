@@ -1,11 +1,24 @@
 // Home.jsx
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+
 export const Home = () => {
+    const { isAuthenticated } = useAuth();
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!isAuthenticated) {
+            navigate('/');
+        }
+    }, [isAuthenticated, navigate]);
+
     return (
         <div style={{ width: "100%", margin: 0, padding: 0 }}>
             {/* Imagen de portada que ocupa toda la pantalla */}
             <div style={{ width: "100%", height: "100vh", overflow: "hidden" }}>
                 <img
-                    src="/imagenhome.jpg" // cambia esto por tu imagen real
+                    src="/imagenhome.jpg"
                     alt="Portada"
                     style={{
                         width: "100%",

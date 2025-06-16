@@ -1,23 +1,19 @@
 INSERT INTO estudiantes (
-    id, rut_estudiante, nombre1, nombre2, apellido1, apellido2,
-    fecha_nacimiento, nacionalidad, genero, anio__ingreso,
-    telefono, carrera, facultad, promedio_general,
-    semestre_actual, experiencia, habilidades, email
+    id, fecha_nacimiento, genero, anio__ingreso, carrera, facultad, 
+    promedio_general, semestre_actual, experiencia, habilidades, email
 ) VALUES
-(1, '12345678-9', 'Carlos', 'Eduardo', 'Pérez', 'González', '2000-05-15', 'Chilena', 'Masculino', 2019, 
- '912345678', 'Ingeniería Civil', 'Ingeniería', 5.6, '8vo', 
+(1, '2000-05-15', 'Masculino', 2019, 'Ingeniería Civil', 'Ingeniería', 
+ 5.6, '8vo', 
  '{"voluntariado": "Ayuda en campamentos", "tutorías": "Matemáticas"}', 
- '["Python", "SQL", "Comunicación"]', '1@mail.udp.cl'),  -- Email separado del array
-(2, '98765432-1', 'María', 'José', 'López', 'Ramírez', '2001-08-22', 'Chilena', 'Femenino', 2020, 
- '923456789', 'Psicología', 'Ciencias Sociales', 6.1, '6to', 
+ '["Python", "SQL", "Comunicación"]', '1@mail.udp.cl'),
+(2, '2001-08-22', 'Femenino', 2020, 'Psicología', 'Ciencias Sociales', 
+ 6.1, '6to', 
  '{"prácticas": "Centro comunitario"}', 
- '["Empatía", "Escucha activa", "SPSS"]', '2@mail.udp.cl');  -- Email separado del array
-
+ '["Empatía", "Escucha activa", "SPSS"]', '2@mail.udp.cl');
 -----
 -- Datos para la tabla profesores (PostgreSQL)
 INSERT INTO profesores (
-    rut,  
-    telefono, 
+    rut_profesor, 
     facultad, 
     especialidad, 
     departamento,
@@ -47,10 +43,7 @@ INSERT INTO proyectos (
     problema, 
     objetivo_general, 
     area_conocimiento, 
-    fecha_inicio, 
-    fecha_fin, 
-    estado, 
-    presupuesto_asignado, 
+    duracion_estimada, 
     informacion_adicional, 
     objetivo_especificos, 
     id_prof, 
@@ -62,16 +55,16 @@ INSERT INTO proyectos (
     'Alto consumo energético sin monitorización en tiempo real', 
     'Reducir el consumo energético en un 20% mediante automatización', 
     'Ingeniería Energética', 
-    '2023-02-01', 
-    '2023-11-30', 
-    'en_desarrollo', 
-    7500.00, 
+    '2023-11-30',  -- Usando como duracion_estimada la fecha de fin original
     '{
         "justificacion": "Costo energético representa el 30% del presupuesto operativo",
         "metodologia": "Prototipado rápido con sensores IoT",
         "impacto_academico": "Creará laboratorio vivo para estudiantes",
         "impacto_social": "Modelo replicable para otras instituciones",
-        "perfil_profesor": "Experto en sistemas embebidos y eficiencia energética"
+        "perfil_profesor": "Experto en sistemas embebidos y eficiencia energética",
+        "estado": "en_desarrollo",
+        "presupuesto_asignado": 7500.00,
+        "fecha_inicio": "2023-02-01"
     }', 
     '{
         "1": "Instalar 50 sensores de consumo",
@@ -86,7 +79,7 @@ INSERT INTO proyectos (
 INSERT INTO participaciones (
     id_proyecto,
     id_estudiante,
-    rol,
+    rol_proyecto,
     fecha_inicio,
     fecha_termino,
     estado_aprobacion

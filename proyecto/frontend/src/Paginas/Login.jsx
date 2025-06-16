@@ -1,6 +1,13 @@
 // Login.jsx
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+// src/Paginas/Login.jsx
+import { useAuth } from '../../context/AuthContext';
 
 export function Login() {
+    const { isAuthenticated, login } = useAuth();
+    const navigate = useNavigate();
+
     const styles = {
         page: {
             minHeight: "100vh",
@@ -33,7 +40,7 @@ export function Login() {
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
-            gap: "24px", // espaciado entre elementos internos
+            gap: "24px",
         },
         h1: {
             color: "#fff",
@@ -64,6 +71,21 @@ export function Login() {
         }
     };
 
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/home');
+        }
+    }, [isAuthenticated, navigate]);
+
+    const handleGoogleLogin = async () => {
+        try {
+            // Redirigir al backend para autenticación con Google
+            window.location.href = 'http://localhost:8000/login';
+        } catch (error) {
+            console.error("Error during login:", error);
+        }
+    };
+
     return (
         <div style={styles.page}>
             <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" style={styles.image} />
@@ -74,12 +96,10 @@ export function Login() {
                         style={styles.googleButton}
                         onMouseOver={e => e.currentTarget.style.backgroundColor = "#f1f1f1"}
                         onMouseOut={e => e.currentTarget.style.backgroundColor = "#fff"}
-                        onClick={() => {
-                            console.log("Iniciar sesión con Google");
-                        }}
+                        onClick={handleGoogleLogin}
                     >
                         <img
-                            src={"/google-icon.png"} // Asegúrate de tener un icono de Google en esta ruta
+                            src={"/google-icon.png"}
                             alt="Google"
                             style={styles.googleIcon}
                         />

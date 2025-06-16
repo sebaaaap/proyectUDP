@@ -1,16 +1,20 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
+  resolve: {
+    extensions: ['.js', '.jsx', '.json'], // Ayuda a resolver imports sin extensiones
+    alias: {
+      '@': '/src', // Opcional: crea un alias para src/
+    }
+  },
   server: {
-    host: true,  // Escuchar en todas las interfaces
-    port: 5173,  // Puerto explícito
+    host: true,
+    port: 5173,
     strictPort: true,
     watch: {
-      usePolling: true  // Necesario para algunos entornos Docker
+      usePolling: true
     }
   }
-
-})
+});

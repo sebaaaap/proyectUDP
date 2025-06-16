@@ -5,10 +5,10 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copia los archivos de configuración del proyecto
-COPY package.json package-lock.json* ./
+COPY package.json ./
 
 # Instala las dependencias
-RUN npm ci --silent
+RUN npm install --silent
 
 # Copia el resto de los archivos del proyecto
 COPY . .
