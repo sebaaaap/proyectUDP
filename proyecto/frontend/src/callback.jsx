@@ -1,23 +1,23 @@
-// Callback.jsx
+// src/Paginas/Callback.jsx
 import { useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from './context/AuthContext.jsx';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
 
-export const Callback = () => {
-    const location = useLocation();
+export function Callback() {
     const { login } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
-        const params = new URLSearchParams(location.hash.substring(1));
-        const token = params.get('token');
-
+        const hash = window.location.hash;
+        const token = hash.substring(hash.indexOf('token=') + 6);
+        
         if (token) {
-            login(token);
+            login(token); // Guarda el token en el contexto de autenticación
+            navigate('/home');
         } else {
-            navigate('/');
+            navigate('/login?error=no_token');
         }
-    }, [location, login, navigate]);
+    }, [login, navigate]);
 
-    return <div>Cargando...</div>;
-};
+    return <div>Procesando autenticación...</div>;
+}

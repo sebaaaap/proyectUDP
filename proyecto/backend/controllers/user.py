@@ -74,5 +74,5 @@ async def auth(request: Request, db: Session = Depends(get_db)):
     })
 
     # Redirigir al frontend con el token en la URL
-    frontend_url = f"http://localhost:3000/callback#token={token_jwt}"
+    frontend_url = f"http://localhost:3000/home#token={token_jwt}"
     return RedirectResponse(url=frontend_url)
