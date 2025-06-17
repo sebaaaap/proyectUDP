@@ -1,7 +1,6 @@
 from controllers.proyecto_filtro import router as proyecto_router
 from controllers.evaluacion_proyecto import router as evaluacion_router
 from fastapi.middleware.cors import CORSMiddleware
-# main.py
 from fastapi import FastAPI
 from database.db import Base, engine  
 from controllers import proyecto_controller, archivos_proyectos

@@ -1,3 +1,4 @@
+export { Ranking } from './Ranking';
 export { Login } from './Login';
 export { Registrar } from './Registrar';
 export { Home } from './Home';

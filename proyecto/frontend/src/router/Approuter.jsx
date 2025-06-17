@@ -4,6 +4,7 @@ import { Login, Registrar, Home, ProyectoForm} from "../Paginas";
 import { DashboardProfe } from "../Paginas/Dashboard-profe"; 
 import { DashboardEstudiante } from "../Paginas/Dashboard-estudiante"; 
 import { MisProyectosEstudiante } from "../Paginas/MisProyectosEstudiante";
+import { Ranking } from "../Paginas";
 
 export const Approuter = () => {
     return (
@@ -15,6 +16,7 @@ export const Approuter = () => {
                 <Route path="dashboard-profe" element={<DashboardProfe />} /> 
                 <Route path="dashboard-estudiante" element={<DashboardEstudiante />} /> 
                 <Route path="mis-proyectos" element={<MisProyectosEstudiante />} /> 
+                <Route path="ranking" element={<Ranking />} />  
             </Route>
                             <Route path="login" element={<Login />} />
 

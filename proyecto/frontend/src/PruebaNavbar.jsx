@@ -52,6 +52,7 @@ function PruebaNavbar() {
                             <Nav.Link as={Link} to="/proyecto-form" style={{ fontSize: '20px', color: "white" }}>Formulario de Proyecto</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
                             <Nav.Link as={Link} to="/mis-proyectos" style={{ fontSize: '20px', color: "white" }}>Mis proyectos</Nav.Link>
+                            <Nav.Link as={Link} to="/ranking" style={{ fontSize: '20px', color: "white" }}>🏆 Ranking</Nav.Link>
                         </Nav>
                         {/* Buscador y Notificaciones DERECHA */}
                         <div className="ms-auto d-flex align-items-center" style={{ gap: 20 }}>
