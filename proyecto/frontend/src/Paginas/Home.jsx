@@ -1,7 +1,7 @@
 // Home.jsx
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../context/AuthContext.jsx';
 
 export const Home = () => {
     const { isAuthenticated } = useAuth();

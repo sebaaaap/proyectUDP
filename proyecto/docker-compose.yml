@@ -15,32 +15,33 @@ services:
   backend:
     build: ./backend
     volumes:
-      # - ./backend/llave.json:/app/llave.json:ro  # Montaje explícito y seguro
       - uploads_volume:/app/uploads
       - ./backend:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     environment:
-       - DATABASE_URL=postgresql://postgres:postgres@db:5432/proyectUDP
-
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/proyectUDP
+      - GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=tu-client-secret 
 
   frontend:
-    build: 
-      context: ./frontend  # Apunta al directorio frontend
+    build:
+      context: ./frontend
       dockerfile: Dockerfile
     volumes:
-      - ./frontend:/app  # Monta el directorio frontend
-      - /app/node_modules  # Volumen separado para node_modules
+      - ./frontend:/app
+      - frontend_node_modules:/app/node_modules
     ports:
       - "5173:5173"
     environment:
       - NODE_ENV=development
-    stdin_open: true  # Necesario para Vite
-    tty: true  # Necesario para Vite
-
+    stdin_open: true
+    tty: true
 
 volumes:
   postgres_data:
   uploads_volume:
+  frontend_node_modules:

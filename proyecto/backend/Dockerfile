@@ -1,28 +1,24 @@
-# backend/Dockerfile
-
 FROM python:3.11-slim
 
-# Evita que Python genere archivos .pyc
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
-# Instala dependencias del sistema
+# Instala dependencias del sistema necesarias para psycopg2 y otras
 RUN apt-get update && apt-get install -y \
-    build-essential
+    build-essential \
+    libpq-dev \
+    curl \
+    && apt-get clean
 
-# Crea el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de dependencias primero
 COPY requirements.txt .
 
-# Instala las dependencias de Python
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Prepara carpeta de archivos
 RUN mkdir -p /app/uploads
 
-# Copia el código fuente al contenedor
 COPY . .
 
-# Comando por defecto al iniciar el contenedor
-CMD ["uvicorn", "main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+# El comando lo define docker-compose.yml, así que no hace falta CMD aquí.

@@ -1,19 +1,22 @@
-# Usa la imagen oficial de Node.js con la versión LTS
+# Usa una imagen ligera de Node.js
 FROM node:20-alpine
 
-# Establece el directorio de trabajo dentro del contenedor
+# Establece el directorio de trabajo
 WORKDIR /app
 
-# Copia los archivos de configuración del proyecto
+# Copia archivos de dependencias
 COPY package.json ./
 
-# Instala las dependencias
+# Si tienes package-lock.json, también lo copias:
+# COPY package-lock.json ./
+
+# Instala todas las dependencias declaradas en package.json
 RUN npm install --silent
 
-# Copia el resto de los archivos del proyecto
+# Copia el resto del código fuente
 COPY . .
 
-# Puerto que expone la aplicación (el mismo que usa Vite por defecto)
+# Expone el puerto del servidor de desarrollo (Vite)
 EXPOSE 5173
 
 # Comando para iniciar la aplicación en modo desarrollo
