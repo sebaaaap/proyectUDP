@@ -12,6 +12,7 @@ RUN npm ci --silent
 
 # Copia el resto de los archivos del proyecto
 COPY . .
+RUN rm -rf node_modules && npm install
 
 # Puerto que expone la aplicación (el mismo que usa Vite por defecto)
 EXPOSE 5173

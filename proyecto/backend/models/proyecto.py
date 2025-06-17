@@ -47,3 +47,5 @@ class Proyecto(Base):
         back_populates="proyecto_rel",
         cascade="all, delete-orphan"
     )
+
+    votos = relationship("Voto", back_populates="proyecto")

@@ -20,3 +20,5 @@ class Profesor(Base):
 
     proyecto = relationship("Proyecto", back_populates="profesor")
     # evaluacion = relationship("Evaluacion", back_populates="profesor")
+
+    votos = relationship("Voto", back_populates="profesor")
