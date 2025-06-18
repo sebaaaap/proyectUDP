@@ -20,9 +20,20 @@ function PruebaNavbar() {
         { id: 2, mensaje: "Nuevo archivo subido a tu proyecto", leido: false }
     ]);
 
-    // Obtener información del usuario autenticado
-    const { user } = useAuth();
+    // Obtener información del usuario autenticado y función de logout
+    const { user, logout } = useAuth();
     const isEstudiante = user?.rol === 'estudiante';
+
+    const handleLogout = () => {
+        logout(); // Esto limpiará el token y redirigirá a '/'
+        // También hacer logout en el backend
+        fetch("http://localhost:8000/logout", {
+            method: "POST",
+            credentials: "include",
+        }).catch(error => {
+            console.error('Error en logout del backend:', error);
+        });
+    };
 
     return (
         <>
@@ -50,9 +61,9 @@ function PruebaNavbar() {
                                 }
                                 id="navbarScrollingDropdown"
                             >
-                                <NavDropdown.Item as={Link} to="/login" style={{ fontSize: '18px' }}>Cerrar Sección</NavDropdown.Item>
+                                <NavDropdown.Item onClick={handleLogout} style={{ fontSize: '18px' }}>Cerrar Sesión</NavDropdown.Item>
                             </NavDropdown>
-                            <Nav.Link as={Link} to="/" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
+                            <Nav.Link as={Link} to="/Home" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
                             {/* Solo mostrar Formulario de Proyecto para estudiantes */}
                             {isEstudiante && (

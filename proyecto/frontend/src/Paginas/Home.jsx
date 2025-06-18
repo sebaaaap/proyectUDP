@@ -12,8 +12,12 @@ export const Home = () => {
         navigate("/proyecto-form");
     };
 
-    const handleLogout = () => {
-        window.location.href = "http://localhost:8000/logout";
+    const irAlDashboard = () => {
+        if (usuario?.rol === 'estudiante') {
+            navigate("/dashboard-estudiante");
+        } else if (usuario?.rol === 'profesor') {
+            navigate("/dashboard-profe");
+        }
     };
 
     useEffect(() => {
@@ -132,6 +136,25 @@ export const Home = () => {
                     alignItems: "center",
                     marginTop: "20px"
                 }}>
+                    {/* Botón de ir al Dashboard */}
+                    <button
+                        onClick={irAlDashboard}
+                        style={{
+                            backgroundColor: "#007bff",
+                            color: "white",
+                            border: "none",
+                            padding: "12px 24px",
+                            borderRadius: "12px",
+                            fontSize: "16px",
+                            cursor: "pointer",
+                            transition: "background-color 0.3s"
+                        }}
+                        onMouseOver={(e) => e.target.style.backgroundColor = "#0056b3"}
+                        onMouseOut={(e) => e.target.style.backgroundColor = "#007bff"}
+                    >
+                        Ir al Dashboard
+                    </button>
+
                     {/* Solo mostrar botón de crear proyecto para estudiantes */}
                     {isEstudiante && (
                         <button
@@ -152,21 +175,6 @@ export const Home = () => {
                             Crear Proyecto
                         </button>
                     )}
-
-                    <button
-                        onClick={handleLogout}
-                        style={{
-                            backgroundColor: "transparent",
-                            color: "#dc3545",
-                            border: "none",
-                            padding: "8px 16px",
-                            fontSize: "14px",
-                            cursor: "pointer",
-                            textDecoration: "underline"
-                        }}
-                    >
-                        Cerrar sesión
-                    </button>
                 </div>
                 
                 <p style={{ marginTop: "30px" }}>

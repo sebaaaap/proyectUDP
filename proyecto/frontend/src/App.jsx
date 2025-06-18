@@ -14,20 +14,9 @@ import CompletarPerfilEstudiante from "./Paginas/CompletarPerfilEstudiante.jsx";
 import CompletarPerfilProfesor from "./Paginas/CompletarPerfilProfesor.jsx";
 import PruebaNavbar from "./PruebaNavbar.jsx";
 import { Callback } from "./callback.jsx";
-
-// Layout con Navbar
-function LayoutWithNavbar() {
-  return (
-    <>
-      <PruebaNavbar />
-      <Routes>
-        <Route path="/home" element={<Home />} />
-        <Route path="/crear-proyecto" element={<CrearProyecto />} />
-        {/* Aquí puedes agregar más rutas que SÍ deben tener navbar */}
-      </Routes>
-    </>
-  );
-}
+import { DashboardProfe } from "./Paginas/Dashboard-profe";
+import { DashboardEstudiante } from "./Paginas/Dashboard-estudiante";
+import { MisProyectosEstudiante } from "./Paginas/MisProyectosEstudiante";
 
 // Componente para la página principal (sin navbar)
 function MainPage() {
@@ -133,7 +122,13 @@ function App() {
       <Route path="/callback" element={<Callback />} />
       
       {/* Rutas con Navbar (todas las demás) */}
-      <Route path="/*" element={<LayoutWithNavbar />} />
+      <Route path="/*" element={<PruebaNavbar />}>
+        <Route path="home" element={<Home />} />
+        <Route path="crear-proyecto" element={<CrearProyecto />} />
+        <Route path="dashboard-profe" element={<DashboardProfe />} />
+        <Route path="dashboard-estudiante" element={<DashboardEstudiante />} />
+        <Route path="mis-proyectos" element={<MisProyectosEstudiante />} />
+      </Route>
     </Routes>
   );
 }
