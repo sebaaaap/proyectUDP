@@ -4,10 +4,11 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from database.db import Base, engine  
-from controllers import proyecto_controller, archivos_proyectos, user
+from controllers import proyecto_controller, archivos_proyectos, user, utils, proyecto
 # from controllers.proyecto_filtro import router as proyecto_filtro_router
 # from controllers.evaluacion_proyecto import router as evaluacion_router
 from controllers.proyecto import router as proyecto_controller
+
 
 # Importar modelos para activar la creación de tablas
 import models
@@ -42,7 +43,10 @@ def read_root():
 # app.include_router(archivos_proyectos.router)
 # app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
 app.include_router(user.router)
+app.include_router(utils.router)
 
+
+app.include_router(proyecto.router, prefix="/proyectos", tags=["proyectos"])
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

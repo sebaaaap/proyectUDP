@@ -8,10 +8,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, useNavigate } from "react-router-dom";
-import Home from "../src/Paginas/HomeV2.jsx";
-import CrearProyecto from "../src/Paginas/CrearProyecto.jsx";
+import Home from "./Paginas/HomeV2";
+import CrearProyecto from "./Paginas/CrearProyecto";
 import CompletarPerfilEstudiante from "./Paginas/CompletarPerfilEstudiante.jsx";
-import CompletarPerfilProfesor from "./Paginas/CompletarPerfilProfesor.jsx";
+import CompletarPerfilProfesor from "./Paginas/CompletarPerfilProfesor";
+import { Login } from "./Paginas/Login";
 
 function App() {
 
@@ -24,8 +25,9 @@ function App() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/crear-proyecto" element={<CrearProyecto />} />
-        <Route path="/completar-perfil-estudiante" element={<CompletarPerfilEstudiante /> } />
-        <Route path="/completar-perfil-profesor" element={<CompletarPerfilProfesor /> } />
+        <Route path="/completar-perfil-estudiante" element={<CompletarPerfilEstudiante />} />
+        <Route path="/completar-perfil-profesor" element={<CompletarPerfilProfesor />} />
+        <Route path="/login" element={<Login />} />
 
         <Route
           path="/"

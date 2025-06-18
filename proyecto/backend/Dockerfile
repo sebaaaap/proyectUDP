@@ -21,4 +21,8 @@ RUN mkdir -p /app/uploads
 
 COPY . .
 
-# El comando lo define docker-compose.yml, así que no hace falta CMD aquí.
+# Crear directorio para uploads si no existe
+RUN mkdir -p uploads
+
+# Ejecutar el script de seed al iniciar
+CMD python scripts/seed_carreras.py && uvicorn main:app --host 0.0.0.0 --port 8000 --reload

@@ -5,13 +5,10 @@ FROM node:20-alpine
 WORKDIR /app
 
 # Copia archivos de dependencias
-COPY package.json ./
-
-# Si tienes package-lock.json, también lo copias:
-# COPY package-lock.json ./
+COPY package*.json ./
 
 # Instala todas las dependencias declaradas en package.json
-RUN npm install --silent
+RUN npm install
 
 # Copia el resto del código fuente
 COPY . .
@@ -20,4 +17,4 @@ COPY . .
 EXPOSE 5173
 
 # Comando para iniciar la aplicación en modo desarrollo
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "dev", "--", "--host", "0.0.0.0"]

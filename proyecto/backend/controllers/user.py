@@ -52,14 +52,12 @@ async def auth(request: Request, db: Session = Depends(get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as e:
-        return templates.TemplateResponse(
-            name='error.html',
-            context={'request': request, 'error': e.error}
-        )
+        # Redirigir al frontend con el error
+        return RedirectResponse(url=f"http://localhost:5173/login?error={e.error}")
 
     userinfo = token.get('userinfo')
     if not userinfo:
-        return RedirectResponse('/')
+        return RedirectResponse('http://localhost:5173/login')
 
     email = userinfo['email']
     nombre_completo = userinfo.get('name', '')

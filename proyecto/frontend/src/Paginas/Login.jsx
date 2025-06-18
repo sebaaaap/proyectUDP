@@ -1,12 +1,14 @@
 // Login.jsx
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 // src/Paginas/Login.jsx
 import { useAuth } from '../context/AuthContext';
 
 export function Login() {
     const { isAuthenticated, login } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const [error, setError] = useState('');
 
     const styles = {
         page: {
@@ -49,6 +51,15 @@ export function Login() {
             textAlign: "center",
             margin: 0,
         },
+        errorMessage: {
+            color: "#ff4444",
+            backgroundColor: "rgba(255, 68, 68, 0.1)",
+            padding: "10px",
+            borderRadius: "5px",
+            width: "100%",
+            textAlign: "center",
+            marginBottom: "10px"
+        },
         googleButton: {
             display: "flex",
             alignItems: "center",
@@ -72,16 +83,24 @@ export function Login() {
     };
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate('/login');
+        // Check for error in URL parameters
+        const errorParam = searchParams.get('error');
+        if (errorParam) {
+            setError(decodeURIComponent(errorParam));
         }
-    }, [isAuthenticated, navigate]);
+
+        // If already authenticated, redirect to home
+        if (isAuthenticated) {
+            navigate('/home');
+        }
+    }, [isAuthenticated, navigate, searchParams]);
 
     const handleGoogleLogin = async () => {
         try {
             // Redirigir al backend para autenticación con Google
             window.location.href = 'http://localhost:8000/login';
         } catch (error) {
+            setError("Error al iniciar sesión. Por favor, intenta nuevamente.");
             console.error("Error during login:", error);
         }
     };
@@ -92,6 +111,7 @@ export function Login() {
             <div style={styles.rightContainer}>
                 <div style={styles.container}>
                     <h1 style={styles.h1}>Inicia sesión con tu cuenta UDP</h1>
+                    {error && <div style={styles.errorMessage}>{error}</div>}
                     <button
                         style={styles.googleButton}
                         onMouseOver={e => e.currentTarget.style.backgroundColor = "#f1f1f1"}

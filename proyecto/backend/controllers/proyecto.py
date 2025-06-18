@@ -27,7 +27,7 @@ def crear_proyecto(proyecto_data: ProyectoCreate, usuario=Depends(verificar_toke
     db.refresh(nuevo_proyecto)
     return {"mensaje": "Proyecto creado", "proyecto": nuevo_proyecto}
 
-# ruta para postular a un proyecto
+# ruta para postular a un proyecto esta vista hacer Q!!!!!!
 @router.post("/{proyecto_id}/postular")
 def postular(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
@@ -75,6 +75,9 @@ def cambiar_estado(proyecto_id: int, estado: EstadoProyectoDBEnum, usuario=Depen
     return {"mensaje": f"Proyecto marcado como {estado}"}
 
 # ruta para ver los participantes de un proyecto
+
+
+
 @router.get("/{proyecto_id}/integrantes")
 def ver_integrantes(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     proyecto = db.query(Proyecto).filter_by(id=proyecto_id).first()
