@@ -94,15 +94,15 @@ async def auth(request: Request, db: Session = Depends(get_db)):
         "apellido": usuario.apellido,
     })
 
-    # Preparar redirección según el rol y estado del perfil
-    if rol == RolEnum.estudiante:
+    # Preparar redirección según el rol guardado en la base de datos y estado del perfil
+    if usuario.rol == RolEnum.estudiante:
         estudiante = db.query(Estudiante).filter_by(id=usuario.id).first()
         if not estudiante:
             redirect_url = "http://localhost:5173/completar-perfil-estudiante"
         else:
             redirect_url = "http://localhost:5173/home"
 
-    elif rol == RolEnum.profesor:
+    elif usuario.rol == RolEnum.profesor:
         profesor = db.query(Profesor).filter_by(id=usuario.id).first()
         if not profesor:
             redirect_url = "http://localhost:5173/completar-perfil-profesor"
