@@ -9,6 +9,7 @@ from database.db import get_db
 import logging
 import uuid
 import os
+import io
 from pathlib import Path
 from typing import List
 from models.proyecto import Proyecto

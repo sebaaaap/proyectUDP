@@ -1,6 +1,7 @@
 version: '3.9'
 
 services:
+  # Base de datos PostgreSQL
   db:
     image: postgres:15
     environment:
@@ -11,7 +12,9 @@ services:
       - postgres_data:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    restart: unless-stopped
 
+  # Backend FastAPI
   backend:
     build: ./backend
     volumes:
@@ -24,9 +27,16 @@ services:
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     environment:
       - DATABASE_URL=postgresql://postgres:postgres@db:5432/proyectUDP
-      - GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
-      - GOOGLE_CLIENT_SECRET=tu-client-secret 
+      # IMPORTANTE: Reemplaza estos valores con tus credenciales reales de Google OAuth
+      # Obtén las credenciales en: https://console.cloud.google.com/apis/credentials
+      - GOOGLE_CLIENT_ID=72805868214-2oai4k6bpkebki43s5hv4g2vtlr0u910.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
+      # Configuración JWT
+      - SECRET_KEY=supersecreto_udp_2024_muy_seguro_y_largo
+      - ALGORITHM=HS256
+    restart: unless-stopped
 
+  # Frontend React
   frontend:
     build:
       context: ./frontend
@@ -40,8 +50,10 @@ services:
       - NODE_ENV=development
     stdin_open: true
     tty: true
+    restart: unless-stopped
 
+# Volúmenes persistentes
 volumes:
-  postgres_data:
-  uploads_volume:
-  frontend_node_modules:
+  postgres_data:    # Datos de PostgreSQL
+  uploads_volume:   # Archivos subidos por usuarios
+  frontend_node_modules:  # Dependencias de Node.js

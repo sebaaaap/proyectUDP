@@ -1,6 +1,9 @@
 import smtplib
+import logging
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+
+logger = logging.getLogger(__name__)
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
@@ -20,6 +23,7 @@ def enviar_correo(destinatario, asunto, cuerpo):
             server.starttls()
             server.login(SMTP_EMAIL, SMTP_PASSWORD)
             server.sendmail(SMTP_EMAIL, destinatario, mensaje.as_string())
-            print(f"Correo enviado a {destinatario}")
+            logger.info(f"Correo enviado exitosamente a {destinatario}")
     except Exception as e:
-        print(f"Error al enviar correo: {e}")
+        logger.error(f"Error al enviar correo a {destinatario}: {e}")
+        raise
