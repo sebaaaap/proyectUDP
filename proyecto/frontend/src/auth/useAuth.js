@@ -33,4 +33,5 @@ const useAuth = ({ redirectTo = "/" } = {}) => {
   return { usuario, loading };
 };
 
+export { useAuth };
 export default useAuth;

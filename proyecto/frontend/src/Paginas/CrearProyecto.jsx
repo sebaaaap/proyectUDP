@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import useAuth from "../auth/useAuth";
+import { useAuth } from "../auth/useAuth";
 import axios from "axios";
 
 const CrearProyecto = ({ usuario }) => {

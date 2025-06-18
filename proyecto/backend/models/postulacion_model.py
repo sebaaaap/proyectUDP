@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime
+from sqlalchemy import Column, Integer, ForeignKey, Enum, DateTime, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database.db import Base
@@ -17,6 +17,11 @@ class Postulacion(Base):
     proyecto_id = Column(Integer, ForeignKey("proyectos.id"), nullable=False)
     estado = Column(Enum(EstadoPostulacionEnum), default=EstadoPostulacionEnum.pendiente)
     fecha_postulacion = Column(DateTime, default=datetime.utcnow)
+
+    # Add unique constraint for proyecto_id and usuario_id
+    __table_args__ = (
+        UniqueConstraint('proyecto_id', 'usuario_id', name='uq_postulacion_proyecto_usuario'),
+    )
 
     estudiante = relationship("Usuario")
     proyecto = relationship("Proyecto")

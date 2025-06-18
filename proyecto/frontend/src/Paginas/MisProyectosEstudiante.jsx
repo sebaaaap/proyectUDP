@@ -1,25 +1,33 @@
 import { useEffect, useState } from "react";
 import { ProyectoDetalle } from "./ProyectoDetalle";
 import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router-dom";
+
+// API configuration
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export function MisProyectosEstudiante() {
     const [proyectos, setProyectos] = useState([]);
     const [seleccionado, setSeleccionado] = useState(null);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
-    const { user } = useAuth();
+    const { usuario, loading } = useAuth({ redirectTo: '/' });
+    const navigate = useNavigate();
 
     function parseFecha(fecha) {
         if (!fecha) return "";
         try {
             const date = new Date(fecha);
+            if (isNaN(date.getTime())) {
+                throw new Error("Fecha inválida");
+            }
             const dia = String(date.getDate()).padStart(2, "0");
             const mes = String(date.getMonth() + 1).padStart(2, "0");
             const año = date.getFullYear();
             return `${dia}-${mes}-${año}`;
         } catch (e) {
             console.error("Error parseando fecha:", e);
-            return fecha;
+            return "Fecha inválida";
         }
     }
 
@@ -29,9 +37,13 @@ export function MisProyectosEstudiante() {
                 setCargando(true);
                 setError(null);
                 
-                console.log("Obteniendo proyectos para usuario:", user);
+                if (!usuario) {
+                    throw new Error("Debes iniciar sesión para ver tus proyectos");
+                }
                 
-                const response = await fetch(`http://localhost:8000/proyectos/usuario`, {
+                console.log("Obteniendo proyectos para usuario:", usuario);
+                
+                const response = await fetch(`${API_BASE_URL}/proyectos/usuario`, {
                     credentials: 'include',
                     headers: {
                         'Accept': 'application/json',
@@ -53,20 +65,29 @@ export function MisProyectosEstudiante() {
                 setProyectos(data);
             } catch (err) {
                 console.error("Error al obtener proyectos:", err);
-                setError(err.message);
+                setError(err.message || "Error al cargar los proyectos. Por favor, intenta nuevamente.");
             } finally {
                 setCargando(false);
             }
         };
 
-        if (user) {
+        if (!loading && usuario) {
             obtenerProyectos();
-        } else {
-            console.log("No hay usuario autenticado");
-            setError("Debes iniciar sesión para ver tus proyectos");
-            setCargando(false);
         }
-    }, [user]);
+    }, [usuario, loading]);
+
+    if (loading) {
+        return (
+            <div style={{ 
+                padding: "24px", 
+                minHeight: "100vh", 
+                backgroundColor: "#222", 
+                color: "#fff" 
+            }}>
+                Cargando...
+            </div>
+        );
+    }
 
     if (seleccionado) {
         return (
@@ -139,7 +160,7 @@ export function MisProyectosEstudiante() {
                                 <span style={{ fontSize: "0.875rem", color: "#999" }}>
                                     Estado: {proyecto.estado}
                                 </span>
-                                {proyecto.creador_id === user?.id && (
+                                {proyecto.creador_id === usuario?.id && (
                                     <span style={{ fontSize: "0.875rem", color: "#4caf50" }}>
                                         Creador
                                     </span>
