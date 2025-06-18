@@ -75,9 +75,6 @@ def cambiar_estado(proyecto_id: int, estado: EstadoProyectoDBEnum, usuario=Depen
     return {"mensaje": f"Proyecto marcado como {estado}"}
 
 # ruta para ver los participantes de un proyecto
-
-
-
 @router.get("/{proyecto_id}/integrantes")
 def ver_integrantes(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     proyecto = db.query(Proyecto).filter_by(id=proyecto_id).first()
@@ -91,5 +88,30 @@ def ver_integrantes(proyecto_id: int, usuario=Depends(verificar_token), db: Sess
         Postulacion.estado == "aceptado"
     ).all()
     return aceptados
+
+@router.get("/usuario")
+def obtener_proyectos_usuario(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+
+    # Obtener proyectos donde el usuario es creador
+    proyectos_creados = db.query(Proyecto).filter(Proyecto.creador_id == usuario_db.id).all()
+    
+    # Obtener proyectos donde el usuario está postulado y aceptado
+    proyectos_postulados = (
+        db.query(Proyecto)
+        .join(Postulacion, Proyecto.id == Postulacion.proyecto_id)
+        .filter(
+            Postulacion.usuario_id == usuario_db.id,
+            Postulacion.estado == EstadoPostulacionEnum.aceptado
+        )
+        .all()
+    )
+
+    # Combinar y eliminar duplicados
+    todos_proyectos = list(set(proyectos_creados + proyectos_postulados))
+    
+    return todos_proyectos
 
 

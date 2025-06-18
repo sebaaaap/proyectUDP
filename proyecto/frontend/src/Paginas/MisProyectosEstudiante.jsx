@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { ProyectoDetalle } from "./ProyectoDetalle";
+import { useAuth } from "../auth/useAuth";
 
 export function MisProyectosEstudiante() {
     const [proyectos, setProyectos] = useState([]);
     const [seleccionado, setSeleccionado] = useState(null);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
-    
-    const estudianteId = 1; // Debería venir de autenticación
+    const { user } = useAuth();
 
     function parseFecha(fecha) {
         if (!fecha) return "";
@@ -19,7 +19,7 @@ export function MisProyectosEstudiante() {
             return `${dia}-${mes}-${año}`;
         } catch (e) {
             console.error("Error parseando fecha:", e);
-            return fecha; // Devuelve la fecha original si falla el parseo
+            return fecha;
         }
     }
 
@@ -29,13 +29,22 @@ export function MisProyectosEstudiante() {
                 setCargando(true);
                 setError(null);
                 
-                const response = await fetch(`http://localhost:8000/proyectos/estudiante/${estudianteId}`);
+                console.log("Obteniendo proyectos para usuario:", user);
+                
+                const response = await fetch(`http://localhost:8000/proyectos/usuario`, {
+                    credentials: 'include',
+                    headers: {
+                        'Accept': 'application/json',
+                    }
+                });
                 
                 if (!response.ok) {
-                    throw new Error(`Error HTTP: ${response.status}`);
+                    const errorData = await response.json().catch(() => ({}));
+                    throw new Error(errorData.detail || `Error HTTP: ${response.status}`);
                 }
                 
                 const data = await response.json();
+                console.log("Proyectos recibidos:", data);
                 
                 if (!Array.isArray(data)) {
                     throw new Error("La respuesta no es un array");
@@ -50,15 +59,20 @@ export function MisProyectosEstudiante() {
             }
         };
 
-        obtenerProyectos();
-    }, []);
+        if (user) {
+            obtenerProyectos();
+        } else {
+            console.log("No hay usuario autenticado");
+            setError("Debes iniciar sesión para ver tus proyectos");
+            setCargando(false);
+        }
+    }, [user]);
 
     if (seleccionado) {
         return (
             <div style={{ minHeight: '100vh', backgroundColor: '#222' }}>
                 <ProyectoDetalle
                     proyecto={seleccionado}
-                    estudianteId={estudianteId}
                     volver={() => setSeleccionado(null)}
                 />
             </div>
@@ -116,14 +130,21 @@ export function MisProyectosEstudiante() {
                             onClick={() => setSeleccionado(proyecto)}
                         >
                             <h2 style={{ fontSize: "1.25rem", fontWeight: 600 }}>
-                                {proyecto.nombre}
+                                {proyecto.titulo}
                             </h2>
                             <p style={{ color: "#bbb", margin: "8px 0" }}>
                                 {proyecto.descripcion}
                             </p>
-                            <p style={{ fontSize: "0.875rem", color: "#999" }}>
-                                Desde {parseFecha(proyecto.fecha_inicio)} hasta {parseFecha(proyecto.fecha_termino)}
-                            </p>
+                            <div style={{ display: "flex", gap: "16px", marginTop: "8px" }}>
+                                <span style={{ fontSize: "0.875rem", color: "#999" }}>
+                                    Estado: {proyecto.estado}
+                                </span>
+                                {proyecto.creador_id === user?.id && (
+                                    <span style={{ fontSize: "0.875rem", color: "#4caf50" }}>
+                                        Creador
+                                    </span>
+                                )}
+                            </div>
                         </li>
                     ))}
                 </ul>
