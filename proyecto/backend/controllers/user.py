@@ -94,11 +94,6 @@ async def auth(request: Request, db: Session = Depends(get_db)):
             "rol_plataforma": usuario.rol_plataforma.value,
         })
 
-<<<<<<< HEAD
-    # Redirigir al frontend con el token en la URL
-    frontend_url = f"http://localhost:5173/callback#token={token_jwt}"
-    return RedirectResponse(url=frontend_url)
-=======
         # Redirigir al frontend con el token en la URL
         frontend_url = f"http://localhost:5173/callback#token={token_jwt}"
         return RedirectResponse(url=frontend_url)
@@ -107,4 +102,3 @@ async def auth(request: Request, db: Session = Depends(get_db)):
         db.rollback()
         logger.error(f"Error creando/obteniendo usuario: {str(e)}")
         return RedirectResponse('/?error=user_creation_failed')
->>>>>>> 60bcadc015cbaf846b334349da0ecc1a1fd148ee
