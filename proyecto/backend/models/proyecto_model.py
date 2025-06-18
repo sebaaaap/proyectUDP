@@ -37,3 +37,5 @@ class Proyecto(Base):
         foreign_keys=[profesor_id],
         back_populates="proyectos_asignados"
     )
+
+    archivos = relationship("ArchivoProyecto", back_populates="proyecto")
