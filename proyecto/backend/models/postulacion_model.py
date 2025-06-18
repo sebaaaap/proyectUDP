@@ -20,3 +20,4 @@ class Postulacion(Base):
 
     estudiante = relationship("Usuario")
     proyecto = relationship("Proyecto")
+    archivos = relationship("ArchivoProyecto", back_populates="postulacion")
