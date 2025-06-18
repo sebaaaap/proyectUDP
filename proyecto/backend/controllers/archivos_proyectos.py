@@ -8,7 +8,7 @@ import os
 from pathlib import Path
 from database.db import get_db
 from models.archivos_proyecto import ArchivoProyecto
-from models.proyecto_model import Proyecto
+from models.proyecto_model import Proyecto, EstadoProyectoDBEnum
 from models.postulacion_model import Postulacion, EstadoPostulacionEnum
 from models.user_model import Usuario
 from helpers.jwtAuth import verificar_token
@@ -39,20 +39,28 @@ async def subir_archivo_proyecto(
     if not proyecto:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
 
-    # 3. Verificar que el usuario está postulado y aceptado al proyecto
-    postulacion = db.query(Postulacion).filter(
-        Postulacion.proyecto_id == id_proyecto,
-        Postulacion.usuario_id == usuario_db.id,
-        Postulacion.estado == EstadoPostulacionEnum.aceptado
-    ).first()
-    
-    if not postulacion and usuario_db.id != proyecto.creador_id:
-        raise HTTPException(
-            status_code=403,
-            detail="No tienes permiso para subir archivos a este proyecto"
-        )
+    # 3. Verificar estado del proyecto
+    if proyecto.estado != EstadoProyectoDBEnum.aprobado:
+        raise HTTPException(status_code=403, detail="El proyecto no está aprobado. No se pueden subir archivos.")
 
-    # 4. Validar y guardar archivo
+    # 4. Verificar permisos del usuario
+    if usuario_db.id == proyecto.creador_id:
+        # El creador puede subir archivos si el proyecto está aprobado (ya validado arriba)
+        pass
+    else:
+        # Participante: debe tener postulación aceptada
+        postulacion = db.query(Postulacion).filter(
+            Postulacion.proyecto_id == id_proyecto,
+            Postulacion.usuario_id == usuario_db.id,
+            Postulacion.estado == EstadoPostulacionEnum.aceptado
+        ).first()
+        if not postulacion:
+            raise HTTPException(
+                status_code=403,
+                detail="No tienes permiso para subir archivos a este proyecto"
+            )
+
+    # 5. Validar y guardar archivo
     try:
         contenido = await archivo.read()
         if len(contenido) > 5 * 1024 * 1024:  # 5MB límite

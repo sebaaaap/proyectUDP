@@ -1,4 +1,4 @@
-from sqlalchemy import Column, ForeignKeyConstraint, Integer, String, ForeignKey, DateTime
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 from datetime import datetime
 from database.db import Base
@@ -18,19 +18,12 @@ class ArchivoProyecto(Base):
     # Relación con Proyecto
     proyecto = relationship("Proyecto", back_populates="archivos")
 
-    # Relación con Postulacion usando ForeignKeyConstraint
-    __table_args__ = (
-        ForeignKeyConstraint(
-            ['id_proyecto', 'id_estudiante'],
-            ['postulaciones.proyecto_id', 'postulaciones.usuario_id']
-        ),
-    )
-
-    postulacion = relationship(
-        "Postulacion",
-        foreign_keys=[id_proyecto, id_estudiante],
-        primaryjoin="and_(ArchivoProyecto.id_proyecto==Postulacion.proyecto_id, "
-                   "ArchivoProyecto.id_estudiante==Postulacion.usuario_id)",
-        back_populates="archivos",
-        viewonly=True
-    )
+    # Relación con Postulacion (solo para consulta, no FK compuesta)
+    # Puedes dejar esto si quieres acceder a la postulacion desde el archivo, pero no es FK
+    # postulacion = relationship(
+    #     "Postulacion",
+    #     primaryjoin="and_(ArchivoProyecto.id_proyecto==Postulacion.proyecto_id, "
+    #                "ArchivoProyecto.id_estudiante==Postulacion.usuario_id)",
+    #     back_populates="archivos",
+    #     viewonly=True
+    # )

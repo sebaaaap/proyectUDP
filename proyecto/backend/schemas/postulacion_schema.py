@@ -12,6 +12,7 @@ class PostulacionBase(BaseModel):
 
 class PostulacionCreate(BaseModel):
     proyecto_id: int
+    motivacion: str
 
 class PostulacionResponse(BaseModel):
     id: int

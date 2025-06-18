@@ -11,27 +11,11 @@ export function DashboardEstudiante() {
     const [filtroEstado, setFiltroEstado] = useState("Todos");
 
     useEffect(() => {
-        // Obtener proyectos desde el backend
-        fetch("http://localhost:8000/proyectos/getall")
+        // Obtener solo proyectos aprobados desde el backend
+        fetch("http://localhost:8000/proyectos/aprobados", { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
-                // Ajustar los datos al formato esperado por el frontend
-                const proyectosAdaptados = data.map(p => ({
-                    id: p.id,
-                    titulo: p.titulo,
-                    descripcion: p.descripcion,
-                    problema: p.problema,
-                    objetivo_general: p.objetivo_general,
-                    area_conocimiento: p.area_conocimiento,
-                    estado: p.estado,
-                    fechaInicio: p.fecha_inicio,
-                    fechaFin: p.fecha_fin,
-                    informacionAdicional: p.informacion_adicional,
-                    objetivoEspecificos: p.objetivo_especificos,
-                    idProf: p.id_prof,
-                    idEstudianteCreador: p.id_estudiante_creador
-                }));
-                setProyectos(proyectosAdaptados);
+                setProyectos(data);
             })
             .catch(() => {
                 setProyectos([]);
@@ -73,25 +57,30 @@ export function DashboardEstudiante() {
         setProyectoAPostular(null);
     };
 
-    const confirmarPostulacion = () => {
+    const postularAProyecto = async (proyectoId, motivacion) => {
+        const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/postular`, {
+            method: "POST",
+            credentials: "include",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ proyecto_id: proyectoId, motivacion })
+        });
+        if (response.ok) {
+            setMensaje("¡Te has postulado correctamente!");
+            // Actualiza el estado si es necesario
+        } else {
+            setMensaje("Error al postularse");
+        }
+    };
+
+    const confirmarPostulacion = async () => {
         if (!motivacion.trim()) {
             setMensaje("Debes ingresar una motivación para postularte");
             setTimeout(() => setMensaje(""), 2500);
             return;
         }
-
-        const nuevaPostulacion = {
-            id: postulaciones.length + 1,
-            proyectoId: proyectoAPostular.id,
-            estado: "Postulado",
-            estadoPostulacion: "En revisión",
-            fechaPostulacion: new Date().toISOString().split('T')[0],
-            comentario: "",
-            motivacion: motivacion
-        };
-
-        setPostulaciones([...postulaciones, nuevaPostulacion]);
-        setMensaje(`¡Te has postulado a "${proyectoAPostular.titulo}" correctamente!`);
+        await postularAProyecto(proyectoAPostular.id, motivacion);
         setMotivacion("");
         setMostrarFormularioPostulacion(false);
         setProyectoAPostular(null);
@@ -272,119 +261,82 @@ export function DashboardEstudiante() {
 
                 {!seleccionado ? (
                     <>
-                        <div style={{ overflowX: "auto" }}>
-                            <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse" }}>
-                                <thead>
-                                    <tr style={{ background: "#333" }}>
-                                        <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Proyecto</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Área</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Estado</th>
-                                        <th style={{ padding: "12px", textAlign: "center" }}>Fecha inicio</th>
-                                        <th style={{ padding: "12px", textAlign: "center" }}>Fecha fin</th>
-                                        <th style={{ padding: "12px", textAlign: "center", borderRadius: "0 8px 8px 0" }}>Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {proyectosFiltrados.map((proyecto) => {
-                                        const postulado = estaPostulado(proyecto.id);
-                                        const estado = getEstadoPostulacion(proyecto.id);
-
-                                        return (
-                                            <tr key={proyecto.id} style={{ background: "#555", borderBottom: "8px solid #403f3f" }}>
-                                                <td style={{ padding: "12px" }}>
-                                                    <div style={{ fontWeight: "bold" }}>{proyecto.titulo}</div>
-                                                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>{proyecto.objetivo_general}</div>
-                                                </td>
-                                                <td style={{ padding: "12px" }}>{proyecto.area_conocimiento || "No especificada"}</td>
-                                                <td style={{ padding: "12px" }}>
-                                                    <span style={{
-                                                        display: "inline-block",
-                                                        padding: "4px 12px",
-                                                        borderRadius: "20px",
-                                                        background: postulado
-                                                            ? estado === "Aprobada"
-                                                                ? "rgba(76, 175, 80, 0.2)"
-                                                                : estado === "Rechazada"
-                                                                    ? "rgba(244, 67, 54, 0.2)"
-                                                                    : "rgba(255, 193, 7, 0.2)"
-                                                            : "transparent",
-                                                        color: postulado
-                                                            ? estado === "Aprobada"
-                                                                ? "#4caf50"
-                                                                : estado === "Rechazada"
-                                                                    ? "#f44336"
-                                                                    : "#ffc107"
-                                                            : "#bbb",
-                                                        fontWeight: "bold",
-                                                        fontSize: "0.85rem"
-                                                    }}>
-                                                        {postulado ? estado : (proyecto.estado || "Propuesto")}
-                                                    </span>
-                                                </td>
-                                                <td style={{ padding: "12px", textAlign: "center" }}>{proyecto.fechaInicio || "-"}</td>
-                                                <td style={{ padding: "12px", textAlign: "center" }}>{proyecto.fechaFin || "-"}</td>
-                                                <td style={{ padding: "12px", textAlign: "center" }}>
-                                                    <div style={{ display: "flex", gap: "8px", justifyContent: "center" }}>
-                                                        <button
-                                                            style={{
-                                                                padding: "8px 16px",
-                                                                borderRadius: "8px",
-                                                                border: "none",
-                                                                background: "#007bff",
-                                                                color: "#fff",
-                                                                cursor: "pointer",
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                gap: "8px"
-                                                            }}
-                                                            onClick={() => setSeleccionado(proyecto)}
-                                                        >
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                                <circle cx="12" cy="12" r="3"></circle>
-                                                            </svg>
-                                                            Detalles
-                                                        </button>
-                                                        <button
-                                                            style={{
-                                                                padding: "8px 16px",
-                                                                borderRadius: "8px",
-                                                                border: "none",
-                                                                background: postulado ? "#dc3545" : "#28a745",
-                                                                color: "#fff",
-                                                                cursor: "pointer",
-                                                                display: "flex",
-                                                                alignItems: "center",
-                                                                gap: "8px"
-                                                            }}
-                                                            onClick={() => iniciarPostulacion(proyecto)}
-                                                        >
-                                                            {postulado ? (
-                                                                <>
-                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                                                        <polyline points="7 3 7 8 15 8"></polyline>
-                                                                    </svg>
-                                                                    Cancelar
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                                        <path d="M12 20h9"></path>
-                                                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                                                                    </svg>
-                                                                    Postularme
-                                                                </>
-                                                            )}
-                                                        </button>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "24px" }}>
+                            {proyectosFiltrados.map((proyecto) => (
+                                <div key={proyecto.id} style={{ background: "#333", borderRadius: "12px", padding: "24px", width: "350px", color: "#fff" }}>
+                                    <h2 style={{ marginBottom: "8px" }}>{proyecto.titulo}</h2>
+                                    <p style={{ color: "#bbb", marginBottom: "8px" }}>{proyecto.descripcion}</p>
+                                    <p><b>Profesor a cargo:</b> {proyecto.profesor}</p>
+                                    <p><b>Área:</b> {proyecto.area}</p>
+                                    <div>
+                                        <b>Perfiles requeridos:</b>
+                                        <ul style={{ margin: 0, paddingLeft: 18 }}>
+                                            {Array.isArray(proyecto.perfiles_requeridos) && proyecto.perfiles_requeridos.length > 0 ? (
+                                                proyecto.perfiles_requeridos.map((perfil, idx) => (
+                                                    <li key={idx}>{perfil.carrera} ({perfil.cantidad})</li>
+                                                ))
+                                            ) : (
+                                                <li>No especificados</li>
+                                            )}
+                                        </ul>
+                                    </div>
+                                    <div style={{ display: "flex", justifyContent: "flex-end", gap: "8px" }}>
+                                        <button
+                                            style={{
+                                                padding: "8px 16px",
+                                                borderRadius: "8px",
+                                                border: "none",
+                                                background: "#007bff",
+                                                color: "#fff",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "8px"
+                                            }}
+                                            onClick={() => setSeleccionado(proyecto)}
+                                        >
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                <circle cx="12" cy="12" r="3"></circle>
+                                            </svg>
+                                            Detalles
+                                        </button>
+                                        <button
+                                            style={{
+                                                padding: "8px 16px",
+                                                borderRadius: "8px",
+                                                border: "none",
+                                                background: estaPostulado(proyecto.id) ? "#dc3545" : "#28a745",
+                                                color: "#fff",
+                                                cursor: "pointer",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                gap: "8px"
+                                            }}
+                                            onClick={() => iniciarPostulacion(proyecto)}
+                                        >
+                                            {estaPostulado(proyecto.id) ? (
+                                                <>
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                                        <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                                        <polyline points="7 3 7 8 15 8"></polyline>
+                                                    </svg>
+                                                    Cancelar
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                        <path d="M12 20h9"></path>
+                                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                                    </svg>
+                                                    Postularme
+                                                </>
+                                            )}
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
 
                         {proyectosFiltrados.length === 0 && (

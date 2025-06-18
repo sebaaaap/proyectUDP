@@ -1,11 +1,12 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Body
 from sqlalchemy.orm import Session
 from database.db import get_db
-from models.proyecto_model import Proyecto
-from schemas.proyecto_schema import ProyectoCreate, EstadoProyectoDBEnum
+from models.proyecto_model import Proyecto, EstadoProyectoDBEnum
+from schemas.proyecto_schema import ProyectoCreate
 from models.user_model import Usuario, RolEnum
 from models.postulacion_model import Postulacion, EstadoPostulacionEnum
 from helpers.jwtAuth import verificar_token
+from schemas.postulacion_schema import PostulacionCreate
 
 router = APIRouter()
 
@@ -29,8 +30,8 @@ def crear_proyecto(proyecto_data: ProyectoCreate, usuario=Depends(verificar_toke
 
 # ruta para postular a un proyecto esta vista hacer Q!!!!!!
 @router.post("/{proyecto_id}/postular")
-def postular(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
-    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
+def postular(proyecto_id: int, datos: PostulacionCreate = Body(...), usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
     if usuario_db.rol != RolEnum.estudiante:
         raise HTTPException(status_code=403, detail="Solo estudiantes pueden postular")
 
@@ -38,10 +39,15 @@ def postular(proyecto_id: int, usuario=Depends(verificar_token), db: Session = D
     if not proyecto or proyecto.creador_id == usuario_db.id:
         raise HTTPException(status_code=403, detail="No puedes postular a tu propio proyecto")
 
-    if db.query(Postulacion).filter_by(proyecto_id=proyecto_id, estudiante_id=usuario_db.id).first():
+    if db.query(Postulacion).filter_by(proyecto_id=proyecto_id, usuario_id=usuario_db.id).first():
         raise HTTPException(status_code=400, detail="Ya postulaste")
 
-    postulacion = Postulacion(proyecto_id=proyecto_id, estudiante_id=usuario_db.id, estado="pendiente")
+    postulacion = Postulacion(
+        proyecto_id=proyecto_id,
+        usuario_id=usuario_db.id,
+        estado=EstadoPostulacionEnum.pendiente,
+        motivacion=datos.motivacion
+    )
     db.add(postulacion)
     db.commit()
     return {"mensaje": "Postulación enviada"}
@@ -113,5 +119,22 @@ def obtener_proyectos_usuario(usuario=Depends(verificar_token), db: Session = De
     todos_proyectos = list(set(proyectos_creados + proyectos_postulados))
     
     return todos_proyectos
+
+@router.get("/aprobados")
+def listar_proyectos_aprobados(db: Session = Depends(get_db)):
+    proyectos = db.query(Proyecto).filter(Proyecto.estado == EstadoProyectoDBEnum.aprobado).all()
+    resultado = []
+    for p in proyectos:
+        profesor = db.query(Usuario).filter(Usuario.id == p.profesor_id).first()
+        resultado.append({
+            "id": p.id,
+            "titulo": p.titulo,
+            "descripcion": p.descripcion,
+            "profesor": f"{profesor.nombre} {profesor.apellido}" if profesor else "",
+            "perfiles_requeridos": p.perfiles_requeridos,
+            "area": p.problema,
+            "estado": p.estado.value
+        })
+    return resultado
 
 
