@@ -1,0 +1,76 @@
+Index: proyecto/backend/controllers/user.py
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+>from fastapi import APIRouter, Depends, HTTPException\nfrom sqlalchemy.orm import Session\nfrom sqlalchemy.sql import text\nfrom starlette.requests import Request\nfrom starlette.responses import RedirectResponse\nfrom authlib.integrations.starlette_client import OAuth, OAuthError\nfrom config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET\nimport logging\nfrom ..models.user_model import Usuario, RolEnum, Estudiante, Profesor\nfrom ..database.db import get_db\nfrom ..helpers.jwtAuth import verificar_usuario, crear_token, decode_token\nfrom ..schemas.user_schema import PerfilProfesor, PerfilEstudiante\n\n\n\nlogger = logging.getLogger(__name__)\nrouter = APIRouter()\n\n# Validar que las credenciales estén configuradas\nif not GOOGLE_CLIENT_ID or GOOGLE_CLIENT_ID == \"tu-client-id.apps.googleusercontent.com\":\n    logger.error(\"GOOGLE_CLIENT_ID no está configurado correctamente\")\n    raise ValueError(\"GOOGLE_CLIENT_ID debe estar configurado en las variables de entorno\")\n\nif not GOOGLE_CLIENT_SECRET or GOOGLE_CLIENT_SECRET == \"tu-client-secret\":\n    logger.error(\"GOOGLE_CLIENT_SECRET no está configurado correctamente\")\n    raise ValueError(\"GOOGLE_CLIENT_SECRET debe estar configurado en las variables de entorno\")\n\noauth = OAuth()\noauth.register(\n    name='google',\n    server_metadata_url='https://accounts.google.com/.well-known/openid-configuration',\n    client_id=GOOGLE_CLIENT_ID,\n    client_secret=GOOGLE_CLIENT_SECRET,\n    client_kwargs={\n        'scope': 'email openid profile',\n        'redirect_uri': 'http://localhost:8000/auth'\n    }\n)\n\n@router.get(\"/login\")\nasync def login(request: Request):\n    try:\n        url = request.url_for('auth')\n        return await oauth.google.authorize_redirect(request, url)\n    except Exception as e:\n        logger.error(f\"Error en login: {str(e)}\")\n        raise HTTPException(status_code=500, detail=\"Error interno en autenticación\")\n\n@router.get('/auth')\nasync def auth(request: Request, db: Session = Depends(get_db)):\n    try:\n        token = await oauth.google.authorize_access_token(request)\n    except OAuthError as e:\n        logger.error(f\"Error de OAuth: {str(e)}\")\n        return RedirectResponse('/?error=auth_failed')\n    except Exception as e:\n        logger.error(f\"Error inesperado en auth: {str(e)}\")\n        return RedirectResponse('/?error=unexpected_error')\n\n    userinfo = token.get('userinfo')\n    if not userinfo:\n        logger.error(\"No se obtuvo información del usuario\")\n        return RedirectResponse('/?error=no_user_info')\n\n    email = userinfo['email']\n    nombre_completo = userinfo.get('name', '')\n    nombre = ' '.join(nombre_completo.split(' ')[0:2]) if nombre_completo else ''\n    apellido = ' '.join(nombre_completo.split(' ')[2:4]) if nombre_completo else ''\n\n    # Verificar si el correo pertenece a un profesor para asignarle el rol\n    try:\n        profesor = db.execute(\n            text(\"SELECT 1 FROM profesores WHERE email = :email\"),\n            {\"email\": email}\n        ).fetchone()\n        rol_plataforma = RolEnum.profesor if profesor else RolEnum.estudiante\n    except Exception as e:\n        logger.error(f\"Error verificando rol de profesor: {str(e)}\")\n        rol_plataforma = RolEnum.estudiante  # Default a estudiante si hay error\n\n    try:\n        usuario = db.query(Usuario).filter(Usuario.email == email).first()\n\n        if not usuario:\n            usuario = Usuario(\n                nombre=nombre,\n                apellido=apellido,\n                email=email,\n                rol_plataforma=rol_plataforma\n            )\n            db.add(usuario)\n            db.commit()\n            db.refresh(usuario)\n\n        token_jwt = crear_token({\n            \"sub\": usuario.email,\n            \"rol_plataforma\": usuario.rol_plataforma.value,\n        })\n\n        # Redirigir al frontend con el token en la URL\n        frontend_url = f\"http://localhost:5173/callback#token={token_jwt}\"\n        return RedirectResponse(url=frontend_url)\n        \n    except Exception as e:\n        db.rollback()\n        logger.error(f\"Error creando/obteniendo usuario: {str(e)}\")\n        return RedirectResponse('/?error=user_creation_failed')\n    # Redirigir al frontend con el token en la URL\n    frontend_url = f\"http://localhost:3000/home#token={token_jwt}\"\n    return RedirectResponse(url=frontend_url)\n\n@router.post(\"/completar-perfil/estudiante\")\ndef completar_perfil_estudiante(\n    perfil: PerfilEstudiante,\n    db: Session = Depends(get_db),\n    usuario_data=Depends(verificar_usuario)\n):\n    if usuario_data[\"rol\"] != \"estudiante\":\n        raise HTTPException(status_code=403, detail=\"Solo los estudiantes pueden usar este endpoint\")\n\n    usuario = db.query(Usuario).filter(Usuario.correo == usuario_data[\"sub\"]).first()\n    if not usuario:\n        raise HTTPException(status_code=404, detail=\"Usuario no encontrado\")\n\n    if db.query(Estudiante).filter(Estudiante.id == usuario.id).first():\n        raise HTTPException(status_code=400, detail=\"Perfil de estudiante ya registrado\")\n\n    estudiante = Estudiante(\n        id=usuario.id,\n        carrera_id=perfil.carrera_id,\n        semestre_actual=perfil.semestre_actual,\n        promedio_general=perfil.promedio_general\n    )\n    db.add(estudiante)\n    db.commit()\n    return {\"mensaje\": \"Perfil de estudiante completado\"}\n\n@router.post(\"/completar-perfil/profesor\")\ndef completar_perfil_profesor(\n    perfil: PerfilProfesor,\n    db: Session = Depends(get_db),\n    usuario_data=Depends(verificar_usuario)\n):\n    if usuario_data[\"rol\"] != \"profesor\":\n        raise HTTPException(status_code=403, detail=\"Solo los profesores pueden usar este endpoint\")\n\n    usuario = db.query(Usuario).filter(Usuario.correo == usuario_data[\"sub\"]).first()\n    if not usuario:\n        raise HTTPException(status_code=404, detail=\"Usuario no encontrado\")\n\n    if db.query(Profesor).filter(Profesor.id == usuario.id).first():\n        raise HTTPException(status_code=400, detail=\"Perfil de profesor ya registrado\")\n\n    profesor = Profesor(\n        id=usuario.id,\n        facultad=perfil.facultad\n    )\n    db.add(profesor)\n    db.commit()\n    return {\"mensaje\": \"Perfil de profesor completado\"}\n\n@router.get(\"/me\")\nasync def obtener_usuario_actual(request: Request, db: Session = Depends(get_db)):\n    token = request.cookies.get(\"access_token\")\n    if not token:\n        raise HTTPException(status_code=401, detail=\"No autenticado\")\n\n    payload = decode_token(token)\n    if not payload:\n        raise HTTPException(status_code=401, detail=\"Token inválido o expirado\")\n\n    correo = payload.get(\"sub\")\n    usuario = db.query(Usuario).filter(Usuario.correo == correo).first()\n    if not usuario:\n        raise HTTPException(status_code=404, detail=\"Usuario no encontrado\")\n\n    return {\n        \"nombre\": usuario.nombre,\n        \"apellido\": usuario.apellido,\n        \"correo\": usuario.correo,\n        \"rol\": usuario.rol.value\n    }\n
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/proyecto/backend/controllers/user.py b/proyecto/backend/controllers/user.py
+--- a/proyecto/backend/controllers/user.py	(revision 668c47674605b732423fc041f2faaaa448e65579)
++++ b/proyecto/backend/controllers/user.py	(date 1750212107186)
+@@ -12,7 +12,6 @@
+ from ..schemas.user_schema import PerfilProfesor, PerfilEstudiante
+ 
+ 
+-
+ logger = logging.getLogger(__name__)
+ router = APIRouter()
+ 
+Index: .idea/workspace.xml
+IDEA additional info:
+Subsystem: com.intellij.openapi.diff.impl.patch.BaseRevisionTextPatchEP
+<+><?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<project version=\"4\">\n  <component name=\"AutoImportSettings\">\n    <option name=\"autoReloadType\" value=\"SELECTIVE\" />\n  </component>\n  <component name=\"ChangeListManager\">\n    <list default=\"true\" id=\"87ae6170-7791-4e21-91ab-8f9a2a329174\" name=\"Changes\" comment=\"\" />\n    <option name=\"SHOW_DIALOG\" value=\"false\" />\n    <option name=\"HIGHLIGHT_CONFLICTS\" value=\"true\" />\n    <option name=\"HIGHLIGHT_NON_ACTIVE_CHANGELIST\" value=\"false\" />\n    <option name=\"LAST_RESOLUTION\" value=\"IGNORE\" />\n  </component>\n  <component name=\"Git.Settings\">\n    <option name=\"RECENT_GIT_ROOT_PATH\" value=\"$PROJECT_DIR$\" />\n  </component>\n  <component name=\"ProjectColorInfo\">{\n  &quot;associatedIndex&quot;: 1\n}</component>\n  <component name=\"ProjectId\" id=\"2y4L1KkR5ay1h6Untvi6LHyHyAV\" />\n  <component name=\"ProjectLevelVcsManager\">\n    <ConfirmationsSetting value=\"2\" id=\"Add\" />\n  </component>\n  <component name=\"ProjectViewState\">\n    <option name=\"hideEmptyMiddlePackages\" value=\"true\" />\n    <option name=\"showLibraryContents\" value=\"true\" />\n  </component>\n  <component name=\"PropertiesComponent\"><![CDATA[{\n  \"keyToString\": {\n    \"ModuleVcsDetector.initialDetectionPerformed\": \"true\",\n    \"RunOnceActivity.ShowReadmeOnStart\": \"true\",\n    \"RunOnceActivity.git.unshallow\": \"true\",\n    \"git-widget-placeholder\": \"login-subida__de__archivos\",\n    \"last_opened_file_path\": \"/home/harol/proyectUDP\",\n    \"node.js.detected.package.eslint\": \"true\",\n    \"node.js.detected.package.tslint\": \"true\",\n    \"node.js.selected.package.eslint\": \"(autodetect)\",\n    \"node.js.selected.package.tslint\": \"(autodetect)\",\n    \"nodejs_package_manager_path\": \"npm\",\n    \"vue.rearranger.settings.migration\": \"true\"\n  }\n}]]></component>\n  <component name=\"SharedIndexes\">\n    <attachedChunks>\n      <set>\n        <option value=\"bundled-js-predefined-d6986cc7102b-6a121458b545-JavaScript-PY-251.25410.159\" />\n        <option value=\"bundled-python-sdk-e0ed3721d81e-36ea0e71a18c-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-251.25410.159\" />\n      </set>\n    </attachedChunks>\n  </component>\n  <component name=\"TaskManager\">\n    <task active=\"true\" id=\"Default\" summary=\"Default task\">\n      <changelist id=\"87ae6170-7791-4e21-91ab-8f9a2a329174\" name=\"Changes\" comment=\"\" />\n      <created>1749088682712</created>\n      <option name=\"number\" value=\"Default\" />\n      <option name=\"presentableId\" value=\"Default\" />\n      <updated>1749088682712</updated>\n      <workItem from=\"1749088683780\" duration=\"3514000\" />\n      <workItem from=\"1749326753306\" duration=\"1020000\" />\n      <workItem from=\"1749486103966\" duration=\"1427000\" />\n      <workItem from=\"1749522154943\" duration=\"1077000\" />\n    </task>\n    <servers />\n  </component>\n  <component name=\"TypeScriptGeneratedFilesManager\">\n    <option name=\"version\" value=\"3\" />\n  </component>\n</project>
+Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP
+<+>UTF-8
+===================================================================
+diff --git a/.idea/workspace.xml b/.idea/workspace.xml
+--- a/.idea/workspace.xml	(revision 668c47674605b732423fc041f2faaaa448e65579)
++++ b/.idea/workspace.xml	(date 1750212180402)
+@@ -4,13 +4,29 @@
+     <option name="autoReloadType" value="SELECTIVE" />
+   </component>
+   <component name="ChangeListManager">
+-    <list default="true" id="87ae6170-7791-4e21-91ab-8f9a2a329174" name="Changes" comment="" />
++    <list default="true" id="87ae6170-7791-4e21-91ab-8f9a2a329174" name="Changes" comment="">
++      <change beforePath="$PROJECT_DIR$/proyecto/backend/controllers/user.py" beforeDir="false" afterPath="$PROJECT_DIR$/proyecto/backend/controllers/user.py" afterDir="false" />
++    </list>
+     <option name="SHOW_DIALOG" value="false" />
+     <option name="HIGHLIGHT_CONFLICTS" value="true" />
+     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+     <option name="LAST_RESOLUTION" value="IGNORE" />
+   </component>
++  <component name="FileTemplateManagerImpl">
++    <option name="RECENT_TEMPLATES">
++      <list>
++        <option value="Python Script" />
++        <option value="JavaScript File" />
++        <option value="JSX File" />
++      </list>
++    </option>
++  </component>
+   <component name="Git.Settings">
++    <option name="RECENT_BRANCH_BY_REPOSITORY">
++      <map>
++        <entry key="$PROJECT_DIR$" value="login-subida_de_archivos" />
++      </map>
++    </option>
+     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+   </component>
+   <component name="ProjectColorInfo">{
+@@ -29,7 +45,7 @@
+     "ModuleVcsDetector.initialDetectionPerformed": "true",
+     "RunOnceActivity.ShowReadmeOnStart": "true",
+     "RunOnceActivity.git.unshallow": "true",
+-    "git-widget-placeholder": "login-subida__de__archivos",
++    "git-widget-placeholder": "rama16",
+     "last_opened_file_path": "/home/harol/proyectUDP",
+     "node.js.detected.package.eslint": "true",
+     "node.js.detected.package.tslint": "true",
+@@ -58,6 +74,7 @@
+       <workItem from="1749326753306" duration="1020000" />
+       <workItem from="1749486103966" duration="1427000" />
+       <workItem from="1749522154943" duration="1077000" />
++      <workItem from="1750205429058" duration="6550000" />
+     </task>
+     <servers />
+   </component>

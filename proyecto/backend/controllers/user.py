@@ -12,7 +12,6 @@ from ..helpers.jwtAuth import verificar_usuario, crear_token, decode_token
 from ..schemas.user_schema import PerfilProfesor, PerfilEstudiante
 
 
-
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
