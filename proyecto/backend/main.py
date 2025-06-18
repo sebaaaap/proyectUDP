@@ -5,8 +5,9 @@ from fastapi.staticfiles import StaticFiles
 
 from database.db import Base, engine  
 from controllers import proyecto_controller, archivos_proyectos, user
-from controllers.proyecto_filtro import router as proyecto_filtro_router
-from controllers.evaluacion_proyecto import router as evaluacion_router
+# from controllers.proyecto_filtro import router as proyecto_filtro_router
+# from controllers.evaluacion_proyecto import router as evaluacion_router
+from controllers.proyecto import router as proyecto_controller
 
 # Importar modelos para activar la creación de tablas
 import models
@@ -26,6 +27,8 @@ app.add_middleware(
 app.add_middleware(SessionMiddleware, secret_key="add any string...")
 
 # Crear las tablas de la base de datos
+
+
 Base.metadata.create_all(bind=engine)
 
 # Ruta de prueba
@@ -34,11 +37,12 @@ def read_root():
     return {"message": "Hola mundo - API Proyecto UDP"}
 
 # Incluir routers
-app.include_router(proyecto_filtro_router)
-app.include_router(evaluacion_router)
-app.include_router(archivos_proyectos.router)
-app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
+# app.include_router(proyecto_filtro_router)
+# app.include_router(evaluacion_router)
+# app.include_router(archivos_proyectos.router)
+# app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
 app.include_router(user.router)
+
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

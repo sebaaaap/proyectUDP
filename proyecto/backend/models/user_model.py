@@ -2,7 +2,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
 from sqlalchemy import Enum as SqlEnum
 import enum
-from ..database.db import  Base
+from database.db import  Base
 
 class RolEnum(enum.Enum):
     estudiante = "estudiante"
@@ -31,6 +31,9 @@ class Usuario(Base):
     )
 
     postulaciones = relationship("Postulacion", back_populates="estudiante")
+
+
+
 
 class Estudiante(Base):
     __tablename__ = "estudiantes"

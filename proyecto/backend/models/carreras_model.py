@@ -1,4 +1,4 @@
-from ..database.db import Base
+from database.db import Base
 from sqlalchemy import Column, Integer, String
 
 class Carrera(Base):

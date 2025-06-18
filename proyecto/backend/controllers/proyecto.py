@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from ..database.db import get_db
-from ..models.proyecto_model import Proyecto
-from ..schemas.proyecto_schema import ProyectoCreate, EstadoProyectoDBEnum
-from ..models.user_model import Usuario, RolEnum
-from ..models.postulacion_model import Postulacion, EstadoPostulacionEnum
-from ..helpers.jwtAuth import verificar_token
+from database.db import get_db
+from models.proyecto_model import Proyecto
+from schemas.proyecto_schema import ProyectoCreate, EstadoProyectoDBEnum
+from models.user_model import Usuario, RolEnum
+from models.postulacion_model import Postulacion, EstadoPostulacionEnum
+from helpers.jwtAuth import verificar_token
 
 router = APIRouter()
 

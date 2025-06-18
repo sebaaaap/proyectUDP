@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, Enum as SqlEnum
 from sqlalchemy.orm import relationship
 import enum
-from ..database.db import  Base
+from database.db import  Base
 
 class EstadoProyectoDBEnum(enum.Enum):
     propuesto = "propuesto"

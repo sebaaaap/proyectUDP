@@ -1,28 +1,30 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
+
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
 import logging
-from ..models.user_model import Usuario, RolEnum, Estudiante, Profesor
-from ..database.db import get_db
-from ..helpers.jwtAuth import verificar_usuario, crear_token, decode_token
-from ..schemas.user_schema import PerfilProfesor, PerfilEstudiante
+from models.user_model import Usuario, RolEnum, Estudiante, Profesor
+from database.db import get_db
+from helpers.jwtAuth import verificar_usuario, crear_token, decode_token
+from schemas.user_schema import PerfilProfesor, PerfilEstudiante
 
 
 logger = logging.getLogger(__name__)
+
 router = APIRouter()
 
 # Validar que las credenciales estén configuradas
-if not GOOGLE_CLIENT_ID or GOOGLE_CLIENT_ID == "tu-client-id.apps.googleusercontent.com":
-    logger.error("GOOGLE_CLIENT_ID no está configurado correctamente")
-    raise ValueError("GOOGLE_CLIENT_ID debe estar configurado en las variables de entorno")
+# if not GOOGLE_CLIENT_ID or GOOGLE_CLIENT_ID == "tu-client-id.apps.googleusercontent.com":
+#     logger.error("GOOGLE_CLIENT_ID no está configurado correctamente")
+#     raise ValueError("GOOGLE_CLIENT_ID debe estar configurado en las variables de entorno")
 
-if not GOOGLE_CLIENT_SECRET or GOOGLE_CLIENT_SECRET == "tu-client-secret":
-    logger.error("GOOGLE_CLIENT_SECRET no está configurado correctamente")
-    raise ValueError("GOOGLE_CLIENT_SECRET debe estar configurado en las variables de entorno")
+# if not GOOGLE_CLIENT_SECRET or GOOGLE_CLIENT_SECRET == "tu-client-secret":
+#     logger.error("GOOGLE_CLIENT_SECRET no está configurado correctamente")
+#     raise ValueError("GOOGLE_CLIENT_SECRET debe estar configurado en las variables de entorno")
 
 oauth = OAuth()
 oauth.register(
@@ -50,63 +52,76 @@ async def auth(request: Request, db: Session = Depends(get_db)):
     try:
         token = await oauth.google.authorize_access_token(request)
     except OAuthError as e:
-        logger.error(f"Error de OAuth: {str(e)}")
-        return RedirectResponse('/?error=auth_failed')
-    except Exception as e:
-        logger.error(f"Error inesperado en auth: {str(e)}")
-        return RedirectResponse('/?error=unexpected_error')
+        return templates.TemplateResponse(
+            name='error.html',
+            context={'request': request, 'error': e.error}
+        )
 
     userinfo = token.get('userinfo')
     if not userinfo:
-        logger.error("No se obtuvo información del usuario")
-        return RedirectResponse('/?error=no_user_info')
+        return RedirectResponse('/')
 
     email = userinfo['email']
     nombre_completo = userinfo.get('name', '')
-    nombre = ' '.join(nombre_completo.split(' ')[0:2]) if nombre_completo else ''
-    apellido = ' '.join(nombre_completo.split(' ')[2:4]) if nombre_completo else ''
+    nombre = ' '.join(nombre_completo.split(' ')[0:2])
+    apellido = ' '.join(nombre_completo.split(' ')[2:4])
 
     # Verificar si el correo pertenece a un profesor para asignarle el rol
-    try:
-        profesor = db.execute(
-            text("SELECT 1 FROM profesores WHERE email = :email"),
-            {"email": email}
-        ).fetchone()
-        rol_plataforma = RolEnum.profesor if profesor else RolEnum.estudiante
-    except Exception as e:
-        logger.error(f"Error verificando rol de profesor: {str(e)}")
-        rol_plataforma = RolEnum.estudiante  # Default a estudiante si hay error
+    profesor = db.execute(
+        text("SELECT 1 FROM correo_profesores WHERE correo = :correo"),
+        {"correo": email}
+    ).fetchone()
+    # Asignarle el rol dependiendo de lo anterior
+    rol = RolEnum.profesor if profesor else RolEnum.estudiante
 
-    try:
-        usuario = db.query(Usuario).filter(Usuario.email == email).first()
+    usuario = db.query(Usuario).filter(Usuario.correo == email).first()
 
-        if not usuario:
-            usuario = Usuario(
-                nombre=nombre,
-                apellido=apellido,
-                email=email,
-                rol_plataforma=rol_plataforma
-            )
-            db.add(usuario)
-            db.commit()
-            db.refresh(usuario)
+    if not usuario:
+        # Crear nuevo usuario en la base de datos
+        usuario = Usuario(
+            nombre=nombre,
+            apellido=apellido,
+            correo=email,
+            rol=rol
+        )
+        db.add(usuario)
+        db.commit()
+        db.refresh(usuario)
 
-        token_jwt = crear_token({
-            "sub": usuario.email,
-            "rol_plataforma": usuario.rol_plataforma.value,
-        })
+    # Generar el token SIEMPRE
+    token = crear_token({
+        "sub": usuario.correo,
+        "rol": usuario.rol.value,
+        "nombre": usuario.nombre,
+        "apellido": usuario.apellido,
+    })
 
-        # Redirigir al frontend con el token en la URL
-        frontend_url = f"http://localhost:5173/callback#token={token_jwt}"
-        return RedirectResponse(url=frontend_url)
-        
-    except Exception as e:
-        db.rollback()
-        logger.error(f"Error creando/obteniendo usuario: {str(e)}")
-        return RedirectResponse('/?error=user_creation_failed')
-    # Redirigir al frontend con el token en la URL
-    frontend_url = f"http://localhost:3000/home#token={token_jwt}"
-    return RedirectResponse(url=frontend_url)
+    # Preparar redirección según el rol y estado del perfil
+    if rol == RolEnum.estudiante:
+        estudiante = db.query(Estudiante).filter_by(id=usuario.id).first()
+        if not estudiante:
+            redirect_url = "http://localhost:5173/completar-perfil-estudiante"
+        else:
+            redirect_url = "http://localhost:5173/home"
+
+    elif rol == RolEnum.profesor:
+        profesor = db.query(Profesor).filter_by(id=usuario.id).first()
+        if not profesor:
+            redirect_url = "http://localhost:5173/completar-perfil-profesor"
+        else:
+            redirect_url = "http://localhost:5173/home"
+
+    # Crear respuesta con redirección y cookie
+    response = RedirectResponse(url=redirect_url)
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,  # True en producción
+        samesite="lax",
+        max_age=60 * 60 * 24
+    )
+    return response
 
 @router.post("/completar-perfil/estudiante")
 def completar_perfil_estudiante(

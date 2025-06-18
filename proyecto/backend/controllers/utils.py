@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends
 from pydantic.class_validators import List
 from sqlalchemy.orm import Session
-from ..database.db import get_db
-from ..models.carreras_model import Carrera
-from ..models.user_model import Usuario, RolEnum
+from database.db import get_db
+from models.carreras_model import Carrera
+from models.user_model import Usuario, RolEnum
 
 
 router = APIRouter()
