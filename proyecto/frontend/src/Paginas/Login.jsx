@@ -73,7 +73,7 @@ export function Login() {
 
     useEffect(() => {
         if (isAuthenticated) {
-            navigate('/home');
+            navigate('/login');
         }
     }, [isAuthenticated, navigate]);
 

@@ -16,7 +16,7 @@ export const Approuter = () => {
                 <Route path="dashboard-estudiante" element={<DashboardEstudiante />} /> 
                 <Route path="mis-proyectos" element={<MisProyectosEstudiante />} /> 
             </Route>
-                            <Route path="login" element={<Login />} />
+                            <Route path="/login" element={<Login />} />
 
         </Routes>
     );
