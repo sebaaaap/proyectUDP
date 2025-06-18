@@ -19,10 +19,6 @@ function Home() {
     }
   };
 
-  const handleLogout = () => {
-    window.location.href = "http://localhost:8000/logout";
-  };
-
   useEffect(() => {
     console.log('Home component mounted');
     console.log('current pathname:', window.location.pathname);
@@ -246,32 +242,6 @@ function Home() {
           }}
         >
           Ir al Dashboard
-        </button>
-
-        <button
-          onClick={handleLogout}
-          style={{
-            backgroundColor: "transparent",
-            color: "#dc3545",
-            border: "2px solid #dc3545",
-            padding: "10px 22px",
-            borderRadius: "12px",
-            fontSize: "16px",
-            cursor: "pointer",
-            transition: "all 0.3s ease"
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = "#dc3545";
-            e.target.style.color = "white";
-            e.target.style.transform = "scale(1.05)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = "transparent";
-            e.target.style.color = "#dc3545";
-            e.target.style.transform = "scale(1)";
-          }}
-        >
-          Cerrar sesión
         </button>
       </div>
 
