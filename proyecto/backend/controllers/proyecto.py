@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from ..database.db import get_db
 from ..models.proyecto_model import Proyecto
-from ..schemas.proyecto_schema import ProyectoCreate
+from ..schemas.proyecto_schema import ProyectoCreate, EstadoProyectoDBEnum
 from ..models.user_model import Usuario, RolEnum
 from ..models.postulacion_model import Postulacion, EstadoPostulacionEnum
 from ..helpers.jwtAuth import verificar_token
@@ -11,95 +11,82 @@ router = APIRouter()
 
 # ruta para crear un proyecto
 @router.post("/crear")
-def crear_proyecto(
-    proyecto_data: ProyectoCreate,
-    usuario=Depends(verificar_token),
-    db: Session = Depends(get_db)
-):
-    # Buscar usuario(id) en DB
-    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
-    if not usuario_db:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+def crear_proyecto(proyecto_data: ProyectoCreate, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.estudiante:
+        raise HTTPException(status_code=403, detail="Solo los estudiantes pueden crear proyectos")
 
     nuevo_proyecto = Proyecto(
-        **proyecto_data.dict(),
-        usuario_id=usuario_db.id  # Asociar al creador
+        **proyecto_data.dict(exclude={"profesor_id", "perfiles_requeridos"}),
+        creador_id=usuario_db.id,
+        profesor_id=proyecto_data.profesor_id,
+        perfiles_requeridos=[p.dict() for p in proyecto_data.perfiles_requeridos]
     )
-
     db.add(nuevo_proyecto)
     db.commit()
     db.refresh(nuevo_proyecto)
-    return {"mensaje": "Proyecto creado exitosamente"}
+    return {"mensaje": "Proyecto creado", "proyecto": nuevo_proyecto}
 
 # ruta para postular a un proyecto
 @router.post("/{proyecto_id}/postular")
-def postular_a_proyecto(
-    proyecto_id: int,
-    usuario=Depends(verificar_token),
-    db: Session = Depends(get_db)
-):
+def postular(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
-
     if usuario_db.rol != RolEnum.estudiante:
-        raise HTTPException(status_code=403, detail="Solo los estudiantes pueden postular a proyectos")
+        raise HTTPException(status_code=403, detail="Solo estudiantes pueden postular")
 
-    postulacion_existente = db.query(Postulacion).filter_by(
-        usuario_id=usuario_db.id, proyecto_id=proyecto_id
-    ).first()
+    proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+    if not proyecto or proyecto.creador_id == usuario_db.id:
+        raise HTTPException(status_code=403, detail="No puedes postular a tu propio proyecto")
 
-    if postulacion_existente:
-        raise HTTPException(status_code=400, detail="Ya postulaste a este proyecto")
+    if db.query(Postulacion).filter_by(proyecto_id=proyecto_id, estudiante_id=usuario_db.id).first():
+        raise HTTPException(status_code=400, detail="Ya postulaste")
 
-    nueva = Postulacion(usuario_id=usuario_db.id, proyecto_id=proyecto_id)
-    db.add(nueva)
+    postulacion = Postulacion(proyecto_id=proyecto_id, estudiante_id=usuario_db.id, estado="pendiente")
+    db.add(postulacion)
     db.commit()
     return {"mensaje": "Postulación enviada"}
 
 # ruta para ver postulaciones
 @router.get("/{proyecto_id}/postulaciones")
-def ver_postulaciones(
-    proyecto_id: int,
-    usuario=Depends(verificar_token),
-    db: Session = Depends(get_db)
-):
+def ver_postulaciones(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
+    proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
 
-    proyecto = db.query(Proyecto).filter_by(id=proyecto_id, usuario_id=usuario_db.id).first()
     if not proyecto:
-        raise HTTPException(status_code=403, detail="No eres el creador del proyecto")
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+
+    if usuario_db.id != proyecto.creador_id and usuario_db.rol != RolEnum.estudiante:
+        raise HTTPException(status_code=403, detail="Acceso denegado")
 
     postulaciones = db.query(Postulacion).filter_by(proyecto_id=proyecto_id).all()
     return postulaciones
 
 # ruta para aceptar o rechazar postulaciones
-@router.put("/postulaciones/{postulacion_id}")
-def actualizar_estado_postulacion(
-    postulacion_id: int,
-    nuevo_estado: EstadoPostulacionEnum,
-    usuario=Depends(verificar_token),
-    db: Session = Depends(get_db)
-):
+@router.patch("/{proyecto_id}/estado")
+def cambiar_estado(proyecto_id: int, estado: EstadoProyectoDBEnum, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
-    postulacion = db.query(Postulacion).get(postulacion_id)
+    proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
 
-    proyecto = db.query(Proyecto).filter_by(id=postulacion.proyecto_id).first()
-    if proyecto.usuario_id != usuario_db.id:
-        raise HTTPException(status_code=403, detail="No eres el creador del proyecto")
+    if proyecto.profesor_id != usuario_db.id:
+        raise HTTPException(status_code=403, detail="No autorizado para modificar el estado")
 
-    postulacion.estado = nuevo_estado
+    proyecto.estado = estado
     db.commit()
-    return {"mensaje": f"Postulación {nuevo_estado.value}"}
+    return {"mensaje": f"Proyecto marcado como {estado}"}
 
 # ruta para ver los participantes de un proyecto
-@router.get("/{proyecto_id}/participantes")
-def ver_participantes(
-    proyecto_id: int,
-    db: Session = Depends(get_db)
-):
-    postulaciones = db.query(Postulacion).filter_by(
-        proyecto_id=proyecto_id,
-        estado=EstadoPostulacionEnum.aceptado
-    ).all()
+@router.get("/{proyecto_id}/integrantes")
+def ver_integrantes(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    proyecto = db.query(Proyecto).filter_by(id=proyecto_id).first()
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["correo"]).first()
 
-    return [{"id": p.estudiante.id, "nombre": p.estudiante.nombre, "correo": p.estudiante.correo}
-            for p in postulaciones]
+    if usuario_db.id not in [proyecto.creador_id, proyecto.profesor_id]:
+        raise HTTPException(status_code=403, detail="Acceso no autorizado")
+
+    aceptados = db.query(Usuario).join(Postulacion).filter(
+        Postulacion.proyecto_id == proyecto_id,
+        Postulacion.estado == "aceptado"
+    ).all()
+    return aceptados
+
+
