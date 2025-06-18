@@ -20,13 +20,13 @@ class Proyecto(Base):
     objetivo_general = Column(Text) 
     area_conocimiento = Column(String)
     duracion_estimada = Column(Date)
+    estado = Column(SqlEnum(EstadoProyectoDBEnum, name="estado_proyecto_enum"), default=EstadoProyectoDBEnum.propuesto)
     informacion_adicional = Column(JSON, nullable=True, default={}) 
     objetivo_especificos = Column(JSON, nullable=True, default={}) 
 
     # Claves foráneas corregidas
     id_prof = Column(Integer, ForeignKey("profesores.id"))
     id_estudiante_creador = Column(Integer, ForeignKey("estudiantes.id"), nullable=True)  # Cambiado a Integer
-
 
     # Relaciones corregidas
     profesor = relationship("Profesor")

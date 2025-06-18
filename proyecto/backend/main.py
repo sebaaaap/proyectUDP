@@ -1,22 +1,19 @@
-from controllers.proyecto_filtro import router as proyecto_router
-from controllers.evaluacion_proyecto import router as evaluacion_router
-from fastapi.middleware.cors import CORSMiddleware
-# main.py
 from fastapi import FastAPI
-from database.db import Base, engine  
-from controllers import proyecto_controller, archivos_proyectos, user
+from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
-import models# Esto activa los modelos vía models/__init__.py
 
+from database.db import Base, engine  
+from controllers import proyecto_controller, archivos_proyectos, user
+from controllers.proyecto_filtro import router as proyecto_filtro_router
+from controllers.evaluacion_proyecto import router as evaluacion_router
 
+# Importar modelos para activar la creación de tablas
+import models
 
+app = FastAPI(title="Proyecto UDP API", version="1.0.0")
 
-
-
-app = FastAPI()
-
-
+# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # En desarrollo puedes usar "*". En producción, especifica el dominio de tu frontend.
@@ -25,21 +22,23 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Base.metadata.drop_all(engine)
-# Crear las tablas (si estás usando tu propio engine con SQLite o PostgreSQL)
+# Configurar sesiones
+app.add_middleware(SessionMiddleware, secret_key="add any string...")
+
+# Crear las tablas de la base de datos
 Base.metadata.create_all(bind=engine)
 
+# Ruta de prueba
 @app.get("/")
 def read_root():
-    return {"message": "Hola mundo"}
+    return {"message": "Hola mundo - API Proyecto UDP"}
 
-app.include_router(proyecto_router)
+# Incluir routers
+app.include_router(proyecto_filtro_router)
 app.include_router(evaluacion_router)
 app.include_router(archivos_proyectos.router)
 app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
-
-
-
 app.include_router(user.router)
-app.add_middleware(SessionMiddleware, secret_key="add any string...")
+
+# Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

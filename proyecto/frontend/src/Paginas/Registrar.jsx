@@ -85,14 +85,9 @@ export function Registrar() {
         setError(false);
         setMensajeError("");
         if (tipo === "estudiante") {
-            console.log("Datos estudiante:", {
-                nombre1, nombre2, apellido1, apellido2, fechaNacimiento,
-                nacionalidad, genero, anioIngreso, telefono, carrera, facultad, correo, rut
-            });
+            // Datos del estudiante validados
         } else {
-            console.log("Datos profesor:", {
-                nombre1, nombre2, apellido1, apellido2, telefono, facultad, rut, especialidad, departamento
-            });
+            // Datos del profesor validados
         }
     };
 

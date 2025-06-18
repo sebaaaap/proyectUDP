@@ -235,7 +235,6 @@ export function ProyectoForm() {
     }
 
     try {
-      console.log('Datos enviados:', formData);
       setSuccess(true);
       
       // Scroll al inicio para mostrar el mensaje de éxito
