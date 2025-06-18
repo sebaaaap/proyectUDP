@@ -8,6 +8,7 @@ from controllers import proyecto_controller, archivos_proyectos, user, utils, pr
 # from controllers.proyecto_filtro import router as proyecto_filtro_router
 # from controllers.evaluacion_proyecto import router as evaluacion_router
 from controllers.proyecto import router as proyecto_controller
+from controllers.archivos_proyectos import router as archivos_router
 
 
 # Importar modelos para activar la creación de tablas
@@ -47,6 +48,7 @@ app.include_router(utils.router)
 
 
 app.include_router(proyecto.router, prefix="/proyectos", tags=["proyectos"])
+app.include_router(archivos_router, prefix="/proyectos", tags=["archivos"])
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")
