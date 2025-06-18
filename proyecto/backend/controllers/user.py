@@ -1,31 +1,21 @@
-<<<<<<< HEAD
 from fastapi import APIRouter, Depends, HTTPException
-=======
-rom fastapi import APIRouter, Depends, HTTPException
->>>>>>> origin/front_etst
 from sqlalchemy.orm import Session
 from sqlalchemy.sql import text
 from starlette.requests import Request
 from starlette.responses import RedirectResponse
 from authlib.integrations.starlette_client import OAuth, OAuthError
 from config import GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET
-<<<<<<< HEAD
-from models.user_model import Usuario, RolEnum
-from helpers.jwtAuth import crear_token
-from database.db import get_db
 import logging
-=======
 from ..models.user_model import Usuario, RolEnum, Estudiante, Profesor
 from ..database.db import get_db
 from ..helpers.jwtAuth import verificar_usuario, crear_token, decode_token
 from ..schemas.user_schema import PerfilProfesor, PerfilEstudiante
 
->>>>>>> origin/front_etst
+
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
 
-<<<<<<< HEAD
 # Validar que las credenciales estén configuradas
 if not GOOGLE_CLIENT_ID or GOOGLE_CLIENT_ID == "tu-client-id.apps.googleusercontent.com":
     logger.error("GOOGLE_CLIENT_ID no está configurado correctamente")
@@ -35,8 +25,6 @@ if not GOOGLE_CLIENT_SECRET or GOOGLE_CLIENT_SECRET == "tu-client-secret":
     logger.error("GOOGLE_CLIENT_SECRET no está configurado correctamente")
     raise ValueError("GOOGLE_CLIENT_SECRET debe estar configurado en las variables de entorno")
 
-=======
->>>>>>> origin/front_etst
 oauth = OAuth()
 oauth.register(
     name='google',
