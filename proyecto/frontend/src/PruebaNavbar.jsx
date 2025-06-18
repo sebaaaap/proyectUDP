@@ -11,6 +11,7 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import Usuario from '../public/Astronauta.png';
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
+import { useAuth } from './context/AuthContext';
 
 function PruebaNavbar() {
     // Notificaciones simuladas
@@ -18,6 +19,10 @@ function PruebaNavbar() {
         { id: 1, mensaje: "Tu postulación fue aprobada", leido: false },
         { id: 2, mensaje: "Nuevo archivo subido a tu proyecto", leido: false }
     ]);
+
+    // Obtener información del usuario autenticado
+    const { user } = useAuth();
+    const isEstudiante = user?.rol === 'estudiante';
 
     return (
         <>
@@ -49,8 +54,13 @@ function PruebaNavbar() {
                             </NavDropdown>
                             <Nav.Link as={Link} to="/" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
-                            <Nav.Link as={Link} to="/proyecto-form" style={{ fontSize: '20px', color: "white" }}>Formulario de Proyecto</Nav.Link>
-                            <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                            {/* Solo mostrar Formulario de Proyecto para estudiantes */}
+                            {isEstudiante && (
+                                <>
+                                    <Nav.Link as={Link} to="/proyecto-form" style={{ fontSize: '20px', color: "white" }}>Formulario de Proyecto</Nav.Link>
+                                    <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                                </>
+                            )}
                             <Nav.Link as={Link} to="/mis-proyectos" style={{ fontSize: '20px', color: "white" }}>Mis proyectos</Nav.Link>
                         </Nav>
                         {/* Buscador y Notificaciones DERECHA */}
