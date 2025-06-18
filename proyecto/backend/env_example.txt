@@ -1,0 +1,13 @@
+# Google OAuth Configuration
+# Obtén estas credenciales desde: https://console.cloud.google.com/apis/credentials
+GOOGLE_CLIENT_ID=tu-client-id.apps.googleusercontent.com
+GOOGLE_CLIENT_SECRET=tu-client-secret
+
+# JWT Configuration
+# Genera una clave secreta segura para JWT
+SECRET_KEY=tu-secret-key-super-seguro-para-jwt-de-al-menos-32-caracteres
+ALGORITHM=HS256
+
+# Database Configuration
+# Configura la URL de tu base de datos PostgreSQL
+DATABASE_URL=postgresql://usuario:contraseña@localhost:5432/nombre_base_datos 

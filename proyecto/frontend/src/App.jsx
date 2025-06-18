@@ -12,6 +12,8 @@ import Home from "../src/Paginas/HomeV2.jsx";
 import CrearProyecto from "../src/Paginas/CrearProyecto.jsx";
 import CompletarPerfilEstudiante from "./Paginas/CompletarPerfilEstudiante.jsx";
 import CompletarPerfilProfesor from "./Paginas/CompletarPerfilProfesor.jsx";
+import { DashboardProfe } from "./Paginas/Dashboard-profe.jsx";
+import { DashboardEstudiante } from "./Paginas/Dashboard-estudiante.jsx";
 import PruebaNavbar from "./PruebaNavbar.jsx";
 import { Callback } from "./callback.jsx";
 
@@ -23,6 +25,8 @@ function LayoutWithNavbar() {
       <Routes>
         <Route path="/home" element={<Home />} />
         <Route path="/crear-proyecto" element={<CrearProyecto />} />
+        <Route path="/dashboard-profe" element={<DashboardProfe />} />
+        <Route path="/dashboard-estudiante" element={<DashboardEstudiante />} />
         {/* Aquí puedes agregar más rutas que SÍ deben tener navbar */}
       </Routes>
     </>
