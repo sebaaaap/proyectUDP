@@ -18,7 +18,14 @@ class ArchivoProyecto(Base):
     # Relación con Proyecto
     proyecto = relationship("Proyecto", back_populates="archivos")
 
-    # Relación con Postulacion
+    # Relación con Postulacion usando ForeignKeyConstraint
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ['id_proyecto', 'id_estudiante'],
+            ['postulaciones.proyecto_id', 'postulaciones.usuario_id']
+        ),
+    )
+
     postulacion = relationship(
         "Postulacion",
         foreign_keys=[id_proyecto, id_estudiante],
