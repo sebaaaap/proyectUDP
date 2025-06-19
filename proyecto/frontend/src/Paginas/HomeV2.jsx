@@ -18,7 +18,9 @@ function Home() {
       navigate("/dashboard-profe");
     }
   };
-
+  const irAlRanking = () => {
+    navigate("/ranking");
+  };
   const handleLogout = () => {
     window.location.href = "http://localhost:8000/logout";
   };
@@ -247,7 +249,30 @@ function Home() {
         >
           Ir al Dashboard
         </button>
-
+          <button
+            onClick={irAlRanking}
+            style={{
+              backgroundColor: "#ffc107",
+              color: "#000",
+              border: "none",
+              padding: "12px 24px",
+              borderRadius: "12px",
+              fontSize: "16px",
+              cursor: "pointer",
+              transition: "all 0.3s ease",
+            boxShadow: "0 4px 15px rgba(255, 193, 7, 0.3)"
+            }}
+  onMouseOver={(e) => {
+    e.target.style.backgroundColor = "#e0a800";
+    e.target.style.transform = "scale(1.05)";
+  }}
+  onMouseOut={(e) => {
+    e.target.style.backgroundColor = "#ffc107";
+    e.target.style.transform = "scale(1)";
+  }}
+>
+  Ver Ranking
+</button>
         {/* <button
           onClick={handleLogout}
           style={{

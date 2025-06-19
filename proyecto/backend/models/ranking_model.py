@@ -15,17 +15,29 @@ class ProyectoRanking(Base):
     
     # Relaciones
     proyecto = relationship("Proyecto", backref="ranking_info")
-    votos = relationship("VotoRanking", back_populates="proyecto_ranking")
+    votos = relationship("VotoRanking", back_populates="proyecto_ranking", cascade="all, delete-orphan")
+    
+    @property
+    def total_votos_positivos(self):
+        """Cuenta solo los votos positivos (upvotes)"""
+        return len([v for v in self.votos if v.voto_positivo and v.activo])
+    
+    @property
+    def total_votos_negativos(self):
+        """Cuenta solo los votos negativos (downvotes)"""
+        return len([v for v in self.votos if not v.voto_positivo and v.activo])
+    
+    @property
+    def puntuacion_neta(self):
+        """Calcula la puntuación neta (upvotes - downvotes) como Reddit"""
+        upvotes = self.total_votos_positivos
+        downvotes = self.total_votos_negativos
+        return upvotes - downvotes
     
     @property
     def total_votos(self):
+        """Total de votos (positivos + negativos)"""
         return len([v for v in self.votos if v.activo])
-    
-    @property
-    def puntuacion_ranking(self):
-        """Calcula la puntuación total basada en votos positivos"""
-        votos_positivos = len([v for v in self.votos if v.voto_positivo and v.activo])
-        return votos_positivos
 
 class VotoRanking(Base):
     __tablename__ = "votos_ranking"
@@ -33,7 +45,7 @@ class VotoRanking(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     proyecto_ranking_id = Column(Integer, ForeignKey("proyectos_ranking.id"), nullable=False)
     profesor_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
-    voto_positivo = Column(Boolean, nullable=False)  # True = upvote, False = downvote
+    voto_positivo = Column(Boolean, nullable=False)  # True = upvote (↑), False = downvote (↓)
     fecha_voto = Column(DateTime, default=datetime.utcnow)
     activo = Column(Boolean, default=True)
     
@@ -41,5 +53,7 @@ class VotoRanking(Base):
     proyecto_ranking = relationship("ProyectoRanking", back_populates="votos")
     profesor = relationship("Usuario", backref="votos_ranking")
     
-    # Constraint para evitar votos duplicados del mismo profesor al mismo proyecto
-    __table_args__ = (UniqueConstraint('proyecto_ranking_id', 'profesor_id', name='unique_voto_profesor_proyecto'),)
+    # Constraint para que cada profesor vote solo una vez por proyecto
+    __table_args__ = (
+        UniqueConstraint('proyecto_ranking_id', 'profesor_id', name='unique_voto_profesor_proyecto'),
+    )
