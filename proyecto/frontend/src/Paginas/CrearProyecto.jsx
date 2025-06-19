@@ -4,6 +4,95 @@ import axios from "axios";
 import { Form, Button, Alert, Container, Row, Col, Card, InputGroup } from 'react-bootstrap';
 import { FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
 
+// Agrego estilos para el overlay y la animación
+const overlayStyles = `
+  .success-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+  .success-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .success-message-box {
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+    padding: 40px 32px 32px 32px;
+    min-width: 320px;
+    max-width: 90vw;
+    color: #222;
+    text-align: center;
+    animation: fadeInScale 0.4s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .success-message-box h3 {
+    margin-top: 18px;
+    margin-bottom: 0;
+    font-weight: 600;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s 0.5s, transform 0.4s 0.5s;
+  }
+  .success-message-box.show-text h3 {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  /* Animación SVG check */
+  .checkmark {
+    width: 64px;
+    height: 64px;
+    display: block;
+    margin: 0 auto 8px auto;
+  }
+  .checkmark__circle {
+    stroke: #28a745;
+    stroke-width: 5;
+    fill: none;
+    stroke-dasharray: 180;
+    stroke-dashoffset: 180;
+    animation: drawCircle 0.6s ease-out forwards;
+  }
+  .success-overlay.show .checkmark__circle {
+    animation: drawCircle 0.6s ease-out forwards;
+  }
+  @keyframes drawCircle {
+    to { stroke-dashoffset: 0; }
+  }
+  .checkmark__check {
+    stroke: #28a745;
+    stroke-width: 5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 36;
+    stroke-dashoffset: 36;
+    animation: drawCheck 0.4s 0.5s cubic-bezier(0.65,0,0.45,1) forwards;
+  }
+  .success-overlay.show .checkmark__check {
+    animation: drawCheck 0.4s 0.5s cubic-bezier(0.65,0,0.45,1) forwards;
+  }
+  @keyframes drawCheck {
+    to { stroke-dashoffset: 0; }
+  }
+  .no-anim { stroke-dashoffset: 180 !important; animation: none !important; }
+  .checkmark__check.no-anim { stroke-dashoffset: 36 !important; animation: none !important; }
+`;
+
 const CrearProyecto = ({ usuario }) => {
   const { loading } = useAuth(); // Ya se validó en App.jsx
 
@@ -20,6 +109,8 @@ const CrearProyecto = ({ usuario }) => {
   const [mensaje, setMensaje] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showCheck, setShowCheck] = useState(false);
 
   useEffect(() => {
     axios.get("http://localhost:8000/profesores", { withCredentials: true })
@@ -85,7 +176,8 @@ const CrearProyecto = ({ usuario }) => {
 
       setSuccess(true);
       setMensaje("Proyecto creado exitosamente");
-      
+      setShowSuccessModal(true);
+      setTimeout(() => setShowCheck(true), 400); // Espera a que la caja blanca aparezca
       // Limpiar formulario después de éxito
       setTimeout(() => {
         setTitulo("");
@@ -98,7 +190,9 @@ const CrearProyecto = ({ usuario }) => {
         setPerfiles([{ carrera: "", cantidad: 1 }]);
         setSuccess(false);
         setMensaje("");
-      }, 3000);
+        setShowSuccessModal(false);
+        setShowCheck(false);
+      }, 2000);
     } catch (err) {
       console.error(err);
       setError("Error al crear el proyecto. Por favor, intenta nuevamente.");
@@ -109,6 +203,18 @@ const CrearProyecto = ({ usuario }) => {
 
   return (
     <Container className="mt-5 mb-5">
+      {/* Overlay personalizado para el mensaje de éxito */}
+      <style>{overlayStyles}</style>
+      <div className={`success-overlay${showSuccessModal ? ' show' : ''}`}>
+        <div className={`success-message-box${showCheck ? ' show-text' : ''}`}>
+          {/* SVG animado para el check, solo animado si showCheck es true */}
+          <svg className="checkmark" viewBox="0 0 52 52">
+            <circle className={`checkmark__circle${showCheck ? '' : ' no-anim'}`} cx="26" cy="26" r="23" />
+            <path className={`checkmark__check${showCheck ? '' : ' no-anim'}`} d="M16 27l7 7 13-13" />
+          </svg>
+          <h3>{mensaje}</h3>
+        </div>
+      </div>
       <Row className="justify-content-center">
         <Col md={12} lg={10}>
           <Card className="shadow">
@@ -119,7 +225,6 @@ const CrearProyecto = ({ usuario }) => {
             
             <Card.Body>
               {error && <Alert variant="danger"><FaExclamationTriangle /> {error}</Alert>}
-              {success && <Alert variant="success"><FaCheckCircle /> {mensaje}</Alert>}
               
               <Form onSubmit={handleSubmit}>
                 {/* Sección 1: Información básica del proyecto */}
