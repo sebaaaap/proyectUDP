@@ -39,3 +39,4 @@ class Proyecto(Base):
     )
 
     archivos = relationship("ArchivoProyecto", back_populates="proyecto")
+    calificacion_final = Column(Float, nullable=True)  # Calificación del 1-7
