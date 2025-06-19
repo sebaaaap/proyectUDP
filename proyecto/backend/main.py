@@ -10,6 +10,15 @@ from controllers import proyecto_controller, archivos_proyectos, user, utils, pr
 from controllers.proyecto import router as proyecto_controller
 from controllers.archivos_proyectos import router as archivos_router
 
+app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000", "http://localhost:5173"],  # Puertos de desarrollo
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # Importar modelos para activar la creación de tablas
 import models

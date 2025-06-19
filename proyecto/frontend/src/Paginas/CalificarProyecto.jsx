@@ -1,3 +1,4 @@
+/*
 // src/Paginas/CalificarProyecto.jsx
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Button, Form, Badge, Alert, Modal, Spinner } from 'react-bootstrap';
@@ -145,7 +146,7 @@ const CalificarProyecto = () => {
                 </Alert>
             )}
 
-            {/* Filtros */}
+            {//Filtros }
             <Row className="mb-4">
                 <Col md={6} className="mx-auto">
                     <div className="d-flex justify-content-center gap-2">
@@ -171,7 +172,7 @@ const CalificarProyecto = () => {
                 </Col>
             </Row>
 
-            {/* Lista de Proyectos */}
+            {// Lista de Proyectos }
             <Row>
                 {proyectosFiltrados.length === 0 ? (
                 <Col>
@@ -246,7 +247,7 @@ const CalificarProyecto = () => {
                 )}
             </Row>
 
-            {/* Modal de Calificación */}
+            {// Modal de Calificación }
             <Modal show={showModal} onHide={cerrarModal} centered>
                 <Modal.Header closeButton>
                     <Modal.Title>Calificar Proyecto</Modal.Title>
@@ -299,3 +300,4 @@ const CalificarProyecto = () => {
 };
 
 export default CalificarProyecto;
+*/
