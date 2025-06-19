@@ -7,7 +7,7 @@ from database.db import Base, engine
 from controllers import proyecto_controller, archivos_proyectos, user, utils, proyecto
 # from controllers.proyecto_filtro import router as proyecto_filtro_router
 # from controllers.evaluacion_proyecto import router as evaluacion_router
-from controllers.proyecto import router as proyecto_controller
+from controllers.proyecto import router as proyecto_controller, profesor_router
 from controllers.archivos_proyectos import router as archivos_router
 
 
@@ -38,6 +38,11 @@ Base.metadata.create_all(bind=engine)
 def read_root():
     return {"message": "Hola mundo - API Proyecto UDP"}
 
+# Endpoint de prueba para postulaciones
+@app.get("/test-postulaciones")
+def test_postulaciones():
+    return {"mensaje": "Endpoint de postulaciones funcionando"}
+
 # Incluir routers
 # app.include_router(proyecto_filtro_router)
 # app.include_router(evaluacion_router)
@@ -48,6 +53,7 @@ app.include_router(utils.router)
 
 
 app.include_router(proyecto.router, prefix="/proyectos", tags=["proyectos"])
+app.include_router(profesor_router, prefix="/profesor", tags=["profesor"])
 app.include_router(archivos_router, prefix="/proyectos", tags=["archivos"])
 
 # Servir archivos estáticos

@@ -1,86 +1,211 @@
 import { useEffect, useState } from "react";
+import { useAuth } from "../context/AuthContext";
 
 export function DashboardProfe() {
-    const [postulaciones, setPostulaciones] = useState([]);
-    const [seleccionada, setSeleccionada] = useState(null);
+    const [proyectos, setProyectos] = useState([]);
+    const [seleccionado, setSeleccionado] = useState(null);
     const [comentario, setComentario] = useState("");
     const [mensaje, setMensaje] = useState("");
-    const [filtroEstado, setFiltroEstado] = useState("Todas");
+    const [filtroEstado, setFiltroEstado] = useState("Todos");
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
+    const { token, user, isAuthenticated } = useAuth();
 
     useEffect(() => {
-        // Datos de ejemplo con más información
-        const datosEjemplo = [
-            {
-                id: 1,
-                estudiante: "Claudio Bravo",
-                email: "claudio.bravo@mail.udp.cl",
-                carrera: "Ingeniería Civil Informática",
-                proyecto: "Sistema de Gestión Académica",
-                fecha: "2025-05-18",
-                estado: "Pendiente",
-                descripcion: "Sistema para gestionar la información académica de los estudiantes y profesores.",
-                motivacion: "Tengo experiencia desarrollando sistemas web con React y Node.js, y me interesa aplicar estos conocimientos en un proyecto real."
-            },
-            {
-                id: 2,
-                estudiante: "Andrés Soto",
-                email: "andres.soto@mail.udp.cl",
-                carrera: "Diseño de Productos Digitales",
-                proyecto: "App de Tutorías UDP",
-                fecha: "2025-05-17",
-                estado: "Aprobada",
-                descripcion: "Aplicación móvil para gestionar las tutorías entre estudiantes y profesores.",
-                motivacion: "Como diseñador UX/UI, quiero contribuir a mejorar la experiencia de tutorías en la universidad.",
-                comentario: "Excelente perfil para el desarrollo frontend."
-            },
-            {
-                id: 3,
-                estudiante: "María Pérez",
-                email: "maria.perez@mail.udp.cl",
-                carrera: "Ingeniería Civil en Computación",
-                proyecto: "Plataforma de Laboratorios Virtuales",
-                fecha: "2025-05-16",
-                estado: "Rechazada",
-                descripcion: "Plataforma para realizar experimentos de laboratorio de forma virtual.",
-                motivacion: "He trabajado con Unity en proyectos personales y quiero profesionalizar mis habilidades.",
-                comentario: "Proyecto requiere más experiencia en desarrollo 3D."
-            },
-            {
-                id: 4,
-                estudiante: "Juan González",
-                email: "juan.gonzalez@mail.udp.cl",
-                carrera: "Ingeniería Civil Informática",
-                proyecto: "Sistema de Gestión Académica",
-                fecha: "2025-05-15",
-                estado: "Pendiente",
-                descripcion: "Sistema para gestionar la información académica de los estudiantes y profesores.",
-                motivacion: "Busco experiencia en desarrollo de sistemas empresariales antes de graduarme."
+        if (isAuthenticated && token) {
+            cargarProyectos();
+        }
+    }, [token, isAuthenticated]);
+
+    const cargarProyectos = async () => {
+        try {
+            setLoading(true);
+            const headers = {
+                'Content-Type': 'application/json'
+            };
+            
+            // Si tenemos token, lo agregamos al header
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
             }
-        ];
-        setPostulaciones(datosEjemplo);
-    }, []);
-
-    const handleVeredicto = (veredicto) => {
-        if (!seleccionada) return;
-
-        setPostulaciones(postulaciones.map(p =>
-            p.id === seleccionada.id
-                ? { ...p, estado: veredicto, comentario }
-                : p
-        ));
-        setMensaje(`Postulación ${veredicto === "Aprobada" ? "aprobada" : "rechazada"} correctamente.`);
-        setSeleccionada(null);
-        setComentario("");
-        setTimeout(() => setMensaje(""), 3000);
+            
+            const response = await fetch("http://localhost:8000/proyectos/usuario/profesor", {
+                method: 'GET',
+                headers: headers,
+                credentials: 'include'
+            });
+            
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Error response:', errorData);
+                throw new Error(`Error al cargar los proyectos: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            setProyectos(data);
+        } catch (err) {
+            console.error('Error:', err);
+            setError('Error al cargar los proyectos');
+            // Fallback a datos de ejemplo si hay error
+            const datosEjemplo = [
+                {
+                    id: 1,
+                    titulo: "Sistema de Gestión Académica",
+                    descripcion: "Sistema para gestionar la información académica de los estudiantes y profesores.",
+                    estado: "propuesto",
+                    creador: {
+                        nombre: "Claudio Bravo",
+                        email: "claudio.bravo@mail.udp.cl"
+                    },
+                    postulaciones_pendientes: 2,
+                    postulaciones_aceptadas: 1,
+                    fecha_creacion: "2025-01-15"
+                },
+                {
+                    id: 2,
+                    titulo: "App de Tutorías UDP",
+                    descripcion: "Aplicación móvil para gestionar las tutorías entre estudiantes y profesores.",
+                    estado: "aprobado",
+                    creador: {
+                        nombre: "Andrés Soto",
+                        email: "andres.soto@mail.udp.cl"
+                    },
+                    postulaciones_pendientes: 0,
+                    postulaciones_aceptadas: 3,
+                    fecha_creacion: "2025-01-10"
+                },
+                {
+                    id: 3,
+                    titulo: "Plataforma de Laboratorios Virtuales",
+                    descripcion: "Plataforma para realizar experimentos de laboratorio de forma virtual.",
+                    estado: "rechazado",
+                    creador: {
+                        nombre: "María Pérez",
+                        email: "maria.perez@mail.udp.cl"
+                    },
+                    postulaciones_pendientes: 1,
+                    postulaciones_aceptadas: 0,
+                    fecha_creacion: "2025-01-05"
+                }
+            ];
+            setProyectos(datosEjemplo);
+        } finally {
+            setLoading(false);
+        }
     };
 
-    const postulacionesFiltradas = filtroEstado === "Todas" 
-        ? postulaciones 
-        : postulaciones.filter(p => p.estado === filtroEstado);
+    const handleCambiarEstado = async (nuevoEstado) => {
+        if (!seleccionado) return;
+
+        try {
+            const headers = {
+                "Content-Type": "application/json"
+            };
+            
+            // Si tenemos token, lo agregamos al header
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            const response = await fetch(`http://localhost:8000/profesor/proyectos/${seleccionado.id}/estado`, {
+                method: "PATCH",
+                headers: headers,
+                credentials: 'include',
+                body: JSON.stringify({ 
+                    estado: nuevoEstado
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error('Error response:', errorData);
+                throw new Error(`Error al actualizar el proyecto: ${response.status}`);
+            }
+
+            // Actualizar el estado local
+            setProyectos(proyectos.map(p =>
+                p.id === seleccionado.id
+                    ? { ...p, estado: nuevoEstado }
+                    : p
+            ));
+            
+            setMensaje(`Proyecto ${nuevoEstado === "aprobado" ? "aprobado" : "rechazado"} correctamente.`);
+            setSeleccionado(null);
+            setComentario("");
+            setTimeout(() => setMensaje(""), 3000);
+        } catch (err) {
+            console.error('Error:', err);
+            setMensaje("Error al procesar la solicitud. Por favor, intenta nuevamente.");
+            setTimeout(() => setMensaje(""), 3000);
+        }
+    };
+
+    const proyectosFiltrados = filtroEstado === "Todos" 
+        ? proyectos 
+        : proyectos.filter(p => {
+            if (filtroEstado === "Propuesto") return p.estado === "propuesto";
+            if (filtroEstado === "Aprobado") return p.estado === "aprobado";
+            if (filtroEstado === "Rechazado") return p.estado === "rechazado";
+            return true;
+        });
+
+    const getEstadoDisplay = (estado) => {
+        switch (estado) {
+            case "aprobado": return "Aprobado";
+            case "rechazado": return "Rechazado";
+            case "propuesto": return "Propuesto";
+            default: return estado;
+        }
+    };
+
+    const getEstadoColor = (estado) => {
+        switch (estado) {
+            case "aprobado": return { background: "rgba(76, 175, 80, 0.2)", color: "#4caf50" };
+            case "rechazado": return { background: "rgba(244, 67, 54, 0.2)", color: "#f44336" };
+            case "propuesto": return { background: "rgba(255, 193, 7, 0.2)", color: "#ffc107" };
+            default: return { background: "rgba(255, 193, 7, 0.2)", color: "#ffc107" };
+        }
+    };
+
+    if (loading) {
+        return (
+            <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div style={{ color: "#fff", fontSize: "1.2rem" }}>Cargando proyectos...</div>
+            </div>
+        );
+    }
+
+    if (!isAuthenticated) {
+        return (
+            <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div style={{ color: "#fff", fontSize: "1.2rem" }}>Debes iniciar sesión para ver tus proyectos.</div>
+            </div>
+        );
+    }
 
     return (
         <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh" }}>
-            <h1 style={{ color: "#fff", marginBottom: "24px" }}>Postulaciones de Proyectos</h1>
+            <h1 style={{ color: "#fff", marginBottom: "24px" }}>Mis Proyectos Asignados</h1>
+            
+            {error && (
+                <div style={{
+                    background: "#f44336",
+                    color: "#fff",
+                    padding: "12px 24px",
+                    borderRadius: "8px",
+                    marginBottom: "24px",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px"
+                }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                    </svg>
+                    {error}
+                </div>
+            )}
             
             <div style={{
                 background: "#403f3f",
@@ -90,7 +215,7 @@ export function DashboardProfe() {
                 marginBottom: "24px"
             }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                    <h2 style={{ color: "#fff", margin: 0 }}>Gestión de Postulaciones</h2>
+                    <h2 style={{ color: "#fff", margin: 0 }}>Gestión de Proyectos</h2>
                     
                     <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
                         <span style={{ color: "#fff" }}>Filtrar por estado:</span>
@@ -105,92 +230,97 @@ export function DashboardProfe() {
                                 border: "1px solid #666"
                             }}
                         >
-                            <option value="Todas">Todas</option>
-                            <option value="Pendiente">Pendientes</option>
-                            <option value="Aprobada">Aprobadas</option>
-                            <option value="Rechazada">Rechazadas</option>
+                            <option value="Todos">Todos</option>
+                            <option value="Propuesto">Propuestos</option>
+                            <option value="Aprobado">Aprobados</option>
+                            <option value="Rechazado">Rechazados</option>
                         </select>
                     </div>
                 </div>
 
-                {!seleccionada ? (
+                {!seleccionado ? (
                     <>
                         <div style={{ overflowX: "auto" }}>
                             <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse", minWidth: "800px" }}>
                                 <thead>
                                     <tr style={{ background: "#333" }}>
-                                        <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Estudiante</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Carrera</th>
-                                        <th style={{ padding: "12px", textAlign: "left" }}>Proyecto</th>
+                                        <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Proyecto</th>
+                                        <th style={{ padding: "12px", textAlign: "left" }}>Creador</th>
                                         <th style={{ padding: "12px", textAlign: "left" }}>Fecha</th>
                                         <th style={{ padding: "12px", textAlign: "center" }}>Estado</th>
+                                        <th style={{ padding: "12px", textAlign: "center" }}>Postulaciones</th>
                                         <th style={{ padding: "12px", textAlign: "center", borderRadius: "0 8px 8px 0" }}>Acción</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {postulacionesFiltradas.map((p) => (
-                                        <tr key={p.id} style={{ background: "#555", borderBottom: "8px solid #403f3f" }}>
-                                            <td style={{ padding: "12px" }}>
-                                                <div style={{ fontWeight: "bold" }}>{p.estudiante}</div>
-                                                <div style={{ fontSize: "0.85rem", color: "#bbb" }}>{p.email}</div>
-                                            </td>
-                                            <td style={{ padding: "12px" }}>{p.carrera}</td>
-                                            <td style={{ padding: "12px" }}>{p.proyecto}</td>
-                                            <td style={{ padding: "12px" }}>{p.fecha}</td>
-                                            <td style={{ padding: "12px", textAlign: "center" }}>
-                                                <span style={{
-                                                    display: "inline-block",
-                                                    padding: "4px 12px",
-                                                    borderRadius: "20px",
-                                                    background:
-                                                        p.estado === "Aprobada"
-                                                            ? "rgba(76, 175, 80, 0.2)"
-                                                            : p.estado === "Rechazada"
-                                                                ? "rgba(244, 67, 54, 0.2)"
-                                                                : "rgba(255, 193, 7, 0.2)",
-                                                    color:
-                                                        p.estado === "Aprobada"
-                                                            ? "#4caf50"
-                                                            : p.estado === "Rechazada"
-                                                                ? "#f44336"
-                                                                : "#ffc107",
-                                                    fontWeight: "bold",
-                                                    fontSize: "0.85rem"
-                                                }}>
-                                                    {p.estado}
-                                                </span>
-                                            </td>
-                                            <td style={{ padding: "12px", textAlign: "center" }}>
-                                                <button
-                                                    style={{
-                                                        padding: "8px 16px",
-                                                        borderRadius: "8px",
-                                                        border: "none",
-                                                        background: "#007bff",
-                                                        color: "#fff",
-                                                        cursor: "pointer",
+                                    {proyectosFiltrados.map((p) => {
+                                        const estadoColors = getEstadoColor(p.estado);
+                                        return (
+                                            <tr key={p.id} style={{ background: "#555", borderBottom: "8px solid #403f3f" }}>
+                                                <td style={{ padding: "12px" }}>
+                                                    <div style={{ fontWeight: "bold" }}>{p.titulo}</div>
+                                                    <div style={{ fontSize: "0.85rem", color: "#bbb", marginTop: "4px" }}>
+                                                        {p.descripcion.length > 60 ? p.descripcion.substring(0, 60) + "..." : p.descripcion}
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "12px" }}>
+                                                    <div style={{ fontWeight: "bold" }}>{p.creador?.nombre || "N/A"}</div>
+                                                    <div style={{ fontSize: "0.85rem", color: "#bbb" }}>{p.creador?.email || "N/A"}</div>
+                                                </td>
+                                                <td style={{ padding: "12px" }}>
+                                                    {p.fecha_creacion ? new Date(p.fecha_creacion).toLocaleDateString('es-ES') : "N/A"}
+                                                </td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>
+                                                    <span style={{
+                                                        display: "inline-block",
+                                                        padding: "4px 12px",
+                                                        borderRadius: "20px",
+                                                        background: estadoColors.background,
+                                                        color: estadoColors.color,
                                                         fontWeight: "bold",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        gap: "8px",
-                                                        margin: "0 auto"
-                                                    }}
-                                                    onClick={() => setSeleccionada(p)}
-                                                >
-                                                    <span>Revisar</span>
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                        <circle cx="12" cy="12" r="3"></circle>
-                                                    </svg>
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
+                                                        fontSize: "0.85rem"
+                                                    }}>
+                                                        {getEstadoDisplay(p.estado)}
+                                                    </span>
+                                                </td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>
+                                                    <div style={{ fontSize: "0.85rem" }}>
+                                                        <div style={{ color: "#ffc107" }}>Pendientes: {p.postulaciones_pendientes}</div>
+                                                        <div style={{ color: "#4caf50" }}>Aceptadas: {p.postulaciones_aceptadas}</div>
+                                                    </div>
+                                                </td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>
+                                                    <button
+                                                        style={{
+                                                            padding: "8px 16px",
+                                                            borderRadius: "8px",
+                                                            border: "none",
+                                                            background: "#007bff",
+                                                            color: "#fff",
+                                                            cursor: "pointer",
+                                                            fontWeight: "bold",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            gap: "8px",
+                                                            margin: "0 auto"
+                                                        }}
+                                                        onClick={() => setSeleccionado(p)}
+                                                    >
+                                                        <span>Revisar</span>
+                                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                            <circle cx="12" cy="12" r="3"></circle>
+                                                        </svg>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
 
-                        {postulacionesFiltradas.length === 0 && (
+                        {proyectosFiltrados.length === 0 && (
                             <div style={{ 
                                 background: "#555", 
                                 padding: "24px", 
@@ -199,9 +329,9 @@ export function DashboardProfe() {
                                 marginTop: "16px"
                             }}>
                                 <p style={{ color: "#fff" }}>
-                                    {filtroEstado === "Todas" 
-                                        ? "No hay postulaciones registradas." 
-                                        : `No hay postulaciones ${filtroEstado.toLowerCase()}.`}
+                                    {filtroEstado === "Todos" 
+                                        ? "No hay proyectos asignados." 
+                                        : `No hay proyectos ${filtroEstado.toLowerCase()}.`}
                                 </p>
                             </div>
                         )}
@@ -209,7 +339,7 @@ export function DashboardProfe() {
                 ) : (
                     <div style={{ color: "#fff" }}>
                         <button
-                            onClick={() => setSeleccionada(null)}
+                            onClick={() => setSeleccionado(null)}
                             style={{
                                 display: "flex",
                                 alignItems: "center",
@@ -235,57 +365,34 @@ export function DashboardProfe() {
                             padding: "24px",
                             marginBottom: "24px"
                         }}>
-                            <h2 style={{ marginTop: 0 }}>Detalle de la Postulación</h2>
+                            <h2 style={{ marginTop: 0 }}>Detalle del Proyecto</h2>
                             
                             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
                                 <div>
-                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Información del Estudiante</h3>
-                                    <p><strong>Nombre:</strong> {seleccionada.estudiante}</p>
-                                    <p><strong>Email:</strong> {seleccionada.email}</p>
-                                    <p><strong>Carrera:</strong> {seleccionada.carrera}</p>
-                                </div>
-                                
-                                <div>
                                     <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Información del Proyecto</h3>
-                                    <p><strong>Proyecto:</strong> {seleccionada.proyecto}</p>
-                                    <p><strong>Fecha postulación:</strong> {seleccionada.fecha}</p>
-                                    <p>
-                                        <strong>Estado:</strong> 
+                                    <p><strong>Título:</strong> {seleccionado.titulo}</p>
+                                    <p><strong>Estado:</strong> 
                                         <span style={{
                                             display: "inline-block",
                                             marginLeft: "8px",
                                             padding: "4px 12px",
                                             borderRadius: "20px",
-                                            background:
-                                                seleccionada.estado === "Aprobada"
-                                                    ? "rgba(76, 175, 80, 0.2)"
-                                                    : seleccionada.estado === "Rechazada"
-                                                        ? "rgba(244, 67, 54, 0.2)"
-                                                        : "rgba(255, 193, 7, 0.2)",
-                                            color:
-                                                seleccionada.estado === "Aprobada"
-                                                    ? "#4caf50"
-                                                    : seleccionada.estado === "Rechazada"
-                                                        ? "#f44336"
-                                                        : "#ffc107",
+                                            ...getEstadoColor(seleccionado.estado),
                                             fontWeight: "bold",
                                             fontSize: "0.85rem"
                                         }}>
-                                            {seleccionada.estado}
+                                            {getEstadoDisplay(seleccionado.estado)}
                                         </span>
                                     </p>
+                                    <p><strong>Fecha creación:</strong> {seleccionado.fecha_creacion ? new Date(seleccionado.fecha_creacion).toLocaleDateString('es-ES') : "N/A"}</p>
                                 </div>
-                            </div>
-                            
-                            <div style={{ marginTop: "24px" }}>
-                                <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Motivación del Estudiante</h3>
-                                <div style={{ 
-                                    background: "#444", 
-                                    padding: "16px", 
-                                    borderRadius: "8px",
-                                    lineHeight: "1.6"
-                                }}>
-                                    {seleccionada.motivacion}
+                                
+                                <div>
+                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Información del Creador</h3>
+                                    <p><strong>Nombre:</strong> {seleccionado.creador?.nombre || "N/A"}</p>
+                                    <p><strong>Email:</strong> {seleccionado.creador?.email || "N/A"}</p>
+                                    <p><strong>Postulaciones pendientes:</strong> {seleccionado.postulaciones_pendientes}</p>
+                                    <p><strong>Postulaciones aceptadas:</strong> {seleccionado.postulaciones_aceptadas}</p>
                                 </div>
                             </div>
                             
@@ -297,104 +404,112 @@ export function DashboardProfe() {
                                     borderRadius: "8px",
                                     lineHeight: "1.6"
                                 }}>
-                                    {seleccionada.descripcion}
+                                    {seleccionado.descripcion}
                                 </div>
                             </div>
+
+                            {seleccionado.resumen && (
+                                <div style={{ marginTop: "24px" }}>
+                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Resumen</h3>
+                                    <div style={{ 
+                                        background: "#444", 
+                                        padding: "16px", 
+                                        borderRadius: "8px",
+                                        lineHeight: "1.6"
+                                    }}>
+                                        {seleccionado.resumen}
+                                    </div>
+                                </div>
+                            )}
+
+                            {seleccionado.problema && (
+                                <div style={{ marginTop: "24px" }}>
+                                    <h3 style={{ color: "#bbb", marginBottom: "12px" }}>Problema</h3>
+                                    <div style={{ 
+                                        background: "#444", 
+                                        padding: "16px", 
+                                        borderRadius: "8px",
+                                        lineHeight: "1.6"
+                                    }}>
+                                        {seleccionado.problema}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <div style={{ 
-                            background: "#555", 
-                            borderRadius: "12px", 
-                            padding: "24px",
-                            marginBottom: "24px"
-                        }}>
-                            <h3 style={{ marginTop: 0, marginBottom: "16px" }}>Evaluación</h3>
-                            
-                            <div style={{ marginBottom: "20px" }}>
-                                <label style={{ display: "block", marginBottom: "8px", fontWeight: "bold" }}>
-                                    Comentario para el estudiante:
-                                </label>
-                                <textarea
-                                    value={comentario}
-                                    onChange={e => setComentario(e.target.value)}
-                                    rows={4}
-                                    style={{
-                                        width: "100%",
-                                        borderRadius: "10px",
-                                        border: "1px solid #666",
-                                        padding: "12px",
-                                        fontSize: "1rem",
-                                        resize: "vertical",
-                                        background: "#444",
-                                        color: "#fff"
-                                    }}
-                                    placeholder="Escribe tus comentarios, sugerencias o razones para aprobar/rechazar..."
-                                />
+                        {seleccionado.estado === "propuesto" && (
+                            <div style={{ 
+                                background: "#555", 
+                                borderRadius: "12px", 
+                                padding: "24px",
+                                marginBottom: "24px"
+                            }}>
+                                <h3 style={{ marginTop: 0, marginBottom: "16px" }}>Evaluación del Proyecto</h3>
+                                
+                                <div style={{ display: "flex", gap: "16px", justifyContent: "flex-end" }}>
+                                    <button
+                                        style={{
+                                            padding: "12px 24px",
+                                            borderRadius: "8px",
+                                            border: "none",
+                                            background: "#6c757d",
+                                            color: "#fff",
+                                            fontWeight: "bold",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px"
+                                        }}
+                                        onClick={() => {
+                                            setSeleccionado(null);
+                                            setComentario("");
+                                        }}
+                                    >
+                                        Cancelar
+                                    </button>
+                                    <button
+                                        style={{
+                                            padding: "12px 24px",
+                                            borderRadius: "8px",
+                                            border: "none",
+                                            background: "#f44336",
+                                            color: "#fff",
+                                            fontWeight: "bold",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px"
+                                        }}
+                                        onClick={() => handleCambiarEstado("rechazado")}
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M18 6L6 18M6 6l12 12"></path>
+                                        </svg>
+                                        Rechazar
+                                    </button>
+                                    <button
+                                        style={{
+                                            padding: "12px 24px",
+                                            borderRadius: "8px",
+                                            border: "none",
+                                            background: "#4caf50",
+                                            color: "#fff",
+                                            fontWeight: "bold",
+                                            cursor: "pointer",
+                                            display: "flex",
+                                            alignItems: "center",
+                                            gap: "8px"
+                                        }}
+                                        onClick={() => handleCambiarEstado("aprobado")}
+                                    >
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                            <path d="M20 6L9 17l-5-5"></path>
+                                        </svg>
+                                        Aprobar
+                                    </button>
+                                </div>
                             </div>
-                            
-                            <div style={{ display: "flex", gap: "16px", justifyContent: "flex-end" }}>
-                                <button
-                                    style={{
-                                        padding: "12px 24px",
-                                        borderRadius: "8px",
-                                        border: "none",
-                                        background: "#6c757d",
-                                        color: "#fff",
-                                        fontWeight: "bold",
-                                        cursor: "pointer",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px"
-                                    }}
-                                    onClick={() => {
-                                        setSeleccionada(null);
-                                        setComentario("");
-                                    }}
-                                >
-                                    Cancelar
-                                </button>
-                                <button
-                                    style={{
-                                        padding: "12px 24px",
-                                        borderRadius: "8px",
-                                        border: "none",
-                                        background: "#f44336",
-                                        color: "#fff",
-                                        fontWeight: "bold",
-                                        cursor: "pointer",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px"
-                                    }}
-                                    onClick={() => handleVeredicto("Rechazada")}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M18 6L6 18M6 6l12 12"></path>
-                                    </svg>
-                                    Rechazar
-                                </button>
-                                <button
-                                    style={{
-                                        padding: "12px 24px",
-                                        borderRadius: "8px",
-                                        border: "none",
-                                        background: "#4caf50",
-                                        color: "#fff",
-                                        fontWeight: "bold",
-                                        cursor: "pointer",
-                                        display: "flex",
-                                        alignItems: "center",
-                                        gap: "8px"
-                                    }}
-                                    onClick={() => handleVeredicto("Aprobada")}
-                                >
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                        <path d="M20 6L9 17l-5-5"></path>
-                                    </svg>
-                                    Aprobar
-                                </button>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 )}
 
