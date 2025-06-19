@@ -1,11 +1,3 @@
-// import { Approuter } from "./router/Approuter";
-// import './index.css';
-// function App() {
-//   return <Approuter />
-// }
-//
-// export default App;
-
 import React, { useEffect, useState } from 'react';
 import { Routes, Route, useNavigate } from "react-router-dom";
 import Home from "../src/Paginas/HomeV2.jsx";
@@ -18,6 +10,7 @@ import PruebaNavbar from "./PruebaNavbar.jsx";
 import { Callback } from "./callback.jsx";
 import { MisProyectosEstudiante } from "./Paginas/MisProyectosEstudiante";
 import RankingProyectos from "./Paginas/RankingProyectos";
+import { CalificarProyecto } from "./Paginas"; 
 
 // Layout con Navbar
 function LayoutWithNavbar() {
@@ -30,7 +23,8 @@ function LayoutWithNavbar() {
         <Route path="/dashboard-profe" element={<DashboardProfe />} />
         <Route path="/mis-proyectos" element={<MisProyectosEstudiante />} />
         <Route path="/dashboard-estudiante" element={<DashboardEstudiante />} />
-        <Route path="/ranking" element={<RankingProyectos />} /> 
+        <Route path="/ranking" element={<RankingProyectos />} />
+        <Route path="/calificar-proyectos" element={<CalificarProyecto />} />
         {/* Aquí puedes agregar más rutas que SÍ deben tener navbar */}
       </Routes>
     </>

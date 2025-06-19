@@ -137,4 +137,100 @@ def listar_proyectos_aprobados(db: Session = Depends(get_db)):
         })
     return resultado
 
+# Endpoint para que profesores vean sus proyectos asignados
+@router.get("/mis-proyectos-asignados")
+def listar_proyectos_asignados_profesor(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.profesor:
+        raise HTTPException(status_code=403, detail="Solo los profesores pueden acceder a esta ruta")
+
+    proyectos = db.query(Proyecto).filter(Proyecto.profesor_id == usuario_db.id).all()
+    resultado = []
+    for p in proyectos:
+        creador = db.query(Usuario).filter(Usuario.id == p.creador_id).first()
+        resultado.append({
+            "id": p.id,
+            "titulo": p.titulo,
+            "descripcion": p.descripcion,
+            "resumen": p.resumen,
+            "problema": p.problema,
+            "justificacion": p.justificacion,
+            "impacto": p.impacto,
+            "creador": f"{creador.nombre} {creador.apellido}" if creador else "",
+            "creador_id": p.creador_id,
+            "estado": p.estado.value,
+            "calificacion_final": p.calificacion_final,
+            "perfiles_requeridos": p.perfiles_requeridos
+        })
+    return resultado
+
+# Endpoint para calificar un proyecto
+@router.put("/{proyecto_id}/calificacion")
+def calificar_proyecto(
+    proyecto_id: int, 
+    calificacion_data: dict = Body(...),
+    usuario=Depends(verificar_token), 
+    db: Session = Depends(get_db)
+):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.profesor:
+        raise HTTPException(status_code=403, detail="Solo los profesores pueden calificar proyectos")
+
+    proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+    if not proyecto:
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+
+    if proyecto.profesor_id != usuario_db.id:
+        raise HTTPException(status_code=403, detail="Solo puedes calificar proyectos asignados a ti")
+
+    calificacion = calificacion_data.get("calificacion")
+    if not calificacion or not (1.0 <= calificacion <= 7.0):
+        raise HTTPException(status_code=400, detail="La calificación debe estar entre 1.0 y 7.0")
+
+    proyecto.calificacion_final = calificacion
+    db.commit()
+    db.refresh(proyecto)
+
+    return {
+        "mensaje": "Proyecto calificado exitosamente",
+        "proyecto_id": proyecto_id,
+        "calificacion": calificacion,
+        "en_ranking": calificacion >= 6.0
+    }
+
+# Endpoint para obtener proyectos del ranking (calificados con 6.0+)
+@router.get("/ranking")
+def obtener_ranking_proyectos(db: Session = Depends(get_db)):
+    proyectos = (
+        db.query(Proyecto)
+        .filter(
+            Proyecto.calificacion_final >= 6.0,
+            Proyecto.estado == EstadoProyectoDBEnum.aprobado
+        )
+        .order_by(Proyecto.calificacion_final.desc())
+        .all()
+    )
+    
+    resultado = []
+    for p in proyectos:
+        creador = db.query(Usuario).filter(Usuario.id == p.creador_id).first()
+        profesor = db.query(Usuario).filter(Usuario.id == p.profesor_id).first()
+        
+        resultado.append({
+            "id": p.id,
+            "titulo": p.titulo,
+            "descripcion": p.descripcion,
+            "resumen": p.resumen,
+            "problema": p.problema,
+            "justificacion": p.justificacion,
+            "impacto": p.impacto,
+            "creador": f"{creador.nombre} {creador.apellido}" if creador else "",
+            "profesor": f"{profesor.nombre} {profesor.apellido}" if profesor else "",
+            "calificacion_final": p.calificacion_final,
+            "perfiles_requeridos": p.perfiles_requeridos,
+            "estado": p.estado.value,
+            "votos_ranking": 0  # Inicialmente 0, se puede implementar sistema de votos después
+        })
+    
+    return resultado
 

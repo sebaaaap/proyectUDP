@@ -52,8 +52,10 @@ function PruebaNavbar() {
                             >
                                 <NavDropdown.Item as={Link} to="/" style={{ fontSize: '18px' }}>Cerrar Sesión</NavDropdown.Item>
                             </NavDropdown>
+                            
                             <Nav.Link as={Link} to="/Home" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                            
                             {/* Solo mostrar Formulario de Proyecto para estudiantes */}
                             {isEstudiante && (
                                 <>
@@ -61,8 +63,26 @@ function PruebaNavbar() {
                                     <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
                                 </>
                             )}
+                            
                             <Nav.Link as={Link} to="/mis-proyectos" style={{ fontSize: '20px', color: "white" }}>Mis proyectos</Nav.Link>
+                            
+                            {/* Solo mostrar Calificar Proyectos para profesores */}
+                            {user?.rol === 'profesor' && (
+                                <>
+                                    <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                                    <Nav.Link as={Link} to="/calificar-proyectos" style={{ fontSize: '20px', color: "white" }}>
+                                        📊 Calificar Proyectos
+                                    </Nav.Link>
+                                </>
+                            )}
+                            
+                            {/* Ranking visible para todos */}
+                            <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
+                            <Nav.Link as={Link} to="/ranking" style={{ fontSize: '20px', color: "white" }}>
+                                🏆 Ranking
+                            </Nav.Link>
                         </Nav>
+                        
                         {/* Buscador y Notificaciones DERECHA */}
                         <div className="ms-auto d-flex align-items-center" style={{ gap: 20 }}>
                             <Form className="d-flex">
