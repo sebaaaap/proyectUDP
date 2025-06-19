@@ -248,7 +248,7 @@ function Home() {
           Ir al Dashboard
         </button>
 
-        <button
+        {/* <button
           onClick={handleLogout}
           style={{
             backgroundColor: "transparent",
@@ -272,7 +272,7 @@ function Home() {
           }}
         >
           Cerrar sesión
-        </button>
+        </button> */}
       </div>
 
       {/* Descripción detallada que aparece al hacer hover - centrada en la pantalla */}

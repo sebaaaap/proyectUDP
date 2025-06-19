@@ -50,9 +50,9 @@ function PruebaNavbar() {
                                 }
                                 id="navbarScrollingDropdown"
                             >
-                                <NavDropdown.Item as={Link} to="/login" style={{ fontSize: '18px' }}>Cerrar Sección</NavDropdown.Item>
+                                <NavDropdown.Item as={Link} to="/" style={{ fontSize: '18px' }}>Cerrar Sesión</NavDropdown.Item>
                             </NavDropdown>
-                            <Nav.Link as={Link} to="/" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
+                            <Nav.Link as={Link} to="/Home" style={{ fontSize: '20px', color: "white" }}>Home</Nav.Link>
                             <Nav.Item style={{ borderLeft: '1px solid white', height: '20px', margin: '0 15px' }}></Nav.Item>
                             {/* Solo mostrar Formulario de Proyecto para estudiantes */}
                             {isEstudiante && (
