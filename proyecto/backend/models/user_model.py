@@ -2,7 +2,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy import Column, Integer, String, ForeignKey, Float
 from sqlalchemy import Enum as SqlEnum
 import enum
-from database.db import  Base
+from database.db import Base
 
 class RolEnum(enum.Enum):
     estudiante = "estudiante"
@@ -18,6 +18,7 @@ class Usuario(Base):
     correo = Column(String, unique=True, index=True)
     rol = Column(SqlEnum(RolEnum), nullable=False)
 
+    # Relaciones existentes
     proyectos_creados = relationship(
         "Proyecto",
         foreign_keys="Proyecto.creador_id",
@@ -31,9 +32,9 @@ class Usuario(Base):
     )
 
     postulaciones = relationship("Postulacion", back_populates="estudiante")
-
-
-
+    
+    # Nueva relación con votos de ranking
+    votos_ranking = relationship("VotoRanking", back_populates="profesor")
 
 class Estudiante(Base):
     __tablename__ = "estudiantes"

@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, Enum as SqlEnum
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, JSON, Enum as SqlEnum, Float, DateTime
 from sqlalchemy.orm import relationship
+from datetime import datetime
 import enum
-from database.db import  Base
+from database.db import Base
 
 class EstadoProyectoDBEnum(enum.Enum):
     propuesto = "propuesto"
@@ -19,6 +20,11 @@ class Proyecto(Base):
     problema = Column(Text)
     justificacion = Column(Text)
     impacto = Column(Text)
+    
+    # Campos adicionales para el ranking
+    calificacion_final = Column(Float)
+    fecha_entrega = Column(DateTime)
+    fecha_creacion = Column(DateTime, default=datetime.utcnow)
 
     creador_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
     profesor_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
@@ -26,6 +32,7 @@ class Proyecto(Base):
     perfiles_requeridos = Column(JSON, default=[])
     estado = Column(SqlEnum(EstadoProyectoDBEnum), default=EstadoProyectoDBEnum.propuesto)
 
+    # Relaciones existentes
     creador = relationship(
         "Usuario",
         foreign_keys=[creador_id],
@@ -39,3 +46,6 @@ class Proyecto(Base):
     )
 
     archivos = relationship("ArchivoProyecto", back_populates="proyecto")
+    
+    # Nueva relación con ranking
+    ranking_info = relationship("ProyectoRanking", back_populates="proyecto", uselist=False)

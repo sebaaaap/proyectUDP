@@ -19,6 +19,10 @@ function Home() {
     }
   };
 
+  const irARanking = () => {
+    navigate("/ranking");
+  };
+
   const handleLogout = () => {
     window.location.href = "http://localhost:8000/logout";
   };
@@ -133,6 +137,43 @@ function Home() {
 
   return (
     <div style={{ width: "100%", margin: 0, padding: 0 }}>
+      {/* Header con botón de ranking */}
+      <div style={{
+        position: "absolute",
+        top: "20px",
+        right: "20px",
+        zIndex: 1000
+      }}>
+        <button
+          onClick={irARanking}
+          style={{
+            backgroundColor: "#fbbf24",
+            color: "#000",
+            border: "none",
+            padding: "12px 20px",
+            borderRadius: "8px",
+            fontSize: "14px",
+            fontWeight: "600",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = "#f59e0b";
+            e.target.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = "#fbbf24";
+            e.target.style.transform = "scale(1)";
+          }}
+        >
+          🏆 Ver Ranking
+        </button>
+      </div>
+
       {/* Imagen de portada que ocupa toda la pantalla */}
       <div style={{ width: "100%", height: "100vh", overflow: "hidden" }}>
         <img
@@ -246,6 +287,32 @@ function Home() {
           }}
         >
           Ir al Dashboard
+        </button>
+
+        <button
+          onClick={irARanking}
+          style={{
+            backgroundColor: "#fbbf24",
+            color: "#000",
+            border: "none",
+            padding: "12px 24px",
+            borderRadius: "12px",
+            fontSize: "16px",
+            fontWeight: "600",
+            cursor: "pointer",
+            transition: "all 0.3s ease",
+            boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)"
+          }}
+          onMouseOver={(e) => {
+            e.target.style.backgroundColor = "#f59e0b";
+            e.target.style.transform = "scale(1.05)";
+          }}
+          onMouseOut={(e) => {
+            e.target.style.backgroundColor = "#fbbf24";
+            e.target.style.transform = "scale(1)";
+          }}
+        >
+          🏆 Ver Ranking
         </button>
 
         {/* <button

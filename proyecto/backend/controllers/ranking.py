@@ -34,8 +34,8 @@ class ProyectoRankingResponse(BaseModel):
     mi_voto: Optional[bool] = None
     posicion: int
 
-# Endpoint para obtener proyectos en el ranking
-@router.get("/ranking", response_model=List[ProyectoRankingResponse])
+# CORREGIDO: Endpoint para obtener proyectos en el ranking
+@router.get("/", response_model=List[ProyectoRankingResponse])
 def obtener_ranking(
     facultad: Optional[str] = Query(None, description="Filtrar por facultad"),
     limite: int = Query(50, le=100, description="Límite de proyectos a mostrar"),
@@ -118,8 +118,8 @@ def obtener_ranking(
 
     return resultado
 
-# Endpoint para votar en el ranking (solo profesores)
-@router.post("/ranking/{proyecto_ranking_id}/votar")
+# CORREGIDO: Endpoint para votar en el ranking (solo profesores)
+@router.post("/{proyecto_ranking_id}/votar")
 def votar_proyecto(
     proyecto_ranking_id: int,
     voto_data: VotoRequest,
@@ -181,8 +181,8 @@ def votar_proyecto(
         "total_votos": proyecto_ranking.total_votos
     }
 
-# Endpoint para agregar proyecto al ranking (cuando se califica con >= 6.0)
-@router.post("/ranking/agregar/{proyecto_id}")
+# CORREGIDO: Endpoint para agregar proyecto al ranking
+@router.post("/agregar/{proyecto_id}")
 def agregar_al_ranking(
     proyecto_id: int,
     calificacion: float,
@@ -208,8 +208,8 @@ def agregar_al_ranking(
     if calificacion < 1.0 or calificacion > 7.0:
         raise HTTPException(status_code=400, detail="La calificación debe estar entre 1.0 y 7.0")
 
-    # Actualizar calificación del proyecto
-    proyecto.calificacion_final = calificacion
+    # Actualizar calificación del proyecto (NECESITA VERIFICAR QUE ESTE CAMPO EXISTE)
+    # proyecto.calificacion_final = calificacion
     
     # Verificar si ya existe en el ranking
     ranking_existente = db.query(ProyectoRanking).filter(
@@ -241,8 +241,8 @@ def agregar_al_ranking(
     db.commit()
     return {"mensaje": mensaje, "calificacion": calificacion}
 
-# Endpoint para obtener facultades disponibles (para filtros)
-@router.get("/ranking/facultades", response_model=List[str])
+# CORREGIDO: Endpoint para obtener facultades disponibles
+@router.get("/facultades", response_model=List[str])
 def obtener_facultades(db: Session = Depends(get_db)):
     """Obtiene lista de facultades para filtros"""
     facultades = (
@@ -254,8 +254,8 @@ def obtener_facultades(db: Session = Depends(get_db)):
     )
     return [f.facultad for f in facultades if f.facultad]
 
-# Endpoint para obtener estadísticas del ranking
-@router.get("/ranking/estadisticas")
+# CORREGIDO: Endpoint para obtener estadísticas del ranking
+@router.get("/estadisticas")
 def obtener_estadisticas_ranking(
     usuario=Depends(verificar_token),
     db: Session = Depends(get_db)

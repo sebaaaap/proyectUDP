@@ -4,12 +4,10 @@ from starlette.middleware.sessions import SessionMiddleware
 from fastapi.staticfiles import StaticFiles
 
 from database.db import Base, engine  
-from controllers import proyecto_controller, archivos_proyectos, user, utils, proyecto
-# from controllers.proyecto_filtro import router as proyecto_filtro_router
-# from controllers.evaluacion_proyecto import router as evaluacion_router
-from controllers.proyecto import router as proyecto_controller, profesor_router
+from controllers import user, utils, proyecto
+from controllers.proyecto import router as proyecto_router, profesor_router
 from controllers.archivos_proyectos import router as archivos_router
-
+from controllers.ranking import router as ranking_router  # Importar el router de ranking
 
 # Importar modelos para activar la creación de tablas
 import models
@@ -29,8 +27,6 @@ app.add_middleware(
 app.add_middleware(SessionMiddleware, secret_key="add any string...")
 
 # Crear las tablas de la base de datos
-
-
 Base.metadata.create_all(bind=engine)
 
 # Ruta de prueba
@@ -44,17 +40,12 @@ def test_postulaciones():
     return {"mensaje": "Endpoint de postulaciones funcionando"}
 
 # Incluir routers
-# app.include_router(proyecto_filtro_router)
-# app.include_router(evaluacion_router)
-# app.include_router(archivos_proyectos.router)
-# app.include_router(proyecto_controller.router, prefix="/proyectos", tags=["proyectos"])
 app.include_router(user.router)
 app.include_router(utils.router)
-
-
-app.include_router(proyecto.router, prefix="/proyectos", tags=["proyectos"])
+app.include_router(proyecto_router, prefix="/proyectos", tags=["proyectos"])
 app.include_router(profesor_router, prefix="/profesor", tags=["profesor"])
 app.include_router(archivos_router, prefix="/proyectos", tags=["archivos"])
+app.include_router(ranking_router, prefix="/ranking", tags=["ranking"])  # Agregar router de ranking
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

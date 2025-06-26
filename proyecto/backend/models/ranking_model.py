@@ -14,7 +14,7 @@ class ProyectoRanking(Base):
     activo = Column(Boolean, default=True)
     
     # Relaciones
-    proyecto = relationship("Proyecto", backref="ranking_info")
+    proyecto = relationship("Proyecto", back_populates="ranking_info")
     votos = relationship("VotoRanking", back_populates="proyecto_ranking", cascade="all, delete-orphan")
     
     @property
@@ -51,7 +51,7 @@ class VotoRanking(Base):
     
     # Relaciones
     proyecto_ranking = relationship("ProyectoRanking", back_populates="votos")
-    profesor = relationship("Usuario", backref="votos_ranking")
+    profesor = relationship("Usuario", back_populates="votos_ranking")
     
     # Constraint para que cada profesor vote solo una vez por proyecto
     __table_args__ = (
