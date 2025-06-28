@@ -5,12 +5,18 @@ from models.proyecto_model import Proyecto, EstadoProyectoDBEnum
 from schemas.proyecto_schema import ProyectoCreate
 from models.user_model import Usuario, RolEnum
 from models.postulacion_model import Postulacion, EstadoPostulacionEnum
+from models.ranking_model import ProyectoRanking
 from helpers.jwtAuth import verificar_token
 from schemas.postulacion_schema import PostulacionCreate
+from pydantic import BaseModel
 from typing import List
 
 router = APIRouter()
 profesor_router = APIRouter()  # Router separado para profesores
+
+# Modelo Pydantic para la calificación
+class CalificacionRequest(BaseModel):
+    calificacion: float
 
 # ruta para crear un proyecto
 @router.post("/crear")
@@ -360,4 +366,100 @@ def obtener_proyectos_profesor(usuario=Depends(verificar_token), db: Session = D
     
     return resultado
 
-
+# NUEVO: Endpoint para calificar proyectos
+@router.patch("/proyectos/{proyecto_id}/calificar")
+async def calificar_proyecto(
+    proyecto_id: int,
+    calificacion_data: CalificacionRequest,
+    usuario=Depends(verificar_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Califica un proyecto. Si la calificación es >= 6.0, lo agrega al ranking automáticamente.
+    """
+    try:
+        # Validar que la calificación esté en el rango correcto
+        if not (1.0 <= calificacion_data.calificacion <= 7.0):
+            raise HTTPException(
+                status_code=400, 
+                detail="La calificación debe estar entre 1.0 y 7.0"
+            )
+        
+        # Verificar que el usuario sea profesor
+        usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+        if not usuario_db or usuario_db.rol != RolEnum.profesor:
+            raise HTTPException(
+                status_code=403, 
+                detail="Solo los profesores pueden calificar proyectos"
+            )
+        
+        # Buscar el proyecto
+        proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+        if not proyecto:
+            raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+        
+        # Verificar que el profesor esté asignado al proyecto
+        if proyecto.profesor_id != usuario_db.id:
+            raise HTTPException(
+                status_code=403, 
+                detail="No tienes permisos para calificar este proyecto"
+            )
+        
+        # Verificar que el proyecto esté aprobado
+        if proyecto.estado != EstadoProyectoDBEnum.aprobado:
+            raise HTTPException(
+                status_code=400, 
+                detail="Solo se pueden calificar proyectos aprobados"
+            )
+        
+        # Actualizar la calificación del proyecto
+        proyecto.calificacion_final = calificacion_data.calificacion
+        
+        # Si la calificación es >= 6.0, agregar al ranking (si no está ya)
+        if calificacion_data.calificacion >= 6.0:
+            # Verificar si ya existe en el ranking
+            ranking_existente = db.query(ProyectoRanking).filter(
+                ProyectoRanking.proyecto_id == proyecto_id
+            ).first()
+            
+            if ranking_existente:
+                # Actualizar calificación en ranking existente
+                ranking_existente.calificacion_final = calificacion_data.calificacion
+                ranking_existente.activo = True
+            else:
+                # Crear nueva entrada en el ranking
+                nuevo_ranking = ProyectoRanking(
+                    proyecto_id=proyecto_id,
+                    calificacion_final=calificacion_data.calificacion,
+                    activo=True
+                )
+                db.add(nuevo_ranking)
+        else:
+            # Si la calificación es < 6.0, remover del ranking si estaba
+            ranking_existente = db.query(ProyectoRanking).filter(
+                ProyectoRanking.proyecto_id == proyecto_id
+            ).first()
+            
+            if ranking_existente:
+                ranking_existente.activo = False
+        
+        # Guardar cambios
+        db.commit()
+        db.refresh(proyecto)
+        
+        # Preparar respuesta
+        mensaje = f"Proyecto calificado con {calificacion_data.calificacion}"
+        if calificacion_data.calificacion >= 6.0:
+            mensaje += " y agregado al ranking"
+        
+        return {
+            "mensaje": mensaje,
+            "calificacion": calificacion_data.calificacion,
+            "en_ranking": calificacion_data.calificacion >= 6.0
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")

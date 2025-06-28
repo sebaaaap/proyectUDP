@@ -9,6 +9,8 @@ export function DashboardProfe() {
     const [filtroEstado, setFiltroEstado] = useState("Todos");
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+    const [calificaciones, setCalificaciones] = useState({});
+    const [guardandoCalificacion, setGuardandoCalificacion] = useState({});
     const { token, user, isAuthenticated } = useAuth();
 
     useEffect(() => {
@@ -24,7 +26,6 @@ export function DashboardProfe() {
                 'Content-Type': 'application/json'
             };
             
-            // Si tenemos token, lo agregamos al header
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
@@ -43,6 +44,15 @@ export function DashboardProfe() {
             
             const data = await response.json();
             setProyectos(data);
+            
+            // Inicializar calificaciones existentes
+            const calificacionesIniciales = {};
+            data.forEach(proyecto => {
+                if (proyecto.calificacion_final) {
+                    calificacionesIniciales[proyecto.id] = proyecto.calificacion_final.toString();
+                }
+            });
+            setCalificaciones(calificacionesIniciales);
         } catch (err) {
             console.error('Error:', err);
             setError('Error al cargar los proyectos');
@@ -59,7 +69,8 @@ export function DashboardProfe() {
                     },
                     postulaciones_pendientes: 2,
                     postulaciones_aceptadas: 1,
-                    fecha_creacion: "2025-01-15"
+                    fecha_creacion: "2025-01-15",
+                    calificacion_final: null
                 },
                 {
                     id: 2,
@@ -72,7 +83,8 @@ export function DashboardProfe() {
                     },
                     postulaciones_pendientes: 0,
                     postulaciones_aceptadas: 3,
-                    fecha_creacion: "2025-01-10"
+                    fecha_creacion: "2025-01-10",
+                    calificacion_final: 6.5
                 },
                 {
                     id: 3,
@@ -85,10 +97,20 @@ export function DashboardProfe() {
                     },
                     postulaciones_pendientes: 1,
                     postulaciones_aceptadas: 0,
-                    fecha_creacion: "2025-01-05"
+                    fecha_creacion: "2025-01-05",
+                    calificacion_final: null
                 }
             ];
             setProyectos(datosEjemplo);
+            
+            // Inicializar calificaciones de ejemplo
+            const calificacionesEjemplo = {};
+            datosEjemplo.forEach(proyecto => {
+                if (proyecto.calificacion_final) {
+                    calificacionesEjemplo[proyecto.id] = proyecto.calificacion_final.toString();
+                }
+            });
+            setCalificaciones(calificacionesEjemplo);
         } finally {
             setLoading(false);
         }
@@ -102,7 +124,6 @@ export function DashboardProfe() {
                 "Content-Type": "application/json"
             };
             
-            // Si tenemos token, lo agregamos al header
             if (token) {
                 headers['Authorization'] = `Bearer ${token}`;
             }
@@ -140,6 +161,66 @@ export function DashboardProfe() {
         }
     };
 
+    const handleCalificacionChange = (proyectoId, valor) => {
+        setCalificaciones(prev => ({
+            ...prev,
+            [proyectoId]: valor
+        }));
+    };
+
+    const calificarProyecto = async (proyectoId) => {
+        const calificacion = parseFloat(calificaciones[proyectoId]);
+        
+        if (isNaN(calificacion) || calificacion < 1.0 || calificacion > 7.0) {
+            setError('La calificación debe estar entre 1.0 y 7.0');
+            setTimeout(() => setError(""), 3000);
+            return;
+        }
+
+        setGuardandoCalificacion(prev => ({ ...prev, [proyectoId]: true }));
+        setError('');
+
+        try {
+            const headers = {
+                'Content-Type': 'application/json',
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/calificar`, {
+                method: 'PATCH',
+                headers: headers,
+                credentials: 'include',
+                body: JSON.stringify({ calificacion: calificacion })
+            });
+
+            if (response.ok) {
+                const result = await response.json();
+                setMensaje(result.mensaje || 'Proyecto calificado correctamente');
+                
+                // Actualizar el proyecto en la lista
+                setProyectos(prev => prev.map(proyecto => 
+                    proyecto.id === proyectoId 
+                        ? { ...proyecto, calificacion_final: calificacion, en_ranking: result.en_ranking }
+                        : proyecto
+                ));
+                
+                setTimeout(() => setMensaje(''), 3000);
+            } else {
+                const errorData = await response.json();
+                setError(errorData.detail || 'Error al calificar el proyecto');
+                setTimeout(() => setError(""), 3000);
+            }
+        } catch (err) {
+            setError('Error de conexión al calificar');
+            setTimeout(() => setError(""), 3000);
+        } finally {
+            setGuardandoCalificacion(prev => ({ ...prev, [proyectoId]: false }));
+        }
+    };
+
     const proyectosFiltrados = filtroEstado === "Todos" 
         ? proyectos 
         : proyectos.filter(p => {
@@ -167,6 +248,16 @@ export function DashboardProfe() {
         }
     };
 
+    const puedeCalificar = (proyecto) => {
+        return proyecto.estado === "aprobado";
+    };
+
+    // Estadísticas
+    const totalProyectos = proyectos.length;
+    const proyectosPendientes = proyectos.filter(p => p.estado === "propuesto").length;
+    const proyectosAprobados = proyectos.filter(p => p.estado === "aprobado").length;
+    const proyectosCalificados = proyectos.filter(p => p.calificacion_final).length;
+
     if (loading) {
         return (
             <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
@@ -185,7 +276,8 @@ export function DashboardProfe() {
 
     return (
         <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh" }}>
-            <h1 style={{ color: "#fff", marginBottom: "24px" }}>Mis Proyectos Asignados</h1>
+            <h1 style={{ color: "#fff", marginBottom: "8px", fontSize: "2rem" }}>Dashboard Profesor</h1>
+            <p style={{ color: "#bbb", marginBottom: "32px" }}>Gestiona, evalúa y califica los proyectos asignados</p>
             
             {error && (
                 <div style={{
@@ -206,6 +298,51 @@ export function DashboardProfe() {
                     {error}
                 </div>
             )}
+
+            {/* Estadísticas */}
+            <div style={{ 
+                display: "grid", 
+                gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", 
+                gap: "16px", 
+                marginBottom: "32px" 
+            }}>
+                <div style={{
+                    background: "#403f3f",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <div style={{ color: "#bbb", fontSize: "0.9rem", marginBottom: "8px" }}>Total Proyectos</div>
+                    <div style={{ color: "#fff", fontSize: "2rem", fontWeight: "bold" }}>{totalProyectos}</div>
+                </div>
+                <div style={{
+                    background: "#403f3f",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <div style={{ color: "#bbb", fontSize: "0.9rem", marginBottom: "8px" }}>Pendientes</div>
+                    <div style={{ color: "#ffc107", fontSize: "2rem", fontWeight: "bold" }}>{proyectosPendientes}</div>
+                </div>
+                <div style={{
+                    background: "#403f3f",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <div style={{ color: "#bbb", fontSize: "0.9rem", marginBottom: "8px" }}>Aprobados</div>
+                    <div style={{ color: "#4caf50", fontSize: "2rem", fontWeight: "bold" }}>{proyectosAprobados}</div>
+                </div>
+                <div style={{
+                    background: "#403f3f",
+                    borderRadius: "12px",
+                    padding: "20px",
+                    textAlign: "center"
+                }}>
+                    <div style={{ color: "#bbb", fontSize: "0.9rem", marginBottom: "8px" }}>Calificados</div>
+                    <div style={{ color: "#007bff", fontSize: "2rem", fontWeight: "bold" }}>{proyectosCalificados}</div>
+                </div>
+            </div>
             
             <div style={{
                 background: "#403f3f",
@@ -241,7 +378,7 @@ export function DashboardProfe() {
                 {!seleccionado ? (
                     <>
                         <div style={{ overflowX: "auto" }}>
-                            <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse", minWidth: "800px" }}>
+                            <table style={{ width: "100%", color: "#fff", borderCollapse: "collapse", minWidth: "1000px" }}>
                                 <thead>
                                     <tr style={{ background: "#333" }}>
                                         <th style={{ padding: "12px", textAlign: "left", borderRadius: "8px 0 0 8px" }}>Proyecto</th>
@@ -249,6 +386,7 @@ export function DashboardProfe() {
                                         <th style={{ padding: "12px", textAlign: "left" }}>Fecha</th>
                                         <th style={{ padding: "12px", textAlign: "center" }}>Estado</th>
                                         <th style={{ padding: "12px", textAlign: "center" }}>Postulaciones</th>
+                                        <th style={{ padding: "12px", textAlign: "center" }}>Calificación</th>
                                         <th style={{ padding: "12px", textAlign: "center", borderRadius: "0 8px 8px 0" }}>Acción</th>
                                     </tr>
                                 </thead>
@@ -288,6 +426,86 @@ export function DashboardProfe() {
                                                         <div style={{ color: "#ffc107" }}>Pendientes: {p.postulaciones_pendientes}</div>
                                                         <div style={{ color: "#4caf50" }}>Aceptadas: {p.postulaciones_aceptadas}</div>
                                                     </div>
+                                                </td>
+                                                <td style={{ padding: "12px", textAlign: "center" }}>
+                                                    {puedeCalificar(p) ? (
+                                                        <div style={{ minWidth: "120px" }}>
+                                                            {p.calificacion_final ? (
+                                                                <div>
+                                                                    <div style={{ 
+                                                                        color: "#4caf50", 
+                                                                        fontWeight: "bold", 
+                                                                        fontSize: "1.1rem",
+                                                                        marginBottom: "4px"
+                                                                    }}>
+                                                                        {p.calificacion_final.toFixed(1)}
+                                                                    </div>
+                                                                    {p.calificacion_final >= 6.0 && (
+                                                                        <div style={{
+                                                                            fontSize: "0.7rem",
+                                                                            color: "#ffd700",
+                                                                            display: "flex",
+                                                                            alignItems: "center",
+                                                                            justifyContent: "center",
+                                                                            gap: "4px"
+                                                                        }}>
+                                                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                                                                                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                                                                            </svg>
+                                                                            Ranking
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            ) : (
+                                                                <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                                                                    <input
+                                                                        type="number"
+                                                                        min="1.0"
+                                                                        max="7.0"
+                                                                        step="0.1"
+                                                                        value={calificaciones[p.id] || ''}
+                                                                        onChange={(e) => handleCalificacionChange(p.id, e.target.value)}
+                                                                        style={{
+                                                                            width: "80px",
+                                                                            padding: "4px 8px",
+                                                                            borderRadius: "4px",
+                                                                            background: "#666",
+                                                                            color: "#fff",
+                                                                            border: "1px solid #777",
+                                                                            fontSize: "0.85rem"
+                                                                        }}
+                                                                        placeholder="6.5"
+                                                                        disabled={guardandoCalificacion[p.id]}
+                                                                    />
+                                                                    <button
+                                                                        onClick={() => calificarProyecto(p.id)}
+                                                                        disabled={!calificaciones[p.id] || guardandoCalificacion[p.id]}
+                                                                        style={{
+                                                                            padding: "4px 8px",
+                                                                            borderRadius: "4px",
+                                                                            border: "none",
+                                                                            background: calificaciones[p.id] ? "#4caf50" : "#666",
+                                                                            color: "#fff",
+                                                                            cursor: calificaciones[p.id] ? "pointer" : "not-allowed",
+                                                                            fontSize: "0.75rem",
+                                                                            fontWeight: "bold",
+                                                                            opacity: guardandoCalificacion[p.id] ? 0.6 : 1
+                                                                        }}
+                                                                    >
+                                                                        {guardandoCalificacion[p.id] ? "..." : "Calificar"}
+                                                                    </button>
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                    ) : (
+                                                        <span style={{ 
+                                                            fontSize: "0.8rem", 
+                                                            color: "#888",
+                                                            fontStyle: "italic"
+                                                        }}>
+                                                            {p.estado === "propuesto" ? "Debe aprobar" : "No disponible"}
+                                                        </span>
+                                                    )}
                                                 </td>
                                                 <td style={{ padding: "12px", textAlign: "center" }}>
                                                     <button
@@ -385,6 +603,27 @@ export function DashboardProfe() {
                                         </span>
                                     </p>
                                     <p><strong>Fecha creación:</strong> {seleccionado.fecha_creacion ? new Date(seleccionado.fecha_creacion).toLocaleDateString('es-ES') : "N/A"}</p>
+                                    {seleccionado.calificacion_final && (
+                                        <p><strong>Calificación:</strong> 
+                                            <span style={{ 
+                                                color: "#4caf50", 
+                                                fontWeight: "bold", 
+                                                fontSize: "1.2rem",
+                                                marginLeft: "8px"
+                                            }}>
+                                                {seleccionado.calificacion_final.toFixed(1)}
+                                            </span>
+                                            {seleccionado.calificacion_final >= 6.0 && (
+                                                <span style={{
+                                                    marginLeft: "8px",
+                                                    color: "#ffd700",
+                                                    fontSize: "0.8rem"
+                                                }}>
+                                                    ⭐ En Ranking
+                                                </span>
+                                            )}
+                                        </p>
+                                    )}
                                 </div>
                                 
                                 <div>
