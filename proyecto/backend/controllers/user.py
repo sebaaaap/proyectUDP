@@ -11,6 +11,7 @@ from models.user_model import Usuario, RolEnum, Estudiante, Profesor
 from database.db import get_db
 from helpers.jwtAuth import verificar_usuario, crear_token, decode_token
 from schemas.user_schema import PerfilProfesor, PerfilEstudiante
+from services.notificacion_service import notificacion_service
 
 
 logger = logging.getLogger(__name__)
@@ -85,6 +86,19 @@ async def auth(request: Request, db: Session = Depends(get_db)):
         db.add(usuario)
         db.commit()
         db.refresh(usuario)
+
+        # Después de db.refresh(usuario) y antes de generar el token
+        # Enviar notificación de cuenta creada
+        try:
+            notificacion_service.notificar_cuenta_creada(
+                nombre=usuario.nombre,
+                apellido=usuario.apellido,
+                email=usuario.correo,
+                rol=usuario.rol.value
+            )
+        except Exception as e:
+            logger.error(f"Error enviando notificación de cuenta creada: {e}")
+            # No fallar el proceso de registro por un error de notificación
 
     # Generar el token SIEMPRE
     token = crear_token({

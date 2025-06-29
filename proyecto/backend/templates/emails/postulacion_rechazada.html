@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actualización de Postulación</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #6c757d;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .info-badge {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .project-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #6c757d;
+        }
+        .button {
+            display: inline-block;
+            background: #007bff;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .encouragement {
+            background: #e7f3ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #007bff;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 Actualización de Postulación</h1>
+            <div class="info-badge">
+                ℹ️ POSTULACIÓN NO SELECCIONADA
+            </div>
+        </div>
+        
+        <p>Estimado/a <strong>{{ estudiante_nombre }}</strong>,</p>
+        
+        <p>Te escribimos para informarte sobre el estado de tu postulación al proyecto.</p>
+        
+        <div class="project-info">
+            <h3>📋 Detalles de la postulación:</h3>
+            <ul>
+                <li><strong>Proyecto:</strong> {{ titulo_proyecto }}</li>
+                <li><strong>Líder del proyecto:</strong> {{ creador_proyecto }}</li>
+                <li><strong>Fecha de decisión:</strong> {{ fecha }}</li>
+            </ul>
+        </div>
+        
+        {% if motivo %}
+        <div class="project-info">
+            <h3>💬 Comentarios del líder del proyecto:</h3>
+            <p><em>"{{ motivo }}"</em></p>
+        </div>
+        {% endif %}
+        
+        <p>Aunque en esta ocasión tu postulación no fue seleccionada, queremos que sepas que valoramos tu interés y motivación por participar en proyectos colaborativos.</p>
+        
+        <div class="encouragement">
+            <h3>🌟 ¡No te desanimes!</h3>
+            <p>Hay muchas otras oportunidades esperándote:</p>
+            <ul>
+                <li><strong>Explora otros proyectos:</strong> Revisa los proyectos disponibles que se ajusten a tu perfil</li>
+                <li><strong>Crea tu propio proyecto:</strong> Propón una idea innovadora y lidera tu propio equipo</li>
+                <li><strong>Mejora tu perfil:</strong> Desarrolla nuevas habilidades que te hagan más atractivo para futuros proyectos</li>
+                <li><strong>Mantente activo:</strong> Nuevos proyectos se publican regularmente</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ url_proyectos }}" class="button">🔍 Ver Otros Proyectos</a>
+        </div>
+        
+        <p>Recuerda que cada experiencia es una oportunidad de aprendizaje. ¡Sigue adelante y no dejes de postular a proyectos que te interesen!</p>
+        
+        <div class="footer">
+            <p><strong>Plataforma de Proyectos UDP</strong><br>
+            Universidad Diego Portales<br>
+            Este correo fue enviado automáticamente, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html>

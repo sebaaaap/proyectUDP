@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 SMTP_SERVER = "smtp.gmail.com"
 SMTP_PORT = 587
-SMTP_EMAIL = "proyectUDP@gmail.com"  
-SMTP_PASSWORD = "utzkuhzxpcylfgya" 
+SMTP_EMAIL = "proyectUDP1@gmail.com"  
+SMTP_PASSWORD = "svnfbngxjnvcuorl" 
 
 def enviar_correo(destinatario, asunto, cuerpo):
     mensaje = MIMEMultipart()

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proyecto Aprobado</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #28a745;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .success-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .project-info {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .next-steps {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 ¡Felicitaciones!</h1>
+            <div class="success-badge">
+                ✅ PROYECTO APROBADO
+            </div>
+        </div>
+        
+        <p>Estimado/a <strong>{{ estudiante_nombre }}</strong>,</p>
+        
+        <p>¡Tenemos excelentes noticias! Tu proyecto ha sido <strong>APROBADO</strong> por el profesor revisor.</p>
+        
+        <div class="project-info">
+            <h3>📋 Detalles del proyecto:</h3>
+            <ul>
+                <li><strong>Título:</strong> {{ titulo_proyecto }}</li>
+                <li><strong>Profesor revisor:</strong> {{ profesor_nombre }}</li>
+                <li><strong>Fecha de aprobación:</strong> {{ fecha }}</li>
+            </ul>
+        </div>
+        
+        {% if comentarios %}
+        <div class="project-info">
+            <h3>💬 Comentarios del profesor:</h3>
+            <p><em>"{{ comentarios }}"</em></p>
+        </div>
+        {% endif %}
+        
+        <div class="next-steps">
+            <h3>🚀 Próximos pasos:</h3>
+            <ol>
+                <li><strong>Formar tu equipo:</strong> Otros estudiantes pueden postular para unirse a tu proyecto</li>
+                <li><strong>Planificar el desarrollo:</strong> Define cronograma y tareas</li>
+                <li><strong>Subir documentación:</strong> Mantén actualizado el progreso del proyecto</li>
+                <li><strong>Comunicación regular:</strong> Mantente en contacto con tu profesor guía</li>
+            </ol>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ url_proyecto }}" class="button">📊 Ver Mi Proyecto</a>
+        </div>
+        
+        <p>Ahora que tu proyecto está aprobado, otros estudiantes podrán postular para unirse a tu equipo. Revisa regularmente las postulaciones y selecciona a los mejores candidatos.</p>
+        
+        <p>¡Estamos emocionados de ver el desarrollo de tu proyecto!</p>
+        
+        <div class="footer">
+            <p><strong>Plataforma de Proyectos UDP</strong><br>
+            Universidad Diego Portales<br>
+            Este correo fue enviado automáticamente, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html>

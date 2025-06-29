@@ -10,6 +10,10 @@ from helpers.jwtAuth import verificar_token
 from schemas.postulacion_schema import PostulacionCreate
 from pydantic import BaseModel
 from typing import List
+from services.notificacion_service import notificacion_service
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 profesor_router = APIRouter()  # Router separado para profesores
@@ -62,6 +66,22 @@ def postular(proyecto_id: int, datos: PostulacionCreate = Body(...), usuario=Dep
     )
     db.add(postulacion)
     db.commit()
+
+    # Después de db.commit() y antes del return
+    # Notificar al creador del proyecto sobre la nueva postulación
+    try:
+        creador = db.query(Usuario).filter(Usuario.id == proyecto.creador_id).first()
+        if creador:
+            notificacion_service.notificar_nueva_postulacion_al_creador(
+                creador_email=creador.correo,
+                creador_nombre=f"{creador.nombre} {creador.apellido}",
+                titulo_proyecto=proyecto.titulo,
+                postulante_nombre=f"{usuario_db.nombre} {usuario_db.apellido}",
+                motivacion=datos.motivacion
+            )
+    except Exception as e:
+        logger.error(f"Error enviando notificación de nueva postulación: {e}")
+
     return {"mensaje": "Postulación enviada"}
 
 # ruta para ver postulaciones
@@ -206,6 +226,31 @@ def cambiar_estado_postulacion(
     db.commit()
     db.refresh(postulacion)
     
+    # Después de db.commit() y antes del return
+    # Enviar notificación al estudiante sobre el cambio de estado
+    try:
+        estudiante = db.query(Usuario).filter(Usuario.id == postulacion.usuario_id).first()
+        creador = db.query(Usuario).filter(Usuario.id == proyecto.creador_id).first()
+        
+        if estudiante and creador:
+            if estado_enum == EstadoPostulacionEnum.aceptado:
+                notificacion_service.notificar_postulacion_aceptada(
+                    estudiante_email=estudiante.correo,
+                    estudiante_nombre=f"{estudiante.nombre} {estudiante.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    creador_proyecto=f"{creador.nombre} {creador.apellido}"
+                )
+            elif estado_enum == EstadoPostulacionEnum.rechazado:
+                notificacion_service.notificar_postulacion_rechazada(
+                    estudiante_email=estudiante.correo,
+                    estudiante_nombre=f"{estudiante.nombre} {estudiante.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    creador_proyecto=f"{creador.nombre} {creador.apellido}",
+                    motivo=comentario
+                )
+    except Exception as e:
+        logger.error(f"Error enviando notificación de cambio de estado: {e}")
+    
     return {"mensaje": f"Postulación {estado_enum.value} correctamente"}
 
 # ruta para aceptar o rechazar postulaciones
@@ -313,6 +358,33 @@ def cambiar_estado_proyecto(
     proyecto.estado = nuevo_estado
     db.commit()
     db.refresh(proyecto)
+
+    # Después de db.commit() y antes del return
+    # Enviar notificación al estudiante creador sobre el cambio de estado del proyecto
+    try:
+        creador = db.query(Usuario).filter(Usuario.id == proyecto.creador_id).first()
+        profesor = db.query(Usuario).filter(Usuario.id == proyecto.profesor_id).first()
+        
+        if creador and profesor:
+            if nuevo_estado == "aprobado":
+                notificacion_service.notificar_proyecto_aprobado(
+                    estudiante_email=creador.correo,
+                    estudiante_nombre=f"{creador.nombre} {creador.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    profesor_nombre=f"{profesor.nombre} {profesor.apellido}",
+                    comentarios=datos.get("comentarios", "")
+                )
+            elif nuevo_estado == "rechazado":
+                notificacion_service.notificar_proyecto_rechazado(
+                    estudiante_email=creador.correo,
+                    estudiante_nombre=f"{creador.nombre} {creador.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    profesor_nombre=f"{profesor.nombre} {profesor.apellido}",
+                    comentarios=datos.get("comentarios", "")
+                )
+    except Exception as e:
+        logger.error(f"Error enviando notificación de estado de proyecto: {e}")
+
     return {"mensaje": f"Proyecto marcado como {nuevo_estado}"}
 
 # NUEVO: Endpoint para obtener proyectos donde el usuario autenticado es profesor responsable

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Postulación Aceptada</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px solid #28a745;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .success-badge {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 25px;
+            display: inline-block;
+            margin: 20px 0;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        .project-info {
+            background: #d4edda;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #28a745;
+        }
+        .button {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-weight: bold;
+        }
+        .responsibilities {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎉 ¡Felicitaciones!</h1>
+            <div class="success-badge">
+                ✅ POSTULACIÓN ACEPTADA
+            </div>
+        </div>
+        
+        <p>Estimado/a <strong>{{ estudiante_nombre }}</strong>,</p>
+        
+        <p>¡Excelentes noticias! Tu postulación ha sido <strong>ACEPTADA</strong> y ahora formas parte del equipo del proyecto.</p>
+        
+        <div class="project-info">
+            <h3>📋 Detalles del proyecto:</h3>
+            <ul>
+                <li><strong>Proyecto:</strong> {{ titulo_proyecto }}</li>
+                <li><strong>Líder del proyecto:</strong> {{ creador_proyecto }}</li>
+                <li><strong>Fecha de aceptación:</strong> {{ fecha }}</li>
+            </ul>
+        </div>
+        
+        <div class="responsibilities">
+            <h3>🤝 Como miembro del equipo, ahora puedes:</h3>
+            <ul>
+                <li><strong>Colaborar activamente:</strong> Participar en todas las actividades del proyecto</li>
+                <li><strong>Subir archivos:</strong> Contribuir con documentos y recursos</li>
+                <li><strong>Comunicarte con el equipo:</strong> Coordinar tareas y avances</li>
+                <li><strong>Acceder a recursos:</strong> Ver y descargar archivos del proyecto</li>
+            </ul>
+        </div>
+        
+        <div style="text-align: center;">
+            <a href="{{ url_proyecto }}" class="button">🚀 Acceder al Proyecto</a>
+        </div>
+        
+        <p><strong>Próximos pasos:</strong></p>
+        <ol>
+            <li>Contacta al líder del proyecto para coordinar las primeras tareas</li>
+            <li>Revisa la documentación existente del proyecto</li>
+            <li>Participa activamente en las reuniones y planificación</li>
+            <li>Mantén actualizado tu progreso en la plataforma</li>
+        </ol>
+        
+        <p>¡Esperamos que tengas una experiencia enriquecedora trabajando en este proyecto!</p>
+        
+        <div class="footer">
+            <p><strong>Plataforma de Proyectos UDP</strong><br>
+            Universidad Diego Portales<br>
+            Este correo fue enviado automáticamente, por favor no responder.</p>
+        </div>
+    </div>
+</body>
+</html>
