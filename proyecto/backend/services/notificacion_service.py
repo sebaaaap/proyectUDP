@@ -23,7 +23,7 @@ class NotificacionService:
         template_dir = Path(__file__).parent.parent / "templates" / "emails"
         self.jinja_env = Environment(loader=FileSystemLoader(template_dir))
     
-    def _enviar_correo_base(self, destinatario: str, asunto: str, cuerpo_html: str, cuerpo_texto: str = None):
+    def _enviar_correo_base(self, destinatario: str, asunto: str, cuerpo_html: str, cuerpo_texto: Optional[str] = None):
         """Método base para enviar correos"""
         try:
             mensaje = MIMEMultipart("alternative")
@@ -74,7 +74,7 @@ class NotificacionService:
             return False
     
     def notificar_proyecto_aprobado(self, estudiante_email: str, estudiante_nombre: str, 
-                                  titulo_proyecto: str, profesor_nombre: str, comentarios: str = None):
+                                  titulo_proyecto: str, profesor_nombre: str, comentarios: Optional[str] = None):
         """Notifica cuando un proyecto es aprobado"""
         try:
             template = self.jinja_env.get_template("proyecto_aprobado.html")
@@ -96,7 +96,7 @@ class NotificacionService:
             return False
     
     def notificar_proyecto_rechazado(self, estudiante_email: str, estudiante_nombre: str,
-                                   titulo_proyecto: str, profesor_nombre: str, comentarios: str = None):
+                                   titulo_proyecto: str, profesor_nombre: str, comentarios: Optional[str] = None):
         """Notifica cuando un proyecto es rechazado"""
         try:
             template = self.jinja_env.get_template("proyecto_rechazado.html")
@@ -139,7 +139,7 @@ class NotificacionService:
             return False
     
     def notificar_postulacion_rechazada(self, estudiante_email: str, estudiante_nombre: str,
-                                      titulo_proyecto: str, creador_proyecto: str, motivo: str = None):
+                                      titulo_proyecto: str, creador_proyecto: str, motivo: Optional[str] = None):
         """Notifica cuando una postulación es rechazada"""
         try:
             template = self.jinja_env.get_template("postulacion_rechazada.html")

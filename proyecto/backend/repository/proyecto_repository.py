@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from models.proyecto_model import Proyecto
-from models.postulacion_model import Participacion
+from models.postulacion_model import Postulacion
 from datetime import datetime
 
 class ProyectoRepository:
@@ -41,8 +41,8 @@ class ProyectoRepository:
     def obtener_proyectos_por_estudiante(self, id_estudiante: int):
         return (
             self.db.query(Proyecto)
-            .join(Participacion, Proyecto.id == Participacion.id_proyecto)
-            .filter(Participacion.id_estudiante == id_estudiante)
+            .join(Postulacion, Proyecto.id == Postulacion.proyecto_id)
+            .filter(Postulacion.usuario_id == id_estudiante)
             .all()
         )
         
