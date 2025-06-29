@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
-from models.proyecto import Proyecto
-from models.participacion import Participacion
+from models.proyecto_model import Proyecto
+from models.postulacion_model import Participacion
 from datetime import datetime
 
 class ProyectoRepository:

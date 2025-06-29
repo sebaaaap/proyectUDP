@@ -11,7 +11,7 @@ from models.user_model import Usuario, RolEnum, Estudiante, Profesor
 from database.db import get_db
 from helpers.jwtAuth import verificar_usuario, crear_token, decode_token
 from schemas.user_schema import PerfilProfesor, PerfilEstudiante
-from services.notificacion_service import notificacion_service
+from services.notificacion_service import notificacion_service 
 
 
 logger = logging.getLogger(__name__)
