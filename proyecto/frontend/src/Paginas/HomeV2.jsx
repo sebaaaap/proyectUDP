@@ -90,15 +90,11 @@ function Home() {
     return (
       <div style={{ width: "100%", margin: 0, padding: 0 }}>
         {/* Imagen de portada que ocupa toda la pantalla */}
-        <div style={{ width: "100%", height: "100vh", overflow: "hidden" }}>
+        <div className="homev2-img-container">
           <img
             src="/imagenhome.jpg"
             alt="Portada"
-            style={{
-              width: "100%",
-              height: "90%",
-              objectFit: "cover"
-            }}
+            className="homev2-img"
           />
         </div>
         <h1 style={{ marginBottom: "18px", color: "#fff", textAlign: "center" }}>
@@ -144,49 +140,18 @@ function Home() {
         right: "20px",
         zIndex: 1000
       }}>
-        <button
-          onClick={irARanking}
-          style={{
-            backgroundColor: "#fbbf24",
-            color: "#000",
-            border: "none",
-            padding: "12px 20px",
-            borderRadius: "8px",
-            fontSize: "14px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)",
-            display: "flex",
-            alignItems: "center",
-            gap: "8px"
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = "#f59e0b";
-            e.target.style.transform = "scale(1.05)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = "#fbbf24";
-            e.target.style.transform = "scale(1)";
-          }}
-        >
-          🏆 Ver Ranking
-        </button>
+        {/* Botón de ranking eliminado, ahora está en el navbar */}
       </div>
 
       {/* Imagen de portada que ocupa toda la pantalla */}
-      <div style={{ width: "100%", height: "100vh", overflow: "hidden" }}>
+      <div className="homev2-img-container">
         <img
           src="/imagenhome.jpg"
           alt="Portada"
-          style={{
-            width: "100%",
-            height: "90%",
-            objectFit: "cover"
-          }}
+          className="homev2-img"
         />
       </div>
-      <h1 style={{ marginBottom: "18px", color: "#fff", textAlign: "center" }}>
+      <h1 className="homev2-bienvenida" style={{ marginBottom: "18px", color: "#fff", textAlign: "center" }}>
         ¡Bienvenido/a {usuario.nombre} a la plataforma de proyectos UDP ({usuario.rol})!
       </h1>
       
@@ -225,121 +190,6 @@ function Home() {
             {circle.title}
           </div>
         ))}
-      </div>
-
-      {/* Botones debajo de los círculos */}
-      <div style={{
-        display: "flex",
-        justifyContent: "center",
-        gap: "15px",
-        marginBottom: "30px",
-        flexWrap: "wrap"
-      }}>
-        {/* Solo mostrar botón de crear proyecto para estudiantes */}
-        {usuario.rol === 'estudiante' && (
-          <button
-            onClick={irACrear}
-            style={{
-              backgroundColor: "#28a745",
-              color: "white",
-              border: "none",
-              padding: "12px 24px",
-              borderRadius: "12px",
-              fontSize: "16px",
-              cursor: "pointer",
-              transition: "all 0.3s ease",
-              animation: "pulse 1s infinite",
-              boxShadow: "0 4px 15px rgba(40, 167, 69, 0.3)"
-            }}
-            onMouseOver={(e) => {
-              e.target.style.backgroundColor = "#218838";
-              e.target.style.transform = "scale(1.1)";
-            }}
-            onMouseOut={(e) => {
-              e.target.style.backgroundColor = "#28a745";
-              e.target.style.transform = "scale(1)";
-            }}
-          >
-            Crear Proyecto
-          </button>
-        )}
-
-        <button
-          onClick={irADashboard}
-          style={{
-            backgroundColor: "#007bff",
-            color: "white",
-            border: "none",
-            padding: "12px 24px",
-            borderRadius: "12px",
-            fontSize: "16px",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            boxShadow: "0 4px 15px rgba(0, 123, 255, 0.3)"
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = "#0056b3";
-            e.target.style.transform = "scale(1.05)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = "#007bff";
-            e.target.style.transform = "scale(1)";
-          }}
-        >
-          Ir al Dashboard
-        </button>
-
-        <button
-          onClick={irARanking}
-          style={{
-            backgroundColor: "#fbbf24",
-            color: "#000",
-            border: "none",
-            padding: "12px 24px",
-            borderRadius: "12px",
-            fontSize: "16px",
-            fontWeight: "600",
-            cursor: "pointer",
-            transition: "all 0.3s ease",
-            boxShadow: "0 4px 15px rgba(251, 191, 36, 0.3)"
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = "#f59e0b";
-            e.target.style.transform = "scale(1.05)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = "#fbbf24";
-            e.target.style.transform = "scale(1)";
-          }}
-        >
-          🏆 Ver Ranking
-        </button>
-
-        {/* <button
-          onClick={handleLogout}
-          style={{
-            backgroundColor: "transparent",
-            color: "#dc3545",
-            border: "2px solid #dc3545",
-            padding: "10px 22px",
-            borderRadius: "12px",
-            fontSize: "16px",
-            cursor: "pointer",
-            transition: "all 0.3s ease"
-          }}
-          onMouseOver={(e) => {
-            e.target.style.backgroundColor = "#dc3545";
-            e.target.style.color = "white";
-            e.target.style.transform = "scale(1.05)";
-          }}
-          onMouseOut={(e) => {
-            e.target.style.backgroundColor = "transparent";
-            e.target.style.color = "#dc3545";
-            e.target.style.transform = "scale(1)";
-          }}
-        >
-          Cerrar sesión
-        </button> */}
       </div>
 
       {/* Descripción detallada que aparece al hacer hover - centrada en la pantalla */}
@@ -397,6 +247,25 @@ function Home() {
               opacity: 1;
               transform: translate(-50%, -50%) scale(1);
             }
+          }
+
+          @media (max-width: 700px) {
+            .homev2-bienvenida {
+              margin-top: 32px !important;
+            }
+            .homev2-img-container {
+              display: none !important;
+            }
+          }
+          .homev2-img-container {
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+          }
+          .homev2-img {
+            width: 100%;
+            height: 90%;
+            object-fit: cover;
           }
         `}
       </style>
