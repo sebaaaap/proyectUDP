@@ -95,9 +95,12 @@ export function MisProyectosEstudiante() {
                     throw new Error("Debes iniciar sesión para ver tus proyectos");
                 }
                 
-                console.log("Obteniendo proyectos para usuario:", usuario);
+                let endpoint = `${API_BASE_URL}/proyectos/usuario`;
+                if (usuario.rol === 'profesor') {
+                    endpoint = `${API_BASE_URL}/proyectos/usuario/profesor`;
+                }
                 
-                const response = await fetch(`${API_BASE_URL}/proyectos/usuario`, {
+                const response = await fetch(endpoint, {
                     credentials: 'include',
                     headers: {
                         'Accept': 'application/json',

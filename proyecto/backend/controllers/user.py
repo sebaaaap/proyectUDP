@@ -201,6 +201,7 @@ async def obtener_usuario_actual(request: Request, db: Session = Depends(get_db)
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
     return {
+        "id": usuario.id,
         "nombre": usuario.nombre,
         "apellido": usuario.apellido,
         "correo": usuario.correo,

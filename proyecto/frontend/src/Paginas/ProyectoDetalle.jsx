@@ -2,13 +2,19 @@ import { useState, useEffect } from "react";
 import { useAuth } from "../auth/useAuth";
 
 export function ProyectoDetalle({ proyecto, volver }) {
-    const { user } = useAuth();
+    const { usuario } = useAuth();
     const [archivoSeleccionado, setArchivoSeleccionado] = useState(null);
     const [archivos, setArchivos] = useState([]);
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(null);
     const [subiendoArchivo, setSubiendoArchivo] = useState(false);
     const [descripcion, setDescripcion] = useState("");
+    // Postulaciones
+    const [postulaciones, setPostulaciones] = useState([]);
+    const [cargandoPostulaciones, setCargandoPostulaciones] = useState(false);
+    const [mensajePostulacion, setMensajePostulacion] = useState("");
+    const [integrantes, setIntegrantes] = useState({ creador: null, profesor: null, colaboradores: [] });
+    const [cargandoIntegrantes, setCargandoIntegrantes] = useState(true);
 
     // Cargar archivos al montar el componente
     useEffect(() => {
@@ -36,7 +42,30 @@ export function ProyectoDetalle({ proyecto, volver }) {
         };
         
         cargarArchivos();
-    }, [proyecto.id]);
+
+        // Cargar postulaciones si el usuario es el creador
+        if (usuario && usuario.id === proyecto.creador_id) {
+            setCargandoPostulaciones(true);
+            fetch(`http://localhost:8000/proyectos/${proyecto.id}/postulaciones`, { credentials: 'include' })
+                .then(res => res.ok ? res.json() : [])
+                .then(data => {
+                    // Filtrar solo pendientes
+                    setPostulaciones(Array.isArray(data) ? data.filter(p => p.estado === "pendiente") : []);
+                })
+                .catch(() => setPostulaciones([]))
+                .finally(() => setCargandoPostulaciones(false));
+        }
+
+        // Fetch de integrantes
+        setCargandoIntegrantes(true);
+        fetch(`http://localhost:8000/proyectos/${proyecto.id}/integrantes`, { credentials: 'include' })
+            .then(res => res.ok ? res.json() : null)
+            .then(data => {
+                if (data) setIntegrantes(data);
+            })
+            .catch(() => setIntegrantes({ creador: null, profesor: null, colaboradores: [] }))
+            .finally(() => setCargandoIntegrantes(false));
+    }, [proyecto.id, usuario]);
 
     const handleSubirArchivo = async (e) => {
         const file = e.target.files[0];
@@ -128,6 +157,26 @@ export function ProyectoDetalle({ proyecto, volver }) {
         }
     };
 
+    // Función para aceptar/rechazar postulaciones
+    const cambiarEstadoPostulacion = async (postulacionId, nuevoEstado) => {
+        try {
+            const response = await fetch(`http://localhost:8000/proyectos/postulaciones/${postulacionId}/estado-creador`, {
+                method: "PATCH",
+                credentials: "include",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ estado: nuevoEstado })
+            });
+            if (!response.ok) throw new Error("Error al actualizar postulación");
+            setMensajePostulacion(`Postulación ${nuevoEstado} correctamente.`);
+            // Quitar la postulación de la lista
+            setPostulaciones(prev => prev.filter(p => p.id !== postulacionId));
+            setTimeout(() => setMensajePostulacion(""), 2500);
+        } catch (err) {
+            setMensajePostulacion("Error al actualizar postulación");
+            setTimeout(() => setMensajePostulacion(""), 2500);
+        }
+    };
+
     // Renderizado seguro
     if (!proyecto) {
         return (
@@ -145,7 +194,48 @@ export function ProyectoDetalle({ proyecto, volver }) {
             {/* Panel de integrantes */}
             <div style={styles.panelIntegrantes}>
                 <h3 style={styles.tituloSeccion}>Integrantes</h3>
-                {/* ... renderizado de integrantes ... */}
+                {cargandoIntegrantes ? (
+                    <p>Cargando integrantes...</p>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 18 }}>
+                        {/* Creador */}
+                        <div style={{ background: '#ffe082', borderRadius: 8, padding: 12, marginBottom: 4, border: '1.5px solid #ffd54f', maxWidth: 320, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            <div style={{ fontWeight: 600, color: '#b28900', fontSize: 15, marginBottom: 2 }}>Creador</div>
+                            {integrantes.creador ? (
+                                <>
+                                    <div style={{ fontSize: 16, fontWeight: 500, color: '#5d4037', wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>{integrantes.creador.nombre}</div>
+                                    <div style={{ color: '#6d4c41', fontSize: 13, wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>{integrantes.creador.correo}</div>
+                                </>
+                            ) : <span style={{ color: '#bbb' }}>N/A</span>}
+                        </div>
+                        {/* Profesor */}
+                        <div style={{ background: '#b3e5fc', borderRadius: 8, padding: 12, marginBottom: 4, border: '1.5px solid #4fc3f7', maxWidth: 320, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            <div style={{ fontWeight: 600, color: '#0277bd', fontSize: 15, marginBottom: 2 }}>Profesor a cargo</div>
+                            {integrantes.profesor ? (
+                                <>
+                                    <div style={{ fontSize: 16, fontWeight: 500, color: '#01579b', wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>{integrantes.profesor.nombre}</div>
+                                    <div style={{ color: '#0277bd', fontSize: 13, wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>{integrantes.profesor.correo}</div>
+                                </>
+                            ) : <span style={{ color: '#bbb' }}>N/A</span>}
+                        </div>
+                        {/* Colaboradores */}
+                        <div style={{ background: '#dcedc8', borderRadius: 8, padding: 12, border: '1.5px solid #aed581', maxWidth: 320, wordBreak: 'break-word', overflowWrap: 'break-word' }}>
+                            <div style={{ fontWeight: 600, color: '#558b2f', fontSize: 15, marginBottom: 2 }}>Colaboradores</div>
+                            {integrantes.colaboradores && integrantes.colaboradores.length > 0 ? (
+                                <ul style={{ paddingLeft: 18, margin: 0 }}>
+                                    {integrantes.colaboradores.map((col, idx) => (
+                                        <li key={idx} style={{ marginBottom: 4, color: '#33691e', wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>
+                                            <span style={{ fontWeight: 500, wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>{col.nombre}</span>
+                                            <span style={{ color: '#789262', fontSize: 13, marginLeft: 4, wordBreak: 'break-word', overflowWrap: 'break-word', whiteSpace: 'pre-line' }}>({col.correo})</span>
+                                        </li>
+                                    ))}
+                                </ul>
+                            ) : (
+                                <div style={{ color: '#789262', fontSize: 13 }}>No hay colaboradores aún</div>
+                            )}
+                        </div>
+                    </div>
+                )}
                 <button onClick={volver} style={styles.botonVolver}>
                     Volver
                 </button>
@@ -156,6 +246,35 @@ export function ProyectoDetalle({ proyecto, volver }) {
                 <h2 style={styles.tituloProyecto}>{proyecto.titulo || 'Proyecto sin nombre'}</h2>
                 <p style={styles.descripcion}>{proyecto.descripcion || 'Sin descripción'}</p>
                 
+                {/* SECCIÓN DE POSTULACIONES SOLO PARA EL CREADOR */}
+                {usuario && usuario.id === proyecto.creador_id && (
+                    <div style={{ marginBottom: 32, background: '#333', borderRadius: 8, padding: 18 }}>
+                        <h4 style={{ color: '#ffc107', marginBottom: 12 }}>Postulaciones pendientes</h4>
+                        {cargandoPostulaciones ? (
+                            <p style={{ color: '#fff' }}>Cargando postulaciones...</p>
+                        ) : postulaciones.length === 0 ? (
+                            <p style={{ color: '#bbb' }}>No hay postulaciones pendientes.</p>
+                        ) : (
+                            <ul style={{ listStyle: 'none', padding: 0 }}>
+                                {postulaciones.map(post => (
+                                    <li key={post.id} style={{ background: '#444', borderRadius: 6, marginBottom: 10, padding: 12, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                                        <div><b>Nombre:</b> {post.nombre || 'N/A'}</div>
+                                        <div><b>Correo:</b> {post.correo || 'N/A'}</div>
+                                        <div><b>Carrera:</b> {post.carrera || 'N/A'}</div>
+                                        <div><b>Promedio general:</b> {post.promedio_general !== null && post.promedio_general !== undefined ? post.promedio_general : 'N/A'}</div>
+                                        <div><b>Motivación:</b> {post.motivacion || 'Sin motivación'}</div>
+                                        <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                                            <button onClick={() => cambiarEstadoPostulacion(post.id, 'aceptado')} style={{ background: '#28a745', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 14px', cursor: 'pointer' }}>Aceptar</button>
+                                            <button onClick={() => cambiarEstadoPostulacion(post.id, 'rechazado')} style={{ background: '#dc3545', color: '#fff', border: 'none', borderRadius: 4, padding: '6px 14px', cursor: 'pointer' }}>Rechazar</button>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
+                        )}
+                        {mensajePostulacion && <div style={{ color: '#4caf50', marginTop: 8 }}>{mensajePostulacion}</div>}
+                    </div>
+                )}
+
                 <h4 style={styles.tituloSeccion}>Archivos subidos</h4>
                 
                 {cargando ? (
@@ -187,7 +306,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
                                     >
                                         Descargar
                                     </button>
-                                    {user?.id === archivo.id_estudiante && (
+                                    {usuario?.id === archivo.id_estudiante && (
                                         <button
                                             onClick={() => handleEliminarArchivo(archivo.id)}
                                             style={{...styles.botonAccion, backgroundColor: '#dc3545'}}

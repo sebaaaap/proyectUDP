@@ -15,24 +15,18 @@ export function DashboardEstudiante() {
         fetch("http://localhost:8000/proyectos/aprobados", { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
+                console.log('Proyectos aprobados recibidos:', data);
                 setProyectos(data);
             })
             .catch(() => {
                 setProyectos([]);
             });
 
-        // Simulación de postulaciones (puedes conectar a tu backend aquí)
-        setPostulaciones([
-            {
-                id: 1,
-                proyectoId: 1,
-                estado: "Postulado",
-                fechaPostulacion: "2025-05-19",
-                estadoPostulacion: "En revisión",
-                comentario: "Tengo experiencia previa con React en proyectos académicos.",
-                motivacion: "He trabajado en dos proyectos similares durante mis cursos y estoy interesado en aplicar mis conocimientos en un entorno profesional."
-            }
-        ]);
+        // Obtener postulaciones reales del usuario desde el backend
+        fetch("http://localhost:8000/postulaciones/mis", { credentials: 'include' })
+            .then(res => res.ok ? res.json() : [])
+            .then(data => Array.isArray(data) ? setPostulaciones(data) : setPostulaciones([]))
+            .catch(() => setPostulaciones([]));
     }, []);
 
     const iniciarPostulacion = (proyecto) => {
@@ -68,7 +62,19 @@ export function DashboardEstudiante() {
         });
         if (response.ok) {
             setMensaje("¡Te has postulado correctamente!");
-            // Actualiza el estado si es necesario
+            // Actualiza el estado local de postulaciones
+            setPostulaciones(prev => [
+                ...prev,
+                {
+                    id: Date.now(), // temporal, el backend no devuelve el id
+                    proyectoId: proyectoId,
+                    estado: "Postulado",
+                    fechaPostulacion: new Date().toISOString().split('T')[0],
+                    estadoPostulacion: "En revisión",
+                    comentario: "",
+                    motivacion: motivacion
+                }
+            ]);
         } else {
             setMensaje("Error al postularse");
         }

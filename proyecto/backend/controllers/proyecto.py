@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from database.db import get_db
 from models.proyecto_model import Proyecto, EstadoProyectoDBEnum
 from schemas.proyecto_schema import ProyectoCreate
-from models.user_model import Usuario, RolEnum
+from models.user_model import Usuario, RolEnum, Estudiante
 from models.postulacion_model import Postulacion, EstadoPostulacionEnum
 from models.ranking_model import ProyectoRanking
 from helpers.jwtAuth import verificar_token
@@ -12,6 +12,7 @@ from pydantic import BaseModel
 from typing import List
 from services.notificacion_service import notificacion_service
 import logging
+from models.carreras_model import Carrera
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ def ver_postulaciones(proyecto_id: int, usuario=Depends(verificar_token), db: Se
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
     if not usuario_db:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
-        
+    
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
     if not proyecto:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
@@ -99,7 +100,24 @@ def ver_postulaciones(proyecto_id: int, usuario=Depends(verificar_token), db: Se
         raise HTTPException(status_code=403, detail="Acceso denegado")
 
     postulaciones = db.query(Postulacion).filter_by(proyecto_id=proyecto_id).all()
-    return postulaciones
+    resultado = []
+    for p in postulaciones:
+        usuario_postulante = db.query(Usuario).filter(Usuario.id == p.usuario_id).first()
+        estudiante = db.query(Estudiante).filter(Estudiante.id == p.usuario_id).first()
+        carrera_nombre = ""
+        if estudiante and getattr(estudiante, 'carrera_id', None):
+            carrera = db.query(Carrera).filter(Carrera.id == estudiante.carrera_id).first()
+            carrera_nombre = carrera.nombre if carrera else ""
+        resultado.append({
+            "id": p.id,
+            "nombre": f"{usuario_postulante.nombre} {usuario_postulante.apellido}" if usuario_postulante else "",
+            "correo": usuario_postulante.correo if usuario_postulante else "",
+            "carrera": carrera_nombre,
+            "promedio_general": estudiante.promedio_general if estudiante else None,
+            "motivacion": p.motivacion,
+            "estado": p.estado.value
+        })
+    return resultado
 
 # Endpoint de prueba
 @router.get("/test")
@@ -282,14 +300,31 @@ def ver_integrantes(proyecto_id: int, usuario=Depends(verificar_token), db: Sess
     if not usuario_db:
         raise HTTPException(status_code=404, detail="Usuario no encontrado")
 
-    if usuario_db.id not in [proyecto.creador_id, proyecto.profesor_id]:
+    # Permitir acceso si es creador, profesor o colaborador aceptado
+    es_colaborador = db.query(Postulacion).filter(
+        Postulacion.proyecto_id == proyecto_id,
+        Postulacion.usuario_id == usuario_db.id,
+        Postulacion.estado == "aceptado"
+    ).first() is not None
+    if usuario_db.id not in [proyecto.creador_id, proyecto.profesor_id] and not es_colaborador:
         raise HTTPException(status_code=403, detail="Acceso no autorizado")
 
-    aceptados = db.query(Usuario).join(Postulacion).filter(
+    # Creador
+    creador = db.query(Usuario).filter(Usuario.id == proyecto.creador_id).first()
+    # Profesor
+    profesor = db.query(Usuario).filter(Usuario.id == proyecto.profesor_id).first()
+    # Colaboradores (aceptados)
+    colaboradores = db.query(Usuario).join(Postulacion).filter(
         Postulacion.proyecto_id == proyecto_id,
         Postulacion.estado == "aceptado"
     ).all()
-    return aceptados
+    return {
+        "creador": {"nombre": f"{creador.nombre} {creador.apellido}", "correo": creador.correo} if creador else None,
+        "profesor": {"nombre": f"{profesor.nombre} {profesor.apellido}", "correo": profesor.correo} if profesor else None,
+        "colaboradores": [
+            {"nombre": f"{u.nombre} {u.apellido}", "correo": u.correo} for u in colaboradores
+        ]
+    }
 
 @router.get("/usuario")
 def obtener_proyectos_usuario(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
@@ -329,7 +364,8 @@ def listar_proyectos_aprobados(db: Session = Depends(get_db)):
             "profesor": f"{profesor.nombre} {profesor.apellido}" if profesor else "",
             "perfiles_requeridos": p.perfiles_requeridos,
             "area": p.problema,
-            "estado": p.estado.value
+            "estado": p.estado.value,
+            "fecha_inicio": p.fecha_creacion.isoformat() if p.fecha_creacion else None
         })
     return resultado
 
@@ -535,3 +571,75 @@ async def calificar_proyecto(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+# Endpoint para que un estudiante vea todas sus propias postulaciones
+@router.get("/postulaciones/mis")
+def mis_postulaciones(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.estudiante:
+        raise HTTPException(status_code=403, detail="Solo estudiantes pueden ver sus postulaciones")
+    postulaciones = db.query(Postulacion).filter_by(usuario_id=usuario_db.id).all()
+    return [
+        {
+            "id": p.id,
+            "proyectoId": p.proyecto_id,
+            "estado": p.estado.value,
+            "fechaPostulacion": p.fecha_postulacion.strftime("%Y-%m-%d"),
+            "motivacion": p.motivacion
+        }
+        for p in postulaciones
+    ]
+
+# Endpoint para que el creador del proyecto acepte o rechace postulaciones a su propio proyecto
+@router.patch("/postulaciones/{postulacion_id}/estado-creador")
+def cambiar_estado_postulacion_creador(
+    postulacion_id: int,
+    datos: dict = Body(...),
+    usuario=Depends(verificar_token),
+    db: Session = Depends(get_db)
+):
+    estado = datos.get("estado")
+    comentario = datos.get("comentario", "")
+    if not estado:
+        raise HTTPException(status_code=400, detail="Estado es requerido")
+    try:
+        estado_enum = EstadoPostulacionEnum(estado)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Estado inválido")
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.estudiante:
+        raise HTTPException(status_code=403, detail="Solo el creador del proyecto puede cambiar el estado de postulaciones")
+    # Obtener la postulación
+    postulacion = db.query(Postulacion).filter(Postulacion.id == postulacion_id).first()
+    if not postulacion:
+        raise HTTPException(status_code=404, detail="Postulación no encontrada")
+    # Verificar que el usuario autenticado es el creador del proyecto
+    proyecto = db.query(Proyecto).filter(Proyecto.id == postulacion.proyecto_id).first()
+    if not proyecto or proyecto.creador_id != usuario_db.id:
+        raise HTTPException(status_code=403, detail="No tienes autorización para modificar esta postulación")
+    # Actualizar el estado
+    postulacion.estado = estado_enum
+    db.commit()
+    db.refresh(postulacion)
+    # Notificar al postulante si es aceptado o rechazado (opcional)
+    try:
+        estudiante = db.query(Usuario).filter(Usuario.id == postulacion.usuario_id).first()
+        if estudiante:
+            if estado_enum == EstadoPostulacionEnum.aceptado:
+                notificacion_service.notificar_postulacion_aceptada(
+                    estudiante_email=estudiante.correo,
+                    estudiante_nombre=f"{estudiante.nombre} {estudiante.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    creador_proyecto=f"{usuario_db.nombre} {usuario_db.apellido}"
+                )
+            elif estado_enum == EstadoPostulacionEnum.rechazado:
+                notificacion_service.notificar_postulacion_rechazada(
+                    estudiante_email=estudiante.correo,
+                    estudiante_nombre=f"{estudiante.nombre} {estudiante.apellido}",
+                    titulo_proyecto=proyecto.titulo,
+                    creador_proyecto=f"{usuario_db.nombre} {usuario_db.apellido}",
+                    motivo=comentario
+                )
+    except Exception as e:
+        logger.error(f"Error enviando notificación de cambio de estado (creador): {e}")
+    return {"mensaje": f"Postulación {estado_enum.value} correctamente"}
