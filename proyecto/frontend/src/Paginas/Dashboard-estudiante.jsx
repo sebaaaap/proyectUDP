@@ -62,19 +62,11 @@ export function DashboardEstudiante() {
         });
         if (response.ok) {
             setMensaje("¡Te has postulado correctamente!");
-            // Actualiza el estado local de postulaciones
-            setPostulaciones(prev => [
-                ...prev,
-                {
-                    id: Date.now(), // temporal, el backend no devuelve el id
-                    proyectoId: proyectoId,
-                    estado: "Postulado",
-                    fechaPostulacion: new Date().toISOString().split('T')[0],
-                    estadoPostulacion: "En revisión",
-                    comentario: "",
-                    motivacion: motivacion
-                }
-            ]);
+            // Refresca las postulaciones reales desde el backend
+            fetch("http://localhost:8000/postulaciones/mis", { credentials: 'include' })
+                .then(res => res.ok ? res.json() : [])
+                .then(data => Array.isArray(data) ? setPostulaciones(data) : setPostulaciones([]))
+                .catch(() => setPostulaciones([]));
         } else {
             setMensaje("Error al postularse");
         }
@@ -104,7 +96,17 @@ export function DashboardEstudiante() {
     };
 
     const estaPostulado = (proyectoId) => {
-        return postulaciones.some(p => p.proyectoId === proyectoId && p.estado === "Postulado");
+        const p = postulaciones.find(p => p.proyectoId === proyectoId);
+        return !!p && (p.estado === 'pendiente' || p.estado === 'aceptado');
+    };
+
+    const renderEstadoPostulacion = (proyectoId) => {
+        const p = postulaciones.find(p => p.proyectoId === proyectoId);
+        if (!p) return <span style={{ color: '#bbb' }}>No postulado</span>;
+        if (p.estado === 'pendiente') return <span style={{ color: '#ffc107', fontWeight: 600 }}>Pendiente</span>;
+        if (p.estado === 'aceptado') return <span style={{ color: '#4caf50', fontWeight: 600 }}>Aceptado</span>;
+        if (p.estado === 'rechazado') return <span style={{ color: '#f44336', fontWeight: 600 }}>Rechazado</span>;
+        return <span style={{ color: '#bbb' }}>No postulado</span>;
     };
 
     const proyectosFiltrados = filtroEstado === "Todos"
@@ -112,6 +114,18 @@ export function DashboardEstudiante() {
         : filtroEstado === "Postulados"
             ? proyectos.filter(p => estaPostulado(p.id))
             : proyectos.filter(p => !estaPostulado(p.id));
+
+    // Determina el estado real de la postulación para un proyecto
+    const getEstadoRealPostulacion = (proyectoId) => {
+        const p = postulaciones.find(p => p.proyectoId === proyectoId);
+        return p ? p.estado : null;
+    };
+
+    // Helper para obtener el nombre del proyecto por ID
+    const getNombreProyecto = (proyectoId) => {
+        const p = proyectos.find(p => p.id === proyectoId);
+        return p ? p.titulo : `Proyecto #${proyectoId}`;
+    };
 
     // Estilos visuales idénticos a Dashboard-profe (header flotante, filas separadas, sombra, paddings, bordes)
     const tableStyles = `
@@ -387,11 +401,7 @@ export function DashboardEstudiante() {
                                         </td>
                                         <td>{proyecto.profesor}</td>
                                         <td>{proyecto.fecha_inicio ? new Date(proyecto.fecha_inicio).toLocaleDateString('es-ES') : 'N/A'}</td>
-                                        <td>
-                                            {estaPostulado(proyecto.id)
-                                                ? <span style={{ color: '#ffc107', fontWeight: 600 }}>Postulado</span>
-                                                : <span style={{ color: '#bbb' }}>No postulado</span>}
-                                        </td>
+                                        <td>{renderEstadoPostulacion(proyecto.id)}</td>
                                         <td>
                                             <div className="acciones-cell">
                                                 <button
@@ -404,29 +414,18 @@ export function DashboardEstudiante() {
                                                     </svg>
                                                     Detalles
                                                 </button>
-                                                <button
-                                                    className={estaPostulado(proyecto.id) ? "btn-cancelar" : "btn-postular"}
-                                                    onClick={() => iniciarPostulacion(proyecto)}
-                                                >
-                                                    {estaPostulado(proyecto.id) ? (
-                                                        <>
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
-                                                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
-                                                                <polyline points="7 3 7 8 15 8"></polyline>
-                                                            </svg>
-                                                            Cancelar
-                                                        </>
-                                                    ) : (
-                                                        <>
-                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                                <path d="M12 20h9"></path>
-                                                                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
-                                                            </svg>
-                                                            Postularme
-                                                        </>
-                                                    )}
-                                                </button>
+                                                {estaPostulado(proyecto.id) ? (
+                                                    <button className="btn-cancelar" disabled>
+                                                        {getEstadoRealPostulacion(proyecto.id) === 'pendiente' ? 'Postulación pendiente' : 'Ya postulado'}
+                                                    </button>
+                                                ) : (
+                                                    <button
+                                                        className="btn-postular"
+                                                        onClick={() => iniciarPostulacion(proyecto)}
+                                                    >
+                                                        Postular
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
