@@ -27,7 +27,7 @@ function PruebaNavbar() {
     }, []);
 
     const handleLogout = () => {
-        window.location.href = 'http://localhost:8000/logout';
+        window.location.href = 'http://localhost:5173/';
     };
 
     const handleRanking = () => {
@@ -48,12 +48,6 @@ function PruebaNavbar() {
                         <Nav.Link as={Link} to="/ranking" className="udp-navbar-link">Ver Ranking</Nav.Link>
                     </Nav>
                     <Nav className="ms-auto d-flex align-items-center" style={{ gap: 18 }}>
-                        <NavDropdown title="Profesores" id="dropdown-profesores" align="end">
-                            {profesores.length === 0 && <NavDropdown.Item disabled>Cargando...</NavDropdown.Item>}
-                            {profesores.map(prof => (
-                                <NavDropdown.Item key={prof.id} disabled>{prof.nombre} ({prof.correo})</NavDropdown.Item>
-                            ))}
-                        </NavDropdown>
                         <Button variant="outline-danger" onClick={handleLogout} style={{ fontWeight: 600, borderRadius: 20, padding: '6px 22px' }}>
                             Cerrar sesión
                         </Button>
