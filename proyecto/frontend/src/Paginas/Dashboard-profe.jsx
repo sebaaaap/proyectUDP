@@ -26,7 +26,7 @@ export function DashboardProfe() {
             console.log('Iniciando carga de proyectos...');
             setLoading(true);
             
-            const response = await fetch("http://localhost:8000/proyectos/usuario/profesor", {
+           const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/calificar`, {
                 method: 'GET',
                 credentials: 'include'
             });

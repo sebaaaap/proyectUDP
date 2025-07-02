@@ -45,7 +45,7 @@ app.include_router(utils.router)
 app.include_router(proyecto_router, prefix="/proyectos", tags=["proyectos"])
 app.include_router(profesor_router, prefix="/profesor", tags=["profesor"])
 app.include_router(archivos_router, prefix="/proyectos", tags=["archivos"])
-app.include_router(ranking_router, prefix="/ranking", tags=["ranking"])  # Agregar router de ranking
+app.include_router(ranking_router, prefix="/ranking", tags=["ranking"])  
 
 # Servir archivos estáticos
 app.mount("/static", StaticFiles(directory="static"), name="static")

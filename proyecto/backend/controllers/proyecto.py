@@ -497,7 +497,7 @@ def obtener_proyectos_profesor(usuario=Depends(verificar_token), db: Session = D
     return resultado
 
 # NUEVO: Endpoint para calificar proyectos
-@router.patch("/proyectos/{proyecto_id}/calificar")
+@router.patch("/{proyecto_id}/calificar")
 async def calificar_proyecto(
     proyecto_id: int,
     calificacion_data: CalificacionRequest,
