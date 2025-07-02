@@ -26,11 +26,11 @@ services:
       - db
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/proyectUDP
+      - DATABASE_URL=postgresql://postgres:BVMTuuTPXFSFYpyoEXCupsynfOvCyMCA@metro.proxy.rlwy.net:40952/railway
       # IMPORTANTE: Reemplaza estos valores con tus credenciales reales de Google OAuth
       # Obtén las credenciales en: https://console.cloud.google.com/apis/credentials
-      - GOOGLE_CLIENT_ID=72805868214-2oai4k6bpkebki43s5hv4g2vtlr0u910.apps.googleusercontent.com
-      - GOOGLE_CLIENT_SECRET=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
+      - GOOGLE_CLIENT_ID=1096636579560-bg81g2g8e22cosomo0ao9in6me7sl3e5.apps.googleusercontent.com
+      - GOOGLE_CLIENT_SECRET=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
       # Configuración JWT
       - SECRET_KEY=supersecreto_udp_2024_muy_seguro_y_largo
       - ALGORITHM=HS256
