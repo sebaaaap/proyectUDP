@@ -141,3 +141,32 @@ input, button, textarea, select {
     max-width: 100%;
   }
 }
+
+/* Login responsive */
+.login-page-responsive {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #272627, #000000);
+}
+.login-logo-responsive {
+  height: 220px;
+  margin-right: 60px;
+  padding: 10px;
+}
+
+@media (max-width: 600px) {
+  .login-page-responsive {
+    flex-direction: column;
+    padding: 16px 0;
+  }
+  .login-logo-responsive {
+    height: 100px;
+    margin-right: 0;
+    margin-bottom: 24px;
+    align-self: center;
+  }
+}
