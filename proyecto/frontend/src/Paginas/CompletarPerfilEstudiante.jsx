@@ -1,132 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-const styles = {
-  page: {
-    minHeight: "100vh",
-    width: "100vw",
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    background: "linear-gradient(to bottom, #272627, #000000)",
-    padding: "20px"
-  },
-  image: {
-    height: "220px",
-    marginRight: "60px",
-    padding: "10px"
-  },
-  rightContainer: {
-    width: "100%",
-    maxWidth: "500px",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-  },
-  container: {
-    width: "100%",
-    maxWidth: "450px",
-    padding: "40px",
-    backgroundColor: "#403f3f",
-    borderRadius: "20px",
-    boxShadow: "0 8px 32px rgba(0, 0, 0, 0.3)",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    gap: "24px",
-  },
-  h1: {
-    color: "#fff",
-    fontWeight: "bold",
-    fontSize: "2rem",
-    textAlign: "center",
-    margin: 0,
-    marginBottom: "10px"
-  },
-  subtitle: {
-    color: "#ccc",
-    fontSize: "1rem",
-    textAlign: "center",
-    margin: 0,
-    marginBottom: "20px"
-  },
-  errorMessage: {
-    color: "#ff4444",
-    backgroundColor: "rgba(255, 68, 68, 0.1)",
-    padding: "12px",
-    borderRadius: "8px",
-    width: "100%",
-    textAlign: "center",
-    marginBottom: "10px",
-    border: "1px solid rgba(255, 68, 68, 0.3)"
-  },
-  form: {
-    width: "100%",
-    display: "flex",
-    flexDirection: "column",
-    gap: "20px"
-  },
-  formGroup: {
-    display: "flex",
-    flexDirection: "column",
-    gap: "8px"
-  },
-  label: {
-    color: "#fff",
-    fontSize: "14px",
-    fontWeight: "500",
-    marginBottom: "4px"
-  },
-  select: {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#2a2a2a",
-    border: "2px solid #555",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "16px",
-    transition: "border-color 0.3s, box-shadow 0.3s",
-    outline: "none"
-  },
-  input: {
-    width: "100%",
-    padding: "12px 16px",
-    backgroundColor: "#2a2a2a",
-    border: "2px solid #555",
-    borderRadius: "8px",
-    color: "#fff",
-    fontSize: "16px",
-    transition: "border-color 0.3s, box-shadow 0.3s",
-    outline: "none"
-  },
-  submitButton: {
-    width: "100%",
-    padding: "14px 24px",
-    backgroundColor: "#28a745",
-    color: "white",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "pointer",
-    transition: "background-color 0.3s, transform 0.1s",
-    marginTop: "10px"
-  },
-  loadingButton: {
-    width: "100%",
-    padding: "14px 24px",
-    backgroundColor: "#666",
-    color: "white",
-    border: "none",
-    borderRadius: "12px",
-    fontSize: "16px",
-    fontWeight: "600",
-    cursor: "not-allowed",
-    marginTop: "10px",
-    opacity: "0.7"
-  }
-};
+import './CompletarPerfilEstudiante.css';
 
 const CompletarPerfilEstudiante = () => {
   const [carreras, setCarreras] = useState([]);
@@ -173,16 +47,6 @@ const CompletarPerfilEstudiante = () => {
     return true;
   };
 
-  const handleInputFocus = (e) => {
-    e.target.style.borderColor = "#28a745";
-    e.target.style.boxShadow = "0 0 0 3px rgba(40, 167, 69, 0.1)";
-  };
-
-  const handleInputBlur = (e) => {
-    e.target.style.borderColor = "#555";
-    e.target.style.boxShadow = "none";
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -221,31 +85,29 @@ const CompletarPerfilEstudiante = () => {
   };
 
   return (
-    <div style={styles.page}>
-      <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" style={styles.image} />
-      <div style={styles.rightContainer}>
-        <div style={styles.container}>
-          <h1 style={styles.h1}>Completa tu perfil</h1>
-          <p style={styles.subtitle}>
+    <div className="completar-perfil-page">
+      <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" className="completar-perfil-image" />
+      <div className="completar-perfil-right-container">
+        <div className="completar-perfil-container">
+          <h1 className="completar-perfil-h1">Completa tu perfil</h1>
+          <p className="completar-perfil-subtitle">
             Necesitamos algunos datos adicionales para personalizar tu experiencia
           </p>
           {error && (
-            <div style={styles.errorMessage}>
+            <div className="completar-perfil-error-message">
               {error}
             </div>
           )}
-          <form onSubmit={handleSubmit} style={styles.form}>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
+          <form onSubmit={handleSubmit} className="completar-perfil-form">
+            <div className="completar-perfil-form-group">
+              <label className="completar-perfil-label">
                 Carrera
               </label>
               <select
                 value={carreraId}
                 onChange={(e) => setCarreraId(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
                 required
-                style={styles.select}
+                className="completar-perfil-select"
               >
                 <option value="">Selecciona una carrera</option>
                 {carreras.map(carrera => (
@@ -255,8 +117,8 @@ const CompletarPerfilEstudiante = () => {
                 ))}
               </select>
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
+            <div className="completar-perfil-form-group">
+              <label className="completar-perfil-label">
                 Semestre actual
               </label>
               <input
@@ -265,15 +127,13 @@ const CompletarPerfilEstudiante = () => {
                 max="12"
                 value={semestreActual}
                 onChange={(e) => setSemestreActual(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
                 required
-                style={styles.input}
+                className="completar-perfil-input"
                 placeholder="Ej: 5"
               />
             </div>
-            <div style={styles.formGroup}>
-              <label style={styles.label}>
+            <div className="completar-perfil-form-group">
+              <label className="completar-perfil-label">
                 Promedio general
               </label>
               <input
@@ -283,25 +143,15 @@ const CompletarPerfilEstudiante = () => {
                 max="7"
                 value={promedioGeneral}
                 onChange={(e) => setPromedioGeneral(e.target.value)}
-                onFocus={handleInputFocus}
-                onBlur={handleInputBlur}
                 required
-                style={styles.input}
+                className="completar-perfil-input"
                 placeholder="Ej: 5.8"
               />
             </div>
             <button
               type="submit"
               disabled={loading}
-              style={loading ? styles.loadingButton : styles.submitButton}
-              onMouseOver={!loading ? (e) => {
-                e.target.style.backgroundColor = "#218838";
-                e.target.style.transform = "translateY(-1px)";
-              } : undefined}
-              onMouseOut={!loading ? (e) => {
-                e.target.style.backgroundColor = "#28a745";
-                e.target.style.transform = "translateY(0)";
-              } : undefined}
+              className={loading ? "completar-perfil-loading-button" : "completar-perfil-submit-button"}
             >
               {loading ? 'Guardando...' : 'Completar perfil'}
             </button>
