@@ -32,6 +32,8 @@ function LayoutWithNavbar() {
         <Route path="/mis-proyectos" element={<MisProyectosEstudiante />} />
         <Route path="/dashboard-estudiante" element={<DashboardEstudiante />} />
         <Route path="/ranking" element={<RankingProyectos />} />
+        <Route path="/completar-perfil-estudiante" element={<CompletarPerfilEstudiante />} />
+        <Route path="/completar-perfil-profesor" element={<CompletarPerfilProfesor />} />
         {/* Aquí puedes agregar más rutas que SÍ deben tener navbar */}
       </Routes>
     </>
