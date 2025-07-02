@@ -207,9 +207,6 @@ def agregar_al_ranking(
     # Validar calificación (debe estar entre 1.0 y 7.0)
     if calificacion < 1.0 or calificacion > 7.0:
         raise HTTPException(status_code=400, detail="La calificación debe estar entre 1.0 y 7.0")
-
-    # Actualizar calificación del proyecto (NECESITA VERIFICAR QUE ESTE CAMPO EXISTE)
-    # proyecto.calificacion_final = calificacion
     
     # Verificar si ya existe en el ranking
     ranking_existente = db.query(ProyectoRanking).filter(
