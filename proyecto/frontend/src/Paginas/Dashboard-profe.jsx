@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../auth/useAuth";
 
 export function DashboardProfe() {
     const [proyectos, setProyectos] = useState([]);
@@ -11,30 +11,27 @@ export function DashboardProfe() {
     const [error, setError] = useState("");
     const [calificaciones, setCalificaciones] = useState({});
     const [guardandoCalificacion, setGuardandoCalificacion] = useState({});
-    const { token, user, isAuthenticated } = useAuth();
+    const { usuario, loading: authLoading } = useAuth();
 
     useEffect(() => {
-        if (isAuthenticated && token) {
+        console.log('Dashboard Profe - authLoading:', authLoading, 'usuario:', usuario);
+        if (!authLoading && usuario) {
+            console.log('Cargando proyectos para usuario:', usuario);
             cargarProyectos();
         }
-    }, [token, isAuthenticated]);
+    }, [usuario, authLoading]);
 
     const cargarProyectos = async () => {
         try {
+            console.log('Iniciando carga de proyectos...');
             setLoading(true);
-            const headers = {
-                'Content-Type': 'application/json'
-            };
-            
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
             
             const response = await fetch("http://localhost:8000/proyectos/usuario/profesor", {
                 method: 'GET',
-                headers: headers,
                 credentials: 'include'
             });
+            
+            console.log('Response status:', response.status);
             
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
@@ -43,6 +40,7 @@ export function DashboardProfe() {
             }
             
             const data = await response.json();
+            console.log('Proyectos cargados:', data);
             setProyectos(data);
             
             // Inicializar calificaciones existentes
@@ -120,17 +118,11 @@ export function DashboardProfe() {
         if (!seleccionado) return;
 
         try {
-            const headers = {
-                "Content-Type": "application/json"
-            };
-            
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            
             const response = await fetch(`http://localhost:8000/profesor/proyectos/${seleccionado.id}/estado`, {
                 method: "PATCH",
-                headers: headers,
+                headers: {
+                    "Content-Type": "application/json"
+                },
                 credentials: 'include',
                 body: JSON.stringify({ 
                     estado: nuevoEstado
@@ -181,17 +173,11 @@ export function DashboardProfe() {
         setError('');
 
         try {
-            const headers = {
-                'Content-Type': 'application/json',
-            };
-            
-            if (token) {
-                headers['Authorization'] = `Bearer ${token}`;
-            }
-            
             const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/calificar`, {
                 method: 'PATCH',
-                headers: headers,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
                 credentials: 'include',
                 body: JSON.stringify({ calificacion: calificacion })
             });
@@ -266,10 +252,19 @@ export function DashboardProfe() {
         );
     }
 
-    if (!isAuthenticated) {
+    if (!usuario) {
         return (
             <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
                 <div style={{ color: "#fff", fontSize: "1.2rem" }}>Debes iniciar sesión para ver tus proyectos.</div>
+            </div>
+        );
+    }
+
+    // Verificar que el usuario es profesor
+    if (usuario.rol !== 'profesor') {
+        return (
+            <div style={{ padding: "40px", background: "linear-gradient(to bottom, #272627, #000000)", minHeight: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+                <div style={{ color: "#fff", fontSize: "1.2rem" }}>Solo los profesores pueden acceder a este dashboard.</div>
             </div>
         );
     }
