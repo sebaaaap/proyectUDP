@@ -4,38 +4,35 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 // src/Paginas/Login.jsx
 import { useAuth } from '../context/AuthContext';
 
+function useIsMobile() {
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 600);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth < 600);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+    return isMobile;
+}
+
 export function Login() {
     const { isAuthenticated, login } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [error, setError] = useState('');
+    const isMobile = useIsMobile();
 
     const styles = {
-        page: {
-            minHeight: "100vh",
-            width: "100vw",
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            background: "linear-gradient(to bottom, #272627, #000000)",
-        },
-        image: {
-            height: "220px",
-            marginRight: "60px",
-            padding: "10px"
-        },
         rightContainer: {
             width: "100%",
-            maxWidth: "480px",
+            maxWidth: isMobile ? "100%" : "480px",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
         },
         container: {
             width: "100%",
-            maxWidth: "400px",
-            padding: "40px",
+            maxWidth: isMobile ? "95vw" : "400px",
+            padding: isMobile ? "20px 10px" : "40px",
             backgroundColor: "#403f3f",
             borderRadius: "20px",
             boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
@@ -47,7 +44,7 @@ export function Login() {
         h1: {
             color: "#fff",
             fontWeight: "bold",
-            fontSize: "2rem",
+            fontSize: isMobile ? "1.3rem" : "2rem",
             textAlign: "center",
             margin: 0,
         },
@@ -65,11 +62,11 @@ export function Login() {
             alignItems: "center",
             justifyContent: "center",
             gap: "12px",
-            padding: "12px 24px",
+            padding: isMobile ? "10px 10px" : "12px 24px",
             backgroundColor: "#fff",
             color: "#000",
             fontWeight: "500",
-            fontSize: "16px",
+            fontSize: isMobile ? "15px" : "16px",
             borderRadius: "6px",
             border: "1px solid #ccc",
             cursor: "pointer",
@@ -77,8 +74,8 @@ export function Login() {
             transition: "background-color 0.2s, transform 0.1s"
         },
         googleIcon: {
-            width: "20px",
-            height: "20px"
+            width: isMobile ? "18px" : "20px",
+            height: isMobile ? "18px" : "20px"
         }
     };
 
@@ -106,8 +103,8 @@ export function Login() {
     };
 
     return (
-        <div style={styles.page}>
-            <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" style={styles.image} />
+        <div className="login-page-responsive">
+            <img src="/Proyectoudpnegrosf.png" alt="Logo UDP" className="login-logo-responsive" />
             <div style={styles.rightContainer}>
                 <div style={styles.container}>
                     <h1 style={styles.h1}>Inicia sesión con tu cuenta UDP</h1>
