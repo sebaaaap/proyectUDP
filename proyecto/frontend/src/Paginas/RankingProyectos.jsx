@@ -14,7 +14,12 @@ const RankingProyectos = () => {
     const [showModal, setShowModal] = useState(false);
     const { user } = useAuth();
 
-    const esProfesor = user?.rol === 'profesor';
+  const esProfesor = useMemo(() => {
+    if (!user || !user.rol) return false;
+    const rol = user.rol.toString().toLowerCase();
+    return rol.includes('profesor');
+}, [user]);
+
 
     useEffect(() => {
         cargarDatos();
@@ -203,9 +208,9 @@ const RankingProyectos = () => {
                                                 onChange={(e) => setSearchTerm(e.target.value)}
                                                 style={{ 
                                                     paddingLeft: '40px', 
-                                                    backgroundColor: '#374151', 
+                                                    backgroundColor: '#ffffff', 
                                                     borderColor: '#4b5563', 
-                                                    color: 'white' 
+                                                    color: '#1f2937', 
                                                 }}
                                                 className="form-control::placeholder"
                                             />
@@ -380,48 +385,55 @@ const RankingProyectos = () => {
                                                 </Col>
 
                                                 {/* Sistema de Votación */}
-                                                <Col lg={4} className="d-flex justify-content-end">
-                                                    <div className="d-flex flex-column align-items-center" style={{ 
-                                                        backgroundColor: '#374151', 
-                                                        borderRadius: '8px', 
-                                                        padding: '12px',
-                                                        minWidth: '80px'
-                                                    }}>
-                                                        {esProfesor ? (
-                                                            <>
-                                                                <Button
-                                                                    variant={proyecto.ya_vote && proyecto.mi_voto === true ? "success" : "outline-light"}
-                                                                    size="sm"
-                                                                    onClick={() => handleVoto(proyecto.id, true)}
-                                                                    style={{ 
-                                                                        fontSize: '12px', 
-                                                                        padding: '4px 8px',
-                                                                        minWidth: '50px',
-                                                                        marginBottom: '4px'
-                                                                    }}
-                                                                    disabled={proyecto.ya_vote}
-                                                                >
-                                                                    {proyecto.ya_vote && proyecto.mi_voto === true ? "Votado" : "Votar"}
-                                                                </Button>
-                                                                <div className="text-white fw-bold" style={{ fontSize: '18px', minWidth: '2rem', textAlign: 'center' }}>
-                                                                    {proyecto.puntuacion_neta > 0 ? '+' : ''}{proyecto.puntuacion_neta}
-                                                                </div>
-                                                                <div className="text-muted" style={{ fontSize: '12px', marginTop: '4px' }}>
-                                                                    {proyecto.total_votos} votos
-                                                                </div>
-                                                            </>
-                                                        ) : (
-                                                            <>
-                                                                <div className="text-white fw-bold" style={{ fontSize: '18px', minWidth: '2rem', textAlign: 'center' }}>
-                                                                    {proyecto.puntuacion_neta > 0 ? '+' : ''}{proyecto.puntuacion_neta}
-                                                                </div>
-                                                                <div className="text-muted" style={{ fontSize: '12px', marginTop: '4px' }}>
-                                                                    {proyecto.total_votos} votos
-                                                                </div>
-                                                            </>
-                                                        )}
-                                                    </div>
-                                                </Col>
+<Col lg={4} className="d-flex justify-content-end">
+  <div className="d-flex flex-column align-items-center justify-content-center" style={{ 
+    backgroundColor: '#374151', 
+    borderRadius: '8px', 
+    padding: '12px',
+    minWidth: '80px'
+  }}>
+    {esProfesor ? (
+      <>
+        {/* Botón votar positivo */}
+        <Button
+          variant={proyecto.ya_vote && proyecto.mi_voto === true ? "success" : "outline-light"}
+          size="sm"
+          onClick={() => handleVoto(proyecto.id, true)}
+          className="mb-2"
+        >
+          ▲
+        </Button>
+
+        <div className="text-white fw-bold" style={{ fontSize: '18px', minWidth: '2rem', textAlign: 'center' }}>
+          {proyecto.puntuacion_neta}
+        </div>
+
+        {/* Botón votar negativo */}
+        <Button
+          variant={proyecto.ya_vote && proyecto.mi_voto === false ? "danger" : "outline-light"}
+          size="sm"
+          onClick={() => handleVoto(proyecto.id, false)}
+          className="mt-2"
+        >
+          ▼
+        </Button>
+
+        <div style={{ fontSize: '12px', marginTop: '8px', color: '#9ca3af' }}>
+          {proyecto.total_votos} votos
+        </div>
+      </>
+    ) : (
+      <>
+        <div className="text-white fw-bold" style={{ fontSize: '24px', minWidth: '2rem', textAlign: 'center' }}>
+          {proyecto.puntuacion_neta}
+        </div>
+        <div style={{ fontSize: '12px', marginTop: '4px', color: '#9ca3af' }}>
+          {proyecto.total_votos} votos
+        </div>
+      </>
+    )}
+  </div>
+</Col>
                                             </Row>
                                         </div>
                                     </div>
@@ -484,15 +496,6 @@ const RankingProyectos = () => {
                     </Button>
                 </Modal.Footer>
             </Modal>
-
-            <style jsx>{`
-                .form-control::placeholder {
-                    color: #6b7280 !important;
-                }
-                .navbar-nav .nav-link:hover {
-                    color: #fbbf24 !important;
-                }
-            `}</style>
         </div>
     );
 };
