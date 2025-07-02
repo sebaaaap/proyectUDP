@@ -1,0 +1,230 @@
+.completar-perfil-page {
+  min-height: 100vh;
+  width: 100vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(to bottom, #272627, #000000);
+  padding: 20px;
+}
+
+.completar-perfil-image {
+  height: 220px;
+  margin-right: 60px;
+  padding: 10px;
+}
+
+.completar-perfil-right-container {
+  width: 100%;
+  max-width: 500px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.completar-perfil-container {
+  width: 100%;
+  max-width: 450px;
+  padding: 40px;
+  background-color: #403f3f;
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.completar-perfil-h1 {
+  color: #fff;
+  font-weight: bold;
+  font-size: 2rem;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 10px;
+}
+
+.completar-perfil-subtitle {
+  color: #ccc;
+  font-size: 1rem;
+  text-align: center;
+  margin: 0;
+  margin-bottom: 20px;
+}
+
+.completar-perfil-error-message {
+  color: #ff4444;
+  background-color: rgba(255, 68, 68, 0.1);
+  padding: 12px;
+  border-radius: 8px;
+  width: 100%;
+  text-align: center;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 68, 68, 0.3);
+}
+
+.completar-perfil-form {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.completar-perfil-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.completar-perfil-label {
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.completar-perfil-select,
+.completar-perfil-input {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #2a2a2a;
+  border: 2px solid #555;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  outline: none;
+}
+
+.completar-perfil-select:focus,
+.completar-perfil-input:focus {
+  border-color: #28a745;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+}
+
+.completar-perfil-submit-button {
+  width: 100%;
+  padding: 14px 24px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.1s;
+  margin-top: 10px;
+}
+
+.completar-perfil-submit-button:hover:not(:disabled) {
+  background-color: #218838;
+  transform: translateY(-1px);
+}
+
+.completar-perfil-loading-button {
+  width: 100%;
+  padding: 14px 24px;
+  background-color: #666;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: not-allowed;
+  margin-top: 10px;
+  opacity: 0.7;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .completar-perfil-page {
+    flex-direction: column;
+    padding: 10px;
+    justify-content: flex-start;
+    padding-top: 20px;
+  }
+
+  .completar-perfil-image {
+    height: 150px;
+    margin-right: 0;
+    margin-bottom: 20px;
+  }
+
+  .completar-perfil-right-container {
+    max-width: 100%;
+  }
+
+  .completar-perfil-container {
+    padding: 30px 20px;
+    border-radius: 15px;
+    gap: 20px;
+  }
+
+  .completar-perfil-h1 {
+    font-size: 1.75rem;
+  }
+
+  .completar-perfil-subtitle {
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+  }
+
+  .completar-perfil-form {
+    gap: 18px;
+  }
+
+  .completar-perfil-submit-button,
+  .completar-perfil-loading-button {
+    padding: 12px 20px;
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  .completar-perfil-image {
+    height: 120px;
+  }
+
+  .completar-perfil-container {
+    padding: 25px 15px;
+    gap: 18px;
+  }
+
+  .completar-perfil-h1 {
+    font-size: 1.5rem;
+  }
+
+  .completar-perfil-subtitle {
+    font-size: 0.85rem;
+  }
+
+  .completar-perfil-error-message {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+
+  .completar-perfil-form {
+    gap: 16px;
+  }
+
+  .completar-perfil-form-group {
+    gap: 6px;
+  }
+
+  .completar-perfil-label {
+    font-size: 13px;
+  }
+
+  .completar-perfil-select,
+  .completar-perfil-input {
+    padding: 10px 14px;
+    font-size: 15px;
+  }
+
+  .completar-perfil-submit-button,
+  .completar-perfil-loading-button {
+    padding: 10px 18px;
+    font-size: 14px;
+  }
+} 
