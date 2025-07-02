@@ -41,7 +41,7 @@ function PruebaNavbar() {
 
     const confirmLogout = () => {
         setShowLogoutModal(false);
-        window.location.href = 'http://localhost:5173/';
+        window.location.href = '/';
     };
 
     const cancelLogout = () => {
