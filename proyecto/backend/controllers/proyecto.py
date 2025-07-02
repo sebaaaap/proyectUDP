@@ -352,10 +352,31 @@ def obtener_proyectos_usuario(usuario=Depends(verificar_token), db: Session = De
     return todos_proyectos
 
 @router.get("/aprobados")
-def listar_proyectos_aprobados(db: Session = Depends(get_db)):
+def listar_proyectos_aprobados(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    # Obtener el usuario autenticado
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    # Obtener todos los proyectos aprobados
     proyectos = db.query(Proyecto).filter(Proyecto.estado == EstadoProyectoDBEnum.aprobado).all()
+    
     resultado = []
     for p in proyectos:
+        # Excluir proyectos donde el usuario es el creador
+        if p.creador_id == usuario_db.id:
+            continue
+            
+        # Excluir proyectos donde el usuario ya tiene una postulación aceptada
+        postulacion_aceptada = db.query(Postulacion).filter(
+            Postulacion.proyecto_id == p.id,
+            Postulacion.usuario_id == usuario_db.id,
+            Postulacion.estado == EstadoPostulacionEnum.aceptado
+        ).first()
+        
+        if postulacion_aceptada:
+            continue
+        
         profesor = db.query(Usuario).filter(Usuario.id == p.profesor_id).first()
         resultado.append({
             "id": p.id,
@@ -365,7 +386,8 @@ def listar_proyectos_aprobados(db: Session = Depends(get_db)):
             "perfiles_requeridos": p.perfiles_requeridos,
             "area": p.problema,
             "estado": p.estado.value,
-            "fecha_inicio": p.fecha_creacion.isoformat() if p.fecha_creacion else None
+            "fecha_inicio": p.fecha_creacion.isoformat() if p.fecha_creacion else None,
+            "creador_id": p.creador_id  # Agregar el ID del creador para referencia
         })
     return resultado
 

@@ -440,13 +440,25 @@ export function DashboardEstudiante() {
                                 textAlign: "center",
                                 marginTop: "16px"
                             }}>
-                                <p style={{ color: "#fff" }}>
+                                <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "12px", marginBottom: "12px" }}>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#bbb">
+                                        <circle cx="12" cy="12" r="10"></circle>
+                                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                    </svg>
+                                </div>
+                                <p style={{ color: "#fff", marginBottom: "8px" }}>
                                     {filtroEstado === "Todos"
-                                        ? "No hay proyectos disponibles en este momento."
+                                        ? "No hay proyectos disponibles para postular en este momento."
                                         : filtroEstado === "Postulados"
                                             ? "No tienes postulaciones activas."
                                             : "No hay proyectos disponibles para postular."}
                                 </p>
+                                {filtroEstado === "Todos" && (
+                                    <p style={{ color: "#bbb", fontSize: "0.9rem", margin: 0 }}>
+                                        Los proyectos que creaste o en los que ya participas no aparecen en esta lista.
+                                    </p>
+                                )}
                             </div>
                         )}
                     </div>
