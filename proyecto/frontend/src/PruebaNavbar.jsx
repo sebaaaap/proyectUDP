@@ -19,6 +19,7 @@ function PruebaNavbar() {
     const isEstudiante = usuario?.rol === 'estudiante';
     const [profesores, setProfesores] = useState([]);
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [showLogoutModal, setShowLogoutModal] = useState(false);
     const navigate = useNavigate();
 
     // Debug: mostrar información del usuario
@@ -35,7 +36,16 @@ function PruebaNavbar() {
     }, []);
 
     const handleLogout = () => {
+        setShowLogoutModal(true);
+    };
+
+    const confirmLogout = () => {
+        setShowLogoutModal(false);
         window.location.href = 'http://localhost:5173/';
+    };
+
+    const cancelLogout = () => {
+        setShowLogoutModal(false);
     };
 
     const handleRanking = () => {
@@ -92,6 +102,25 @@ function PruebaNavbar() {
                     </Button>
                 </Nav>
             </Navbar>
+
+            {/* Modal de confirmación de logout */}
+            {showLogoutModal && (
+                <div className="logout-modal-overlay" onClick={cancelLogout}>
+                    <div className="logout-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="logout-modal-header">
+                            <h4>¿Estas seguro que quieres cerrar sesión?</h4>
+                        </div>
+                        <div className="logout-modal-footer" style={{ marginTop: 20 }}>
+                            <Button variant="secondary" onClick={cancelLogout} style={{ marginRight: 10,}}>
+                                Cancelar
+                            </Button>
+                            <Button variant="danger" onClick={confirmLogout}>
+                                Cerrar sesión
+                            </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Barra lateral */}
             <div className={`sidebar-overlay ${sidebarOpen ? 'active' : ''}`} onClick={closeSidebar}></div>
@@ -158,6 +187,100 @@ function PruebaNavbar() {
                 .hamburger-btn:hover {
                     background: rgba(255, 255, 255, 0.1) !important;
                     border-radius: 5px;
+                }
+
+                /* Estilos para el modal de logout */
+                .logout-modal-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 2000;
+                    animation: fadeIn 0.3s ease;
+                }
+
+                .logout-modal {
+                    background: #f3f3f3;
+                    border-radius: 12px;
+                    padding: 0;
+                    max-width: 400px;
+                    width: 90%;
+                    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+                    animation: slideIn 0.3s ease;
+                }
+
+                .logout-modal-header {
+                    padding: 20px 20px 0 20px;
+                    border-bottom: 1px solid #ddd;
+                }
+
+                .logout-modal-header h4 {
+                    margin: 0;
+                    color: #222;
+                    font-weight: 600;
+                }
+
+                .logout-modal-body {
+                    padding: 20px;
+                }
+
+                .logout-modal-body p {
+                    margin: 0;
+                    color: #222;
+                    font-size: 16px;
+                    text-align: center;
+                }
+
+                .logout-modal-footer {
+                    padding: 0 20px 20px 20px;
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 10px;
+                }
+
+                .logout-modal-footer .btn {
+                    transition: all 0.3s ease;
+                    border-radius: 8px;
+                    font-weight: 600;
+                    padding: 8px 20px;
+                }
+
+                .logout-modal-footer .btn:hover {
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+                }
+
+                .logout-modal-footer .btn-secondary:hover {
+                    background-color: #6c757d !important;
+                    border-color: #6c757d !important;
+                    color: white !important;
+                }
+
+                .logout-modal-footer .btn-danger:hover {
+                    background-color: #dc3545 !important;
+                    border-color: #dc3545 !important;
+                    color: white !important;
+                }
+
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes slideIn {
+                    from { 
+                        opacity: 0;
+                        transform: translateY(-20px) scale(0.95);
+                    }
+                    to { 
+                        opacity: 1;
+                        transform: translateY(0) scale(1);
+                    }
                 }
 
                 /* Estilos para la barra lateral */
