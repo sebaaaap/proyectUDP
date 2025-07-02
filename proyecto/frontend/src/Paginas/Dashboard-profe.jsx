@@ -26,7 +26,7 @@ export function DashboardProfe() {
             console.log('Iniciando carga de proyectos...');
             setLoading(true);
             
-            const response = await fetch("http://localhost:8000/proyectos/usuario/profesor", {
+            const response = await fetch("https://udprojectstest-production.up.railway.app/proyectos/usuario/profesor", {
                 method: 'GET',
                 credentials: 'include'
             });
@@ -118,7 +118,7 @@ export function DashboardProfe() {
         if (!seleccionado) return;
 
         try {
-            const response = await fetch(`http://localhost:8000/profesor/proyectos/${seleccionado.id}/estado`, {
+            const response = await fetch(`https://udprojectstest-production.up.railway.app/profesor/proyectos/${seleccionado.id}/estado`, {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/json"
@@ -173,7 +173,7 @@ export function DashboardProfe() {
         setError('');
 
         try {
-            const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/calificar`, {
+            const response = await fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyectoId}/calificar`, {
                 method: 'PATCH',
                 headers: {
                     'Content-Type': 'application/json',

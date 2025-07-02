@@ -12,7 +12,7 @@ const CompletarPerfilProfesor = () => {
   useEffect(() => {
     const fetchFacultades = async () => {
       try {
-        const response = await fetch("http://localhost:8000/facultades", {
+        const response = await fetch("https://udprojectstest-production.up.railway.app/facultades", {
           credentials: 'include'
         });
         if (!response.ok) {
@@ -47,7 +47,7 @@ const CompletarPerfilProfesor = () => {
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/completar-perfil/profesor', {
+      const response = await fetch('https://udprojectstest-production.up.railway.app/completar-perfil/profesor', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

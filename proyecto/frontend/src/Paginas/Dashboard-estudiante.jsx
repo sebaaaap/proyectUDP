@@ -12,7 +12,7 @@ export function DashboardEstudiante() {
 
     useEffect(() => {
         // Obtener solo proyectos aprobados desde el backend
-        fetch("http://localhost:8000/proyectos/aprobados", { credentials: 'include' })
+        fetch("https://udprojectstest-production.up.railway.app/proyectos/aprobados", { credentials: 'include' })
             .then(res => res.json())
             .then(data => {
                 console.log('Proyectos aprobados recibidos:', data);
@@ -23,7 +23,7 @@ export function DashboardEstudiante() {
             });
 
         // Obtener postulaciones reales del usuario desde el backend
-        fetch("http://localhost:8000/postulaciones/mis", { credentials: 'include' })
+        fetch("https://udprojectstest-production.up.railway.app/postulaciones/mis", { credentials: 'include' })
             .then(res => res.ok ? res.json() : [])
             .then(data => Array.isArray(data) ? setPostulaciones(data) : setPostulaciones([]))
             .catch(() => setPostulaciones([]));
@@ -52,7 +52,7 @@ export function DashboardEstudiante() {
     };
 
     const postularAProyecto = async (proyectoId, motivacion) => {
-        const response = await fetch(`http://localhost:8000/proyectos/${proyectoId}/postular`, {
+        const response = await fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyectoId}/postular`, {
             method: "POST",
             credentials: "include",
             headers: {
@@ -63,7 +63,7 @@ export function DashboardEstudiante() {
         if (response.ok) {
             setMensaje("¡Te has postulado correctamente!");
             // Refresca las postulaciones reales desde el backend
-            fetch("http://localhost:8000/postulaciones/mis", { credentials: 'include' })
+            fetch("https://udprojectstest-production.up.railway.app/postulaciones/mis", { credentials: 'include' })
                 .then(res => res.ok ? res.json() : [])
                 .then(data => Array.isArray(data) ? setPostulaciones(data) : setPostulaciones([]))
                 .catch(() => setPostulaciones([]));

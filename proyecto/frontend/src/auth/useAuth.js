@@ -9,7 +9,7 @@ const useAuth = ({ redirectTo = "/" } = {}) => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch("http://localhost:8000/me", {
+        const response = await fetch("https://udprojectstest-production.up.railway.app/me", {
           credentials: 'include'
         });
         

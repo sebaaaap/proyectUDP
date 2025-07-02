@@ -28,7 +28,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
                 setCargando(true);
                 setError(null);
                 
-                const response = await fetch(`http://localhost:8000/proyectos/${proyecto.id}/archivos`, {
+                const response = await fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/archivos`, {
                     credentials: 'include'
                 });
                 
@@ -56,7 +56,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
         // Cargar postulaciones si el usuario es el creador
         if (usuario && usuario.id === proyecto.creador_id) {
             setCargandoPostulaciones(true);
-            fetch(`http://localhost:8000/proyectos/${proyecto.id}/postulaciones`, { credentials: 'include' })
+            fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/postulaciones`, { credentials: 'include' })
                 .then(res => res.ok ? res.json() : [])
                 .then(data => {
                     // Filtrar solo pendientes
@@ -68,7 +68,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
 
         // Fetch de integrantes
         setCargandoIntegrantes(true);
-        fetch(`http://localhost:8000/proyectos/${proyecto.id}/integrantes`, { credentials: 'include' })
+        fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/integrantes`, { credentials: 'include' })
             .then(res => res.ok ? res.json() : null)
             .then(data => {
                 if (data) setIntegrantes(data);
@@ -89,7 +89,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
             formData.append('archivo', file);
             formData.append('descripcion', descripcion);
 
-            const response = await fetch(`http://localhost:8000/proyectos/${proyecto.id}/archivos`, {
+            const response = await fetch(`https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/archivos`, {
                 method: 'POST',
                 body: formData,
                 credentials: 'include'
@@ -117,7 +117,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
     const handleDescargarArchivo = async (archivoId) => {
         try {
             const response = await fetch(
-                `http://localhost:8000/proyectos/${proyecto.id}/archivos/${archivoId}/descargar`,
+                `https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/archivos/${archivoId}/descargar`,
                 {
                     credentials: 'include'
                 }
@@ -149,7 +149,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
 
         try {
             const response = await fetch(
-                `http://localhost:8000/proyectos/${proyecto.id}/archivos/${archivoId}`,
+                `https://udprojectstest-production.up.railway.app/proyectos/${proyecto.id}/archivos/${archivoId}`,
                 {
                     method: 'DELETE',
                     credentials: 'include'
@@ -170,7 +170,7 @@ export function ProyectoDetalle({ proyecto, volver }) {
     // Función para aceptar/rechazar postulaciones
     const cambiarEstadoPostulacion = async (postulacionId, nuevoEstado) => {
         try {
-            const response = await fetch(`http://localhost:8000/proyectos/postulaciones/${postulacionId}/estado-creador`, {
+            const response = await fetch(`https://udprojectstest-production.up.railway.app/proyectos/postulaciones/${postulacionId}/estado-creador`, {
                 method: "PATCH",
                 credentials: "include",
                 headers: { "Content-Type": "application/json" },

@@ -95,7 +95,7 @@ export function Login() {
     const handleGoogleLogin = async () => {
         try {
             // Redirigir al backend para autenticación con Google
-            window.location.href = 'http://localhost:8000/login';
+            window.location.href = 'https://udprojectstest-production.up.railway.app/login';
         } catch (error) {
             setError("Error al iniciar sesión. Por favor, intenta nuevamente.");
             console.error("Error during login:", error);

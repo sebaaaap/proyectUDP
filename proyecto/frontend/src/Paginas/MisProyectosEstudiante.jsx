@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom";
 console.log("Montando MisProyectosEstudiante");
 
 // API configuration
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://udprojectstest-production.up.railway.app';
 
 // Función para obtener estilos de color según el estado
 function getEstadoColor(estado) {
