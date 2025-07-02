@@ -496,8 +496,8 @@ def obtener_proyectos_profesor(usuario=Depends(verificar_token), db: Session = D
     
     return resultado
 
-# NUEVO: Endpoint para calificar proyectos
-@router.patch("/proyectos/{proyecto_id}/calificar")
+# NUEVO: Endpoint para calificar proyectos (MODIFICADO - solo una calificación)
+@router.patch("/{proyecto_id}/calificar")
 async def calificar_proyecto(
     proyecto_id: int,
     calificacion_data: CalificacionRequest,
@@ -506,6 +506,7 @@ async def calificar_proyecto(
 ):
     """
     Califica un proyecto. Si la calificación es >= 6.0, lo agrega al ranking automáticamente.
+    Solo permite calificar una vez por proyecto.
     """
     try:
         # Validar que la calificación esté en el rango correcto
@@ -540,6 +541,13 @@ async def calificar_proyecto(
             raise HTTPException(
                 status_code=400, 
                 detail="Solo se pueden calificar proyectos aprobados"
+            )
+        
+        # NUEVA VALIDACIÓN: Verificar si ya fue calificado
+        if proyecto.calificacion_final is not None:
+            raise HTTPException(
+                status_code=400, 
+                detail=f"Este proyecto ya fue calificado con nota {proyecto.calificacion_final}. No se puede calificar nuevamente."
             )
         
         # Actualizar la calificación del proyecto
@@ -593,6 +601,44 @@ async def calificar_proyecto(
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+# NUEVO: Endpoint para obtener la calificación de un proyecto (opcional)
+@router.get("/{proyecto_id}/calificacion")
+def obtener_calificacion_proyecto(
+    proyecto_id: int,
+    usuario=Depends(verificar_token),
+    db: Session = Depends(get_db)
+):
+    """
+    Obtiene la calificación de un proyecto si ya fue calificado.
+    """
+    # Verificar que el usuario sea profesor
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    if not usuario_db or usuario_db.rol != RolEnum.profesor:
+        raise HTTPException(
+            status_code=403, 
+            detail="Solo los profesores pueden ver las calificaciones"
+        )
+    
+    # Buscar el proyecto
+    proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+    if not proyecto:
+        raise HTTPException(status_code=404, detail="Proyecto no encontrado")
+    
+    # Verificar que el profesor esté asignado al proyecto
+    if proyecto.profesor_id != usuario_db.id:
+        raise HTTPException(
+            status_code=403, 
+            detail="No tienes permisos para ver la calificación de este proyecto"
+        )
+    
+    return {
+        "proyecto_id": proyecto_id,
+        "titulo": proyecto.titulo,
+        "calificacion_final": proyecto.calificacion_final,
+        "ya_calificado": proyecto.calificacion_final is not None,
+        "en_ranking": proyecto.calificacion_final is not None and proyecto.calificacion_final >= 6.0
+    }
 
 # Endpoint para que un estudiante vea todas sus propias postulaciones
 @router.get("/postulaciones/mis")
