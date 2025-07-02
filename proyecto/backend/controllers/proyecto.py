@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Body, Request
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from database.db import get_db
 from models.proyecto_model import Proyecto, EstadoProyectoDBEnum
 from schemas.proyecto_schema import ProyectoCreate
@@ -7,6 +7,7 @@ from models.user_model import Usuario, RolEnum
 from models.postulacion_model import Postulacion, EstadoPostulacionEnum
 from helpers.jwtAuth import verificar_token
 from schemas.postulacion_schema import PostulacionCreate
+from models.carreras_model import Carrera
 from typing import List
 
 router = APIRouter()
@@ -29,6 +30,21 @@ def crear_proyecto(proyecto_data: ProyectoCreate, usuario=Depends(verificar_toke
     db.commit()
     db.refresh(nuevo_proyecto)
     return {"mensaje": "Proyecto creado", "proyecto": nuevo_proyecto}
+
+#ruta para ver todos mis proyectos creados
+@router.get("/mis-proyectos")
+def listar_proyectos_propios(usuario=Depends(verificar_token), db: Session = Depends(get_db)):
+    usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
+    proyectos = db.query(Proyecto).filter(Proyecto.creador_id == usuario_db.id).all()
+    return [
+        {
+            "id": p.id,
+            "titulo": p.titulo,
+            "resumen": p.resumen,
+            "estado": p.estado.value
+        }
+        for p in proyectos
+    ]
 
 # ruta para postular a un proyecto esta vista hacer Q!!!!!!
 @router.post("/{proyecto_id}/postular")
@@ -58,22 +74,43 @@ def postular(proyecto_id: int, datos: PostulacionCreate = Body(...), usuario=Dep
     db.commit()
     return {"mensaje": "Postulación enviada"}
 
-# ruta para ver postulaciones
+# ruta para ver postulaciones (solo el creador las puede ver)
 @router.get("/{proyecto_id}/postulaciones")
 def ver_postulaciones(proyecto_id: int, usuario=Depends(verificar_token), db: Session = Depends(get_db)):
     usuario_db = db.query(Usuario).filter(Usuario.correo == usuario["sub"]).first()
-    if not usuario_db:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-        
     proyecto = db.query(Proyecto).filter(Proyecto.id == proyecto_id).first()
+
     if not proyecto:
         raise HTTPException(status_code=404, detail="Proyecto no encontrado")
 
-    if usuario_db.id != proyecto.creador_id and usuario_db.rol != RolEnum.estudiante:
-        raise HTTPException(status_code=403, detail="Acceso denegado")
+    if usuario_db.id != proyecto.creador_id:
+        raise HTTPException(status_code=403, detail="Solo el creador puede ver las postulaciones")
 
-    postulaciones = db.query(Postulacion).filter_by(proyecto_id=proyecto_id).all()
-    return postulaciones
+    postulaciones = db.query(Postulacion).options(
+        joinedload(Postulacion.estudiante).joinedload(Usuario.estudiante_info)
+    ).filter_by(proyecto_id=proyecto_id).all()
+
+    resultado = []
+    for p in postulaciones:
+        estudiante = p.estudiante
+        estudiante_info = estudiante.estudiante_info
+        carrera = None
+        if estudiante_info:
+            carrera_db = db.query(Carrera).filter_by(id=estudiante_info.carrera_id).first()
+            if carrera_db:
+                carrera = carrera_db.nombre
+
+        resultado.append({
+            "id": p.id,
+            "estado": p.estado.value,
+            "fecha_postulacion": p.fecha_postulacion,
+            "usuario_id": estudiante.id,
+            "nombre": estudiante.nombre,
+            "apellido": estudiante.apellido,
+            "carrera": carrera
+        })
+
+    return resultado
 
 # Endpoint de prueba
 @router.get("/test")
